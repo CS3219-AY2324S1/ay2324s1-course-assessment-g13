@@ -8,3 +8,7 @@ node_modules
 
 # ide configs
 .idea
+
+
+# build files
+.next
