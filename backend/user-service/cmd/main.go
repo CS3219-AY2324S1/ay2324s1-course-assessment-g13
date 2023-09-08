@@ -13,6 +13,7 @@ func main() {
 
 	// e.POST("/users", saveUser)
 	e.GET("/users/:id", handlers.GetUser)
+	
 	// e.PUT("/users/:id", updateUser)
 	// e.DELETE("/users/:id", deleteUser)
 
