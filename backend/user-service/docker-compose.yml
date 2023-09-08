@@ -8,3 +8,17 @@ services:
       - "3000:3000"
     volumes:
       - .:/usr/src/app
+  db:
+    image: postgres:16rc1-alpine3.18
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - data:/var/lib/postgresql/data
+
+volumes:
+  data:
