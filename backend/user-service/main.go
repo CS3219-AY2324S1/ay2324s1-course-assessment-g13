@@ -3,16 +3,20 @@ package main
 import (
 	"fmt"
 
-	"github.com/labstack/echo"
+	"user-service/handlers"
+	"github.com/labstack/echo/v4"
 )
 
 func main() {
 	fmt.Println("Starting development server")
 	e := echo.New()
 
-	e.GET("/", func(c echo.Context) error {
-		return c.String(200, "Hello World")
-	})
+	// e.POST("/users", saveUser)
+	e.GET("/users/:id", handlers.GetUser)
+	// e.PUT("/users/:id", updateUser)
+	// e.DELETE("/users/:id", deleteUser)
+
+
 
 	e.Start(":3000")
 }
