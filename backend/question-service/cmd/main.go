@@ -2,17 +2,20 @@ package main
 
 import (
 	"fmt"
+	"question-service/config"
+	controller "question-service/controllers"
 
 	"github.com/labstack/echo/v4"
 )
 
 func main() {
+	config.ConnectDb()
 	fmt.Println("Starting development server")
 	e := echo.New()
 
-	e.GET("/", func(c echo.Context) error {
-		return c.String(200, "Hello World")
-	})
+	questionGroup := e.Group("/questions")
+	questionGroup.GET("", controller.GetQuestions)
+	questionGroup.POST("", controller.CreateQuestion)
 
 	e.Start(":8080")
 }
