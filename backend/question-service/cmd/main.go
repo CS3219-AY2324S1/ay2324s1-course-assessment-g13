@@ -9,6 +9,7 @@ import (
 
 func main() {
 	config.ConnectDb()
+	config.PopulateDb()
 	e := echo.New()
 
 	questionGroup := e.Group("/questions")
