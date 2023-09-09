@@ -1,0 +1,15 @@
+services:
+  collaboration-service:
+    container_name: collaboration-service
+    build:
+      context: ./backend/collaboration-service
+      dockerfile: Dockerfile
+    ports:
+      - "5005:8080" # Maps container port 8080 to local 5005
+  matching-service:
+    container_name: matching-service
+    build:
+      context: ./backend/matching-service
+      dockerfile: Dockerfile
+    ports:
+      - "5007:8080" # Maps container port 8080 to local 5007
