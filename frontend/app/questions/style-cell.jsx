@@ -1,8 +1,13 @@
 import { complexityColorMap } from "./data";
 import { Chip } from "@nextui-org/chip";
 import { Tooltip } from "@nextui-org/tooltip";
-import { EyeIcon } from "./assets/EyeIcon";
 import { DeleteIcon } from "./assets/DeleteIcon";
+import QuestionDescriptionModal from "./question-decription-modal";
+import { questionsDescription } from "./data"
+
+const getDescription = (id) => {
+    return questionsDescription.filter(question => question.id === id)[0].description
+}
 
 export const styleCell = (item, columnKey) => {
     const cellValue = item[columnKey];
@@ -12,7 +17,7 @@ export const styleCell = (item, columnKey) => {
             return (
                 <div className="relative flex items-center">
                     {cellValue.map(category => 
-                        <Chip variant="bordered">
+                        <Chip variant="bordered" key={category}>
                             {category}
                         </Chip>
                     )}
@@ -26,11 +31,7 @@ export const styleCell = (item, columnKey) => {
             )
         case "actions":
             return <div className="relative flex items-center gap-5">
-                <Tooltip content="Question Description">
-                    <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                        <EyeIcon />
-                    </span>
-                </Tooltip>
+                <QuestionDescriptionModal title={item.title} description={getDescription(item.id)}/>
                 <Tooltip color="danger" content="Delete user">
                     <span className="text-lg text-danger cursor-pointer active:opacity-50">
                         <DeleteIcon />

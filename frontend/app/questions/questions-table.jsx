@@ -18,7 +18,7 @@ export default function QuestionsTable() {
     return rows.slice(start, end);
   }, [page, rows]);
 
-  const renderCell = useCallback(styleCell);
+  const renderCell = useCallback(styleCell, []);
 
   return (
     <Table 
