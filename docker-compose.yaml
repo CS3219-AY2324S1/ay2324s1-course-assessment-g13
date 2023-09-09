@@ -2,6 +2,11 @@ version: "3"
 
 services:
   frontend:
+    depends_on:
+      matching-service:
+        condition: service_started
+      collaboration-service:
+        condition: service_started
     build:
       context: ./frontend
       dockerfile: Dockerfile
