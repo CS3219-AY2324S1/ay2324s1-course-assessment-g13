@@ -12,7 +12,7 @@ services:
       - db
 
   db:
-    image: mongo:latest
+    image: mongo:7.0.1
     container_name: mongodb
     ports:
       - "27017:27017"
