@@ -113,14 +113,12 @@ func EditQuestion(c echo.Context) error {
 			"_id":   bson.M{"$ne": objectID},
 			"title": request.Title,
 		}
-		err = collection.FindOne(context.TODO(), filter).Err()
-		if err == nil {
+		if err = collection.FindOne(context.TODO(), filter).Err(); err == nil {
 			return c.JSON(http.StatusConflict, map[string]string{"error": "Another question with this title already exists"})
 		}
 	}
 
-	_, err = collection.UpdateByID(context.Background(), objectID, bson.M{"$set": request})
-	if err != nil {
+	if _, err = collection.UpdateByID(context.Background(), objectID, bson.M{"$set": request}); err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
