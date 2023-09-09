@@ -1,15 +1,14 @@
-package models
+package model
 
 import "gorm.io/gorm"
 
 type User struct {
 	gorm.Model
-	Username string
+	Username       string
 	HashedPassword string
-	// Salt string `json:"salt"`
 }
 
 type CreateUserRequest struct {
-    Username string `json:"username"`
-    Password string `json:"password"`
+	Username string `json:"username" validate:"required"`
+	Password string `json:"password" validate:"required"`
 }
