@@ -3,6 +3,7 @@ module question-service
 go 1.20
 
 require (
+	github.com/go-playground/validator/v10 v10.15.3
 	github.com/labstack/echo/v4 v4.11.1
 	go.mongodb.org/mongo-driver v1.12.1
 )
@@ -11,7 +12,6 @@ require (
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.15.3 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/labstack/gommon v0.4.0 // indirect
