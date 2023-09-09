@@ -16,6 +16,7 @@ func main() {
 	questionGroup.GET("/:id", controllers.GetQuestion)
 	questionGroup.POST("", controllers.CreateQuestion)
 	questionGroup.DELETE("/:id", controllers.DeleteQuestion)
+	questionGroup.PATCH("/:id", controllers.EditQuestion)
 
 	e.Start(":8080")
 }
