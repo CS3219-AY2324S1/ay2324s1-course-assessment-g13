@@ -32,7 +32,7 @@ export const styleCell = (item, columnKey) => {
         case "actions":
             return <div className="relative flex items-center gap-5">
                 <QuestionDescriptionModal title={item.title} description={getDescription(item.id)}/>
-                <Tooltip color="danger" content="Delete user">
+                <Tooltip color="danger" content="Delete question">
                     <span className="text-lg text-danger cursor-pointer active:opacity-50">
                         <DeleteIcon />
                     </span>
