@@ -6,6 +6,8 @@ import (
 	"user-service/config"
 	"user-service/handlers"
 
+	"github.com/gorilla/sessions"
+	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 )
 
@@ -14,12 +16,13 @@ func main() {
 
 	fmt.Println("Starting development server")
 	e := echo.New()
+	e.Use(session.Middleware(sessions.NewCookieStore([]byte("Secret"))))
 
 	e.POST("/users", handlers.CreateUser)
 	e.GET("/users", handlers.GetUsers)
 	e.GET("/users/:id", handlers.GetUser)
 	// e.PUT("/users/:id", updateUser)
-	// e.DELETE("/users/:id", deleteUser)
+	e.DELETE("/users", handlers.DeleteUser)
 
 	e.POST("/login", handlers.Login)
 

@@ -7,6 +7,7 @@ import (
 	model "user-service/models"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -59,4 +60,18 @@ func CreateUser(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusCreated, "User created successfully")
+}
+
+func DeleteUser(c echo.Context) error {
+	sess, _ := session.Get("session", c)
+	sessionUserId := sess.Values["userId"]
+
+	var user model.User
+	config.DB.Where("id = ?", sessionUserId).First(&user)
+	if user.ID == 0 {
+		return c.JSON(http.StatusBadRequest, "User not found")
+	}
+
+	config.DB.Delete(&user)
+	return c.JSON(http.StatusOK, "User deleted successfully")
 }
