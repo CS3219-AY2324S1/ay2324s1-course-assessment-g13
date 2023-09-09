@@ -13,10 +13,15 @@ import (
 )
 
 func GetUser(c echo.Context) error {
-	// User ID from path `users/:id`
 	id := c.Param("id")
 
-	return c.String(http.StatusOK, "bye"+id)
+	var user model.User
+	config.DB.Where("id = ?", id).First(&user)
+	if user.ID == 0 {
+		return c.JSON(http.StatusBadRequest, "User not found")
+	}
+
+	return c.String(http.StatusOK, user.Username)
 }
 
 func GetUsers(c echo.Context) error {
@@ -60,6 +65,30 @@ func CreateUser(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusCreated, "User created successfully")
+}
+
+func UpdateUser(c echo.Context) error {
+	sess, _ := session.Get("session", c)
+	sessionUserId := sess.Values["userId"]
+
+	var user model.User
+	config.DB.Where("id = ?", sessionUserId).First(&user)
+
+	req := new(model.UpdateUserRequest)
+	if err := c.Bind(req); err != nil {
+		return c.JSON(http.StatusBadRequest, "Invalid JSON request")
+	}
+
+	if req.Username != "" {
+		user.Username = req.Username
+	}
+	if req.Password != "" {
+		hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+		user.HashedPassword = string(hashedPassword)
+	}
+
+	config.DB.Save(&user)
+	return c.JSON(http.StatusOK, "User updated successfully")
 }
 
 func DeleteUser(c echo.Context) error {
