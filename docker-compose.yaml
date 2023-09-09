@@ -1,4 +1,18 @@
+version: "3"
+
 services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    volumes:
+      - ./frontend:/usr/src/app
+      - /usr/src/app/node_modules
+      - /usr/src/app/.next
+    ports:
+      - 3000:3000
+
   collaboration-service:
     container_name: collaboration-service
     build:
@@ -6,6 +20,7 @@ services:
       dockerfile: Dockerfile
     ports:
       - "5005:8080" # Maps container port 8080 to local 5005
+
   matching-service:
     container_name: matching-service
     build:
