@@ -95,7 +95,7 @@ func EditQuestion(c echo.Context) error {
 	existingQuestion := models.Question{}
 	err = collection.FindOne(context.TODO(), bson.M{"_id": objectID}).Decode(&existingQuestion)
 	if err == mongo.ErrNoDocuments {
-		return c.JSON(http.StatusConflict, map[string]string{"error": "Specified question does not exist"})
+		return c.JSON(http.StatusNotFound, map[string]string{"error": "Specified question does not exist"})
 	}
 
 	var request models.EditRequest
