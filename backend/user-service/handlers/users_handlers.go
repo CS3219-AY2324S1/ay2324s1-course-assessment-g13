@@ -38,6 +38,12 @@ func CreateUser(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, "Invalid user input")
 	}
 
+	var existingUser model.User
+	config.DB.Where("username = ?", req.Username).First(&existingUser)
+	if existingUser.ID != 0 {
+		return c.JSON(http.StatusBadRequest, "Username already exists")
+	}
+
 	// Map CreateUserRequest fields to User model
 	user := new(model.User)
 	user.Username = req.Username
