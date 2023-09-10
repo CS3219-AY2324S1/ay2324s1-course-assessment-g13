@@ -16,9 +16,12 @@ export const questionBankSlice = createSlice({
     addQuestion: (state, action: PayloadAction<Question>) => {
       state.questionBank = [...state.questionBank, action.payload];
     },
+    deleteQuestion: (state, action: PayloadAction<string>) => {
+      state.questionBank = state.questionBank.filter(question => question.title !== action.payload);
+    },
   },
 });
 
-export const { addQuestion } = questionBankSlice.actions;
+export const { addQuestion, deleteQuestion } = questionBankSlice.actions;
 
 export default questionBankSlice.reducer;

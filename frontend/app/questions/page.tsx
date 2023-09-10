@@ -1,6 +1,5 @@
-import { Button } from '@nextui-org/button';
-import QuestionsTable from './questions-table';
-import QuestionAddModal from './question-add-modal';
+import QuestionsTable from './questionsTable';
+import QuestionAddModal from './addQuestionModal';
 
 export default function Questions() {
   return (
