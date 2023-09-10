@@ -53,3 +53,5 @@ export const complexityColorMap = {
     Medium: "warning",
     Hard: "danger",
 }
+
+export const categories = ['Algorithms', 'Data Structure', 'BrainTeaser', 'Strings', 'Bit Manipulation', 'Dynamic Programming']

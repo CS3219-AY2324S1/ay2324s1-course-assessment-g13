@@ -6,13 +6,13 @@ export default function QuestionDescriptionModal({title, description}) {
 
   return (
     <>
-        <Tooltip content="Question Description">
-            <Button onPress={onOpen} className="h-fit min-w-0 px-0 bg-transparent">
-                <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                    <EyeIcon />
-                </span>
-            </Button>
-        </Tooltip>
+      <Tooltip content="Question Description">
+          <Button onPress={onOpen} className="h-fit min-w-0 px-0 bg-transparent">
+              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                  <EyeIcon />
+              </span>
+          </Button>
+      </Tooltip>
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>
           {(onClose) => (
