@@ -1,4 +1,4 @@
-FROM golang:1.20
+FROM golang:1.20-alpine AS builder
 
 # Set the current working directory inside the container
 WORKDIR /app
@@ -22,7 +22,19 @@ RUN alias air='$(go env GOPATH)/bin/air'
 COPY . .
 
 # Build the Go app
-RUN go build -o main .
+RUN go build -o /collaboration-service .
+
+# Run unit tests on container
+FROM builder AS builder-test
+
+RUN go test -v ./...
+
+# We just want the binary, rest need not be copied over
+FROM scratch
+
+WORKDIR /
+
+COPY --from=builder /collaboration-service /collaboration-service
 
 # Expose port 8080 to the outside world
 EXPOSE 8080
