@@ -1,4 +1,4 @@
-export const DeleteIcon = (props) => (
+export const DeleteIcon = props => (
   <svg
     aria-hidden="true"
     fill="none"
