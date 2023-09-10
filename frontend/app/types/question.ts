@@ -20,7 +20,6 @@ export const ComplexityToColor: Record<Complexity, string> = {
 };
 
 export interface Question {
-  id: number;
   title: string;
   categories: Category[];
   complexity: Complexity;

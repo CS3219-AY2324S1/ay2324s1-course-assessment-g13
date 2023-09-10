@@ -1,9 +1,8 @@
-import { ComplexityToColor } from './data';
 import { Chip } from '@nextui-org/chip';
 import { Tooltip } from '@nextui-org/tooltip';
 import { DeleteIcon } from './assets/DeleteIcon';
 import QuestionDescriptionModal from './question-decription-modal';
-import { questionsDescription } from './data';
+import { ComplexityToColor } from '../types/question';
 
 export const styleCell = (item, columnKey) => {
   const cellValue = item[columnKey];

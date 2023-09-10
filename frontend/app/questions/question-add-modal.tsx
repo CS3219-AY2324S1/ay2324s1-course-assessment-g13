@@ -13,81 +13,124 @@ import { Input } from '@nextui-org/input';
 import { Select, SelectItem } from '@nextui-org/select';
 import { Chip } from '@nextui-org/chip';
 import { Textarea } from '@nextui-org/react';
-import { Complexity, categories } from './data';
+import { Category, Complexity, Question } from '../types/question';
+import { useForm } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
+import { addQuestion } from '../redux/slices/questionBankSlice';
 
 export default function QuestionAddModal() {
+  const dispatch = useDispatch();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const categories = Object.values(Category);
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm();
+
+  const onSubmit = handleSubmit(async (data: Question) => {
+    dispatch(addQuestion(data));
+    reset();
+  });
 
   return (
     <>
       <Button color="primary" variant="ghost" className="text-lg py-5" onPress={onOpen}>
         Add Question
       </Button>
-      <Modal size={'2xl'} isOpen={isOpen} onOpenChange={onOpenChange} placement="top-center">
+      <Modal
+        size={'2xl'}
+        isOpen={isOpen}
+        onOpenChange={() => {
+          onOpenChange();
+          reset();
+        }}
+        placement="top-center"
+      >
         <ModalContent>
           {onClose => (
             <>
               <ModalHeader className="flex flex-col gap-1">Add Question</ModalHeader>
-              <ModalBody>
-                <Input
-                  autoFocus
-                  label="Title"
-                  placeholder="Enter Question Title"
-                  variant="bordered"
-                  labelPlacement="outside"
-                  className="mb-6"
-                />
-                <Select
-                  label="Complexity"
-                  isRequired
-                  placeholder="Select Complexity"
-                  variant="bordered"
-                  labelPlacement="outside"
-                >
-                  {Object.values(Complexity).map(c => (
-                    <SelectItem key={c} value={c}>
-                      {c.toUpperCase()}
-                    </SelectItem>
-                  ))}
-                </Select>
-                <Select
-                  items={categories}
-                  label="Category"
-                  isRequired
-                  variant="bordered"
-                  labelPlacement="outside"
-                  isMultiline
-                  selectionMode="multiple"
-                  placeholder="Select Categories"
-                  renderValue={items => {
-                    return (
-                      <div className="flex flex-wrap gap-2">
-                        {items.map(item => (
-                          <Chip key={item.key} variant="bordered">
-                            {item.key}
-                          </Chip>
-                        ))}
-                      </div>
-                    );
+              <form>
+                <ModalBody>
+                  <Input
+                    {...register('title', {
+                      required: 'Title is required',
+                    })}
+                    autoFocus
+                    label="Title"
+                    placeholder="Enter Question Title"
+                    isRequired
+                    variant="bordered"
+                    labelPlacement="outside"
+                    errorMessage={errors.title?.message as string}
+                  />
+                  <Select
+                    {...register('complexity', { required: 'Complexity is required' })}
+                    label="Complexity"
+                    isRequired
+                    placeholder="Select Complexity"
+                    variant="bordered"
+                    labelPlacement="outside"
+                    errorMessage={errors.complexity?.message as string}
+                  >
+                    {Object.values(Complexity).map(c => (
+                      <SelectItem key={c} value={c}>
+                        {c.toUpperCase()}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                  <Select
+                    {...register('categories', { required: 'Category is required' })}
+                    items={categories}
+                    label="Category"
+                    isRequired
+                    variant="bordered"
+                    labelPlacement="outside"
+                    isMultiline
+                    selectionMode="multiple"
+                    placeholder="Select Categories"
+                    errorMessage={errors.categories?.message as string}
+                    renderValue={items => {
+                      return (
+                        <div className="flex flex-wrap gap-2">
+                          {items.map(item => (
+                            <Chip key={item.key} variant="bordered">
+                              {item.key}
+                            </Chip>
+                          ))}
+                        </div>
+                      );
+                    }}
+                  >
+                    {categories.map(category => (
+                      <SelectItem key={category} value={category}>
+                        {category.toUpperCase()}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                  <Textarea
+                    {...register('description')}
+                    label="Description"
+                    labelPlacement="outside"
+                    placeholder="Enter Question Description"
+                  />
+                </ModalBody>
+              </form>
+              <ModalFooter>
+                <Button
+                  color="danger"
+                  variant="flat"
+                  onClick={() => {
+                    onClose();
+                    reset();
                   }}
                 >
-                  {categories.map(category => (
-                    <SelectItem key={category} value={category}>
-                      {category.toUpperCase()}
-                    </SelectItem>
-                  ))}
-                </Select>
-                <Textarea
-                  label="Description"
-                  labelPlacement="outside"
-                  placeholder="Enter Question Description"
-                />
-              </ModalBody>
-              <ModalFooter>
-                <Button color="danger" variant="flat" onPress={onClose}>
                   Close
                 </Button>
-                <Button color="primary" onPress={onClose}>
+                <Button color="primary" onClick={onSubmit}>
                   Add
                 </Button>
               </ModalFooter>

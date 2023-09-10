@@ -25,6 +25,7 @@ export default function QuestionsTable() {
     return questionBank.slice(start, end);
   }, [page, questionBank]);
 
+  console.log(items);
   const renderCell = useCallback(styleCell, []);
 
   const columns = useMemo(() => {
@@ -63,7 +64,7 @@ export default function QuestionsTable() {
       </TableHeader>
       <TableBody items={items} emptyContent={'No rows to display.'}>
         {item => (
-          <TableRow key={item.id}>
+          <TableRow key={item.title}>
             {columnKey => <TableCell>{renderCell(item, columnKey)}</TableCell>}
           </TableRow>
         )}
