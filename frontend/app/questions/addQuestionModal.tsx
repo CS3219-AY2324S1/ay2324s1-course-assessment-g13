@@ -15,11 +15,13 @@ import { Chip } from '@nextui-org/chip';
 import { Textarea } from '@nextui-org/react';
 import { Category, Complexity, Question } from '../types/question';
 import { useForm } from 'react-hook-form';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addQuestion } from '../redux/slices/questionBankSlice';
+import { AppState } from '../redux/store';
 
 export default function QuestionAddModal() {
   const dispatch = useDispatch();
+  const { questionBank } = useSelector((state: AppState) => state.questionBank);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const categories = Object.values(Category);
 
@@ -63,6 +65,13 @@ export default function QuestionAddModal() {
                   <Input
                     {...register('title', {
                       required: 'Title is required',
+                      validate: value => {
+                        const isDuplicate = questionBank.some(question => question.title === value);
+                        if (isDuplicate) {
+                          return 'Question already exists';
+                        }
+                        return true;
+                      },
                     })}
                     autoFocus
                     label="Title"
