@@ -31,7 +31,12 @@ export default function QuestionAddModal() {
   } = useForm();
 
   const onSubmit = handleSubmit(async (data: Question) => {
-    dispatch(addQuestion(data));
+    const modifiedData = {
+      ...data,
+      categories: (data.categories as string).split(',') as Category[],
+    };
+    dispatch(addQuestion(modifiedData));
+    onOpenChange();
     reset();
   });
 

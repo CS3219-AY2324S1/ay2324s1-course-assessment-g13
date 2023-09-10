@@ -4,13 +4,13 @@ import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from 
 import { Pagination } from '@nextui-org/pagination';
 import { useState, useMemo, useCallback } from 'react';
 // import { rows, columns } from './data'
-import { styleCell } from './style-cell';
+import StyleCell from './style-cell';
 import { AppState } from '../redux/store';
 import { useSelector } from 'react-redux';
 
-export default function QuestionsTable() {
+const QuestionsTable = () => {
   const { questionBank } = useSelector((state: AppState) => state.questionBank);
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   const questionBankLength = questionBank.length;
   const rowsPerPage = 10;
 
@@ -22,11 +22,17 @@ export default function QuestionsTable() {
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
 
-    return questionBank.slice(start, end);
+    const questions = questionBank.slice(start, end);
+    // return questionBank.slice(start, end);
+    return questions.map((question, i) => {
+      return {
+        ...question,
+        id: i + 1 + start,
+      };
+    });
   }, [page, questionBank]);
 
-  console.log(items);
-  const renderCell = useCallback(styleCell, []);
+  const renderCell = useCallback(StyleCell, []);
 
   const columns = useMemo(() => {
     return [
@@ -64,11 +70,13 @@ export default function QuestionsTable() {
       </TableHeader>
       <TableBody items={items} emptyContent={'No rows to display.'}>
         {item => (
-          <TableRow key={item.title}>
-            {columnKey => <TableCell>{renderCell(item, columnKey)}</TableCell>}
+          <TableRow key={item.id}>
+            {columnKey => <TableCell>{renderCell({ item, columnKey })}</TableCell>}
           </TableRow>
         )}
       </TableBody>
     </Table>
   );
-}
+};
+
+export default QuestionsTable;

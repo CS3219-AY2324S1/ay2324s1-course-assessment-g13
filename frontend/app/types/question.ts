@@ -13,15 +13,24 @@ export enum Category {
   DYNAMIC_PROGRAMMING = 'Dynamic Programming',
 }
 
-export const ComplexityToColor: Record<Complexity, string> = {
-  [Complexity.EASY]: 'success',
-  [Complexity.MEDIUM]: 'warning',
-  [Complexity.HARD]: 'danger',
+export enum ComplexityColor {
+  DEFAULT = 'default',
+  PRIMARY = 'primary',
+  SECONDARY = 'secondary',
+  SUCCESS = 'success',
+  WARNING = 'warning',
+  DANGER = 'danger',
+}
+
+export const ComplexityToColor: Record<Complexity, ComplexityColor> = {
+  [Complexity.EASY]: ComplexityColor.SUCCESS,
+  [Complexity.MEDIUM]: ComplexityColor.WARNING,
+  [Complexity.HARD]: ComplexityColor.DANGER,
 };
 
 export interface Question {
   title: string;
-  categories: Category[];
+  categories: Category[] | string;
   complexity: Complexity;
   description: string;
 }

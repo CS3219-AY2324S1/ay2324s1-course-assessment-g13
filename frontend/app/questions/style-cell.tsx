@@ -2,16 +2,24 @@ import { Chip } from '@nextui-org/chip';
 import { Tooltip } from '@nextui-org/tooltip';
 import { DeleteIcon } from './assets/DeleteIcon';
 import QuestionDescriptionModal from './question-decription-modal';
-import { ComplexityToColor } from '../types/question';
+import { Category, ComplexityToColor, Question } from '../types/question';
+import { Key } from 'react';
 
-export const styleCell = (item, columnKey) => {
-  const cellValue = item[columnKey];
+interface StyleCellProps {
+  item: Question & { id: number };
+  columnKey: Key;
+}
 
+const StyleCell: React.FC<StyleCellProps> = ({ item, columnKey }) => {
   switch (columnKey) {
+    case 'id':
+      return <span>{item.id}</span>;
+    case 'title':
+      return <span>{item.title}</span>;
     case 'category':
       return (
         <div className="relative flex items-center">
-          {cellValue.map(category => (
+          {(item.categories as Category[]).map(category => (
             <Chip variant="bordered" key={category}>
               {category}
             </Chip>
@@ -19,7 +27,7 @@ export const styleCell = (item, columnKey) => {
         </div>
       );
     case 'complexity':
-      return <Chip color={ComplexityToColor[item.complexity]}>{cellValue}</Chip>;
+      return <Chip color={ComplexityToColor[item.complexity]}>{item.complexity}</Chip>;
     case 'actions':
       return (
         <div className="relative flex items-center gap-5">
@@ -33,6 +41,8 @@ export const styleCell = (item, columnKey) => {
       );
 
     default:
-      return cellValue;
+      return '';
   }
 };
+
+export default StyleCell;
