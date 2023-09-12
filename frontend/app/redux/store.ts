@@ -9,12 +9,12 @@ import {
   persistReducer,
   persistStore,
 } from 'redux-persist';
-import storage from 'redux-persist/lib/storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import questionBankReducer from './slices/questionBankSlice';
 
 const persistConfig = {
   key: 'root',
-  storage,
+  storage: AsyncStorage,
   whitelist: ['questionBank'],
 };
 
