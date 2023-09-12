@@ -18,12 +18,17 @@ import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { addQuestion } from '../redux/slices/questionBankSlice';
 import { AppState } from '../redux/store';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function QuestionAddModal() {
   const dispatch = useDispatch();
   const { questionBank } = useSelector((state: AppState) => state.questionBank);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const categories = Object.values(Category);
+  const notifyAdd = () => toast.success("Question Added Successfully", {
+    theme: "dark"
+  });
 
   const {
     register,
@@ -38,12 +43,14 @@ export default function QuestionAddModal() {
       categories: (data.categories as string).split(',') as Category[],
     };
     dispatch(addQuestion(modifiedData));
+    notifyAdd();
     onOpenChange();
     reset();
   });
 
   return (
     <>
+      <ToastContainer />
       <Button color="primary" variant="ghost" className="text-lg py-5" onPress={onOpen}>
         Add Question
       </Button>

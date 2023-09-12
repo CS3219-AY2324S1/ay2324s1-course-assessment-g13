@@ -11,13 +11,19 @@ import {
 import { DeleteIcon } from './assets/DeleteIcon';
 import { useDispatch } from 'react-redux';
 import { deleteQuestion } from '../redux/slices/questionBankSlice';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const DeleteConfirmationModal = ({ title }: { title: string }) => {
   const dispatch = useDispatch();
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
+  const notifyDelete = () => toast.error("Question Deleted Successfully", {
+    theme:"dark"
+  });
 
   const handleDelete = () => {
     dispatch(deleteQuestion(title));
+    notifyDelete();
     onClose();
   };
   return (
@@ -29,6 +35,7 @@ const DeleteConfirmationModal = ({ title }: { title: string }) => {
           </span>
         </Button>
       </Tooltip>
+      <ToastContainer/>
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>
           {onClose => (
