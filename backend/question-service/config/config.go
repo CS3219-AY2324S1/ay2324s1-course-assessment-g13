@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"github.com/joho/godotenv"
 	"log"
 	"os"
 	"question-service/models"
@@ -17,9 +18,20 @@ var ctx = context.TODO()
 const minDocuments int64 = 5
 
 func ConnectDb() {
+<<<<<<< HEAD
 	MONGO_URI := os.Getenv("MONGO_URI")
 
 	clientOptions := options.Client().ApplyURI(MONGO_URI)
+=======
+	var err error
+	err = godotenv.Load()
+	if err != nil {
+		log.Fatal("Unable to load environment variables, with error: ", err)
+		os.Exit(2)
+	}
+
+	clientOptions := options.Client().ApplyURI(os.Getenv("MONGODB_URI"))
+>>>>>>> 7bb1470 (Set up containerisation for question-service)
 	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
 		log.Fatal(err)

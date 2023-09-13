@@ -3,9 +3,10 @@ version: '3'
 services:
   question-service:
     container_name: question-service
-    build: .
+    build:
+      dockerfile: Dockerfile.stage
     ports:
-      - "8080:8080"
+      - "5008:8080"
     volumes:
       - .:/usr/src/app
     env_file:
@@ -15,9 +16,13 @@ services:
     networks:
       - peerpreps-backend
 
-  db:
+
+  mongodb:
     image: mongo:7.0.1
     container_name: mongodb
+    restart: always
+    env_file:
+      - .env
     ports:
       - "27017:27017"
     volumes:
@@ -26,6 +31,7 @@ services:
       - MONGO_URI=${MONGO_URI}
     networks:
       - peerpreps-backend
+
 volumes:
   db-data:
 

@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  user-service:
+    container_name: user-service
+    build:
+      dockerfile: Dockerfile.stage
+    env_file:
+      - .env
+    ports:
+      - "5006:8080"
+    volumes:
+      - .:/usr/src/app
+  db:
+    image: postgres:16rc1-alpine3.18
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - data:/var/lib/postgresql/data
+
+volumes:
+  data:

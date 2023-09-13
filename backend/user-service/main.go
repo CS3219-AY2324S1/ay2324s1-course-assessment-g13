@@ -42,6 +42,7 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"user-service/config"
 
 	"user-service/handlers"
@@ -57,6 +58,10 @@ func main() {
 	fmt.Println("Starting development server")
 	e := echo.New()
 	e.Use(session.Middleware(sessions.NewCookieStore([]byte("Secret"))))
+
+	e.GET("/ping", func(c echo.Context) error {
+		return c.JSON(http.StatusOK, "I am the user microservice")
+	})
 
 	e.POST("/users", handlers.CreateUser)
 	e.GET("/users", handlers.GetUsers)
