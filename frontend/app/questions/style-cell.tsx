@@ -5,14 +5,14 @@ import { Key } from 'react';
 import DeleteConfirmationModal from './deleteConfirmationModal';
 
 interface StyleCellProps {
-  item: Question & { id: number };
+  item: Question & { listId: number };
   columnKey: Key;
 }
 
 const StyleCell: React.FC<StyleCellProps> = ({ item, columnKey }) => {
   switch (columnKey) {
     case 'id':
-      return <span>{item.id}</span>;
+      return <span>{item.listId}</span>;
     case 'title':
       return <span>{item.title}</span>;
     case 'category':

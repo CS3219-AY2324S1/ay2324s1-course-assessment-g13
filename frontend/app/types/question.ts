@@ -6,7 +6,7 @@ export enum Complexity {
 
 export enum Category {
   ALGORITHMS = 'Algorithms',
-  DATA_STRUCTURE = 'Data Structure',
+  DATA_STRUCTURES = 'Data Structures',
   BRAIN_TEASER = 'BrainTeaser',
   STRINGS = 'Strings',
   BIT_MANIPULATION = 'Bit Manipulation',
@@ -29,6 +29,7 @@ export const ComplexityToColor: Record<Complexity, ComplexityColor> = {
 };
 
 export interface Question {
+  id: string;
   title: string;
   categories: Category[] | string;
   complexity: Complexity;

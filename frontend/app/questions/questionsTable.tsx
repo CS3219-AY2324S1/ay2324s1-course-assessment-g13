@@ -2,35 +2,49 @@
 
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@nextui-org/table';
 import { Pagination } from '@nextui-org/pagination';
-import { useState, useMemo, useCallback } from 'react';
-// import { rows, columns } from './data'
+import { useState, useMemo, useCallback, useEffect } from 'react';
+import { Question } from '../types/question';
 import StyleCell from './style-cell';
-import { AppState } from '../redux/store';
-import { useSelector } from 'react-redux';
+import axios from 'axios';
 
 const QuestionsTable = () => {
-  const { questionBank } = useSelector((state: AppState) => state.questionBank);
+  const [questions, setQuestions] = useState([]);
   const [page, setPage] = useState(1);
-  const questionBankLength = questionBank.length;
   const rowsPerPage = 10;
+  
 
-  const noOfPages = Math.ceil(questionBankLength / rowsPerPage)
-    ? Math.ceil(questionBankLength / rowsPerPage)
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const headers = {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        };
+        const response = await axios.get('http://localhost:8080/questions', { headers });
+        setQuestions(response.data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    }
+    fetchData();
+  }, []);
+
+  const noOfPages = Math.ceil(questions.length / rowsPerPage)
+    ? Math.ceil(questions.length / rowsPerPage)
     : 1;
 
   const items = useMemo(() => {
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
-
-    const questions = questionBank.slice(start, end);
-    // return questionBank.slice(start, end);
-    return questions.map((question, i) => {
+    const paginatedQuestions = questions.slice(start, end);
+    return paginatedQuestions.map((question, i) => {
       return {
-        ...question,
-        id: i + 1 + start,
-      };
+        ...(question as Question),
+        listId: i + 1 + start,
+      }
     });
-  }, [page, questionBank]);
+
+  }, [page, questions]);
 
   const renderCell = useCallback(StyleCell, []);
 
