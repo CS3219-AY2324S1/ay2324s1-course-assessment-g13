@@ -1,41 +1,28 @@
 package main
 
 import (
-	"github.com/labstack/echo/v4"
 	"net/http"
-	"os"
+	"question-service/config"
+	"question-service/controllers"
 
-	"github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/echo/v4"
 )
 
 func main() {
-
+	config.ConnectDb()
+	config.PopulateDb()
 	e := echo.New()
 
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
-
-	e.GET("/", func(c echo.Context) error {
-		return c.HTML(http.StatusOK, "Hello, Docker! <3")
+	e.GET("/ping", func(c echo.Context) error {
+		return c.JSON(http.StatusOK, "I am the questions microservice")
 	})
 
-	e.GET("/health", func(c echo.Context) error {
-		return c.JSON(http.StatusOK, struct{ Status string }{Status: "OK"})
-	})
+	questionGroup := e.Group("/questions")
+	questionGroup.GET("", controllers.GetQuestions)
+	questionGroup.GET("/:id", controllers.GetQuestion)
+	questionGroup.POST("", controllers.CreateQuestion)
+	questionGroup.DELETE("/:id", controllers.DeleteQuestion)
+	questionGroup.PATCH("/:id", controllers.EditQuestion)
 
-	httpPort := os.Getenv("PORT")
-	if httpPort == "" {
-		httpPort = "8080"
-	}
-
-	e.Logger.Fatal(e.Start(":" + httpPort))
-}
-
-// Simple implementation of an integer minimum
-// Adapted from: https://gobyexample.com/testing-and-benchmarking
-func IntMin(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
+	e.Start(":8080")
 }

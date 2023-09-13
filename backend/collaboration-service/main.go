@@ -6,7 +6,7 @@ import (
 
 func main() {
 	r := gin.Default()
-	r.GET("/collaborate", func(c *gin.Context) {
+	r.GET("/ping", func(c *gin.Context) {
 		c.String(200, "I am the collaboration microservice!")
 	})
 	r.Run()

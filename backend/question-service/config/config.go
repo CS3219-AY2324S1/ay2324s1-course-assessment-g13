@@ -2,7 +2,9 @@ package config
 
 import (
 	"context"
+	"github.com/joho/godotenv"
 	"log"
+	"os"
 	"question-service/models"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -16,7 +18,14 @@ var ctx = context.TODO()
 const minDocuments int64 = 5
 
 func ConnectDb() {
-	clientOptions := options.Client().ApplyURI("mongodb://db:27017")
+	var err error
+	err = godotenv.Load()
+	if err != nil {
+		log.Fatal("Unable to load environment variables, with error: ", err)
+		os.Exit(2)
+	}
+
+	clientOptions := options.Client().ApplyURI(os.Getenv("MONGODB_URI"))
 	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
 		log.Fatal(err)

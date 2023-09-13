@@ -11,7 +11,7 @@ your own docker image and then run it on port 8080.
 
  2. Alternatively, build your image using multistage builds to build a leaner image binary 
      ```bash
-     docker build -t question-service:multistage -f Dockerfile.multistage .
+     docker build -t question-service:multistage -f Dockerfile.prod .
      ```
 
  3. Once the image is finished building, run the following command to verify
@@ -31,3 +31,6 @@ your own docker image and then run it on port 8080.
     ```bash
     docker rm <container_name>
     ```
+    
+Set your `.env` file based on the `.env.sample` for MONGODB_URI variable. For local testing, this should default to
+"mongodb://mongodb:27017"
