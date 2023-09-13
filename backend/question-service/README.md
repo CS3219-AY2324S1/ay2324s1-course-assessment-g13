@@ -11,7 +11,7 @@ your own docker image and then run it on port 8080.
 
  2. Alternatively, build your image using multistage builds to build a leaner image binary 
      ```bash
-     docker build -t question-service:multistage -f Dockerfile.stage.stage.stage.multistage .
+     docker build -t question-service:multistage -f Dockerfile.multistage .
      ```
 
  3. Once the image is finished building, run the following command to verify
