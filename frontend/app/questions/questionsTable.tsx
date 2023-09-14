@@ -4,9 +4,9 @@ import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from 
 import { Pagination } from '@nextui-org/pagination';
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { Question } from '../types/question';
-import { getQuestions } from '../questionRequests';
 import { ToastContainer, toast } from 'react-toastify';
 import StyleCell from './style-cell';
+import  axiosInstance  from '../requests';
 import 'react-toastify/dist/ReactToastify.css';
 
 const QuestionsTable = ({update, setUpdate}) => {
@@ -18,16 +18,15 @@ const QuestionsTable = ({update, setUpdate}) => {
   });
 
   useEffect(() => {
-    const fetchData = () => {
-      getQuestions().then(response  => {
+    const fetchData = async () => {
+      try {
+        const response = await axiosInstance.get('');
         setQuestions(response.data == null ? [] : response.data);
         setUpdate(false);
-      })
-      .catch(error => {
+      } catch (error) {
         notifyError("An error occurred while retrieving questions");
-      }) 
+      } 
     }
-
     if (update) {
       fetchData();
     }

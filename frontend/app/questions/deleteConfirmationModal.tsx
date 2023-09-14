@@ -10,7 +10,7 @@ import {
 } from '@nextui-org/react';
 import { DeleteIcon } from './assets/DeleteIcon';
 import { ToastContainer, toast } from 'react-toastify';
-import { deleteQuestion } from '../questionRequests';
+import axiosInstance from '../requests';
 import 'react-toastify/dist/ReactToastify.css';
 
 
@@ -24,20 +24,18 @@ const DeleteConfirmationModal = ({ title, id, setUpdate}) => {
   });
 
   const handleDelete = async () => {
-    deleteQuestion(id)
-    .then(() => {
+    try {
+      axiosInstance.delete(`/${id}`);
       setUpdate(true);
       notifyDelete();
-    })
-    .catch(error => {
+    } catch(error) {
       const status = error.response.status;
       if (status === 404) {
         notifyError("Not Found: Specified question has already been deleted");
       }
-    })
-    .finally(() => {
+    } finally {
       onClose();
-    })
+    }
   };
   
   return (

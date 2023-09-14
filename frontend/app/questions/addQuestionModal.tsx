@@ -16,7 +16,7 @@ import { Textarea } from '@nextui-org/react';
 import { Category, Complexity, Question } from '../types/question';
 import { useForm } from 'react-hook-form';
 import { ToastContainer, toast } from 'react-toastify';
-import { createQuestion } from '../questionRequests';
+import axiosInstance from '../requests';
 import 'react-toastify/dist/ReactToastify.css';
 
 
@@ -43,26 +43,24 @@ export default function QuestionAddModal({setUpdate}) {
         ...data,
         categories: (data.categories as string).split(',') as Category[],
       };
-      createQuestion(modifiedData)
-      .then(() => {
+      try {
+        await axiosInstance.post('', modifiedData);
         setUpdate(true);
         notifyAdd();
-      })
-      .catch(error =>  {
+      } catch(error) {
         const status = error.response.status;
         if (status === 400) {
-          notifyError("Bad Request: Ensure data inputted is valid.");
+          notifyError("Bad Request: Ensure data inputted is valid");
         } else if (status === 409) {
-          notifyError("Conflict: This question already exists.");
+          notifyError("Conflict: This question already exists");
         } else {
-          notifyError("An error occurred. Please try again later.");
+          notifyError("An error occurred. Please try again later");
         }
-      })
-      .finally(() =>{
+      } finally {
         onOpenChange();
         reset();
-      });
-    });
+      }
+  });
 
   return (
     <>
@@ -86,7 +84,14 @@ export default function QuestionAddModal({setUpdate}) {
               <form>
                 <ModalBody>
                   <Input
-                    {...register('title', { required: 'Title is required' })}
+                    {...register('title', 
+                      { required: 'Title is required',
+                        validate: { 
+                          noNumbers : (value) => !/\d/.test(value) 
+                          || 'Title should not contain numbers',
+                        },
+                      }
+                    )}
                     autoFocus
                     label="Title"
                     placeholder="Enter Question Title"
@@ -140,7 +145,15 @@ export default function QuestionAddModal({setUpdate}) {
                     ))}
                   </Select>
                   <Textarea
-                    {...register('description', { required: 'Description is required' })}
+                    {...register('description', 
+                      { 
+                        required: 'Description is required',
+                        validate: {
+                          notEmpty: (value) => value.trim() !== '' 
+                          || 'Description cannot be empty or contain only whitespace',
+                        }, 
+                      }
+                    )}
                     label="Description"
                     isRequired
                     labelPlacement="outside"
