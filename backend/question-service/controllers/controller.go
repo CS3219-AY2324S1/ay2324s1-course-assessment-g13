@@ -54,7 +54,7 @@ func CreateQuestion(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
-	err := config.Collection.FindOne(context.TODO(), bson.M{"title": question.Title}).Err()
+	err := config.Collection.FindOne(context.TODO(), bson.M{"title": bson.M{"$regex": primitive.Regex{Pattern: "^" + question.Title + "$", Options: "i"}}}).Err()
 	if err == nil {
 		return c.JSON(http.StatusConflict, map[string]string{"error": "Question with this title already exists"})
 	}
@@ -111,7 +111,7 @@ func EditQuestion(c echo.Context) error {
 	if request.Title != "" {
 		filter := bson.M{
 			"_id":   bson.M{"$ne": objectID},
-			"title": request.Title,
+			"title": bson.M{"$regex": primitive.Regex{Pattern: request.Title, Options: "i"}},
 		}
 		if err = collection.FindOne(context.TODO(), filter).Err(); err == nil {
 			return c.JSON(http.StatusConflict, map[string]string{"error": "Another question with this title already exists"})

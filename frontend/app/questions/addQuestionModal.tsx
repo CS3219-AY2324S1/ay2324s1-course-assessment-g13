@@ -15,20 +15,20 @@ import { Chip } from '@nextui-org/chip';
 import { Textarea } from '@nextui-org/react';
 import { Category, Complexity, Question } from '../types/question';
 import { useForm } from 'react-hook-form';
-import { useDispatch, useSelector } from 'react-redux';
-import { addQuestion } from '../redux/slices/questionBankSlice';
-import { AppState } from '../redux/store';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
 
-export default function QuestionAddModal() {
-  const dispatch = useDispatch();
-  const { questionBank } = useSelector((state: AppState) => state.questionBank);
+export default function QuestionAddModal({setUpdate}) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const categories = Object.values(Category);
   const notifyAdd = () => toast.success("Question Added Successfully", {
     theme: "dark"
   });
+  const notifyError = (err : string) => toast.warn(err, {
+    theme: "dark"
+  });
+  
 
   const {
     register,
@@ -38,12 +38,27 @@ export default function QuestionAddModal() {
   } = useForm();
 
   const onSubmit = handleSubmit(async (data: Question) => {
-    const modifiedData = {
-      ...data,
-      categories: (data.categories as string).split(',') as Category[],
-    };
-    dispatch(addQuestion(modifiedData));
-    notifyAdd();
+    try {
+      const modifiedData = {
+        ...data,
+        categories: (data.categories as string).split(',') as Category[],
+      };
+      const headers = {
+        "Content-Type": "application/json"
+      }
+      await axios.post('http://localhost:8080/questions', modifiedData, { headers });
+      setUpdate(true);
+      notifyAdd();
+    } catch (error) {
+      const status = error.response.status;
+      if (status === 400) {
+        notifyError("Bad Request: Ensure title only consists of alphabetic characters.");
+      } else if (status === 409) {
+        notifyError("Conflict: This question already exists.");
+      } else {
+        notifyError("An error occurred. Please try again later.");
+      }
+    }
     onOpenChange();
     reset();
   });
@@ -70,16 +85,7 @@ export default function QuestionAddModal() {
               <form>
                 <ModalBody>
                   <Input
-                    {...register('title', {
-                      required: 'Title is required',
-                      validate: value => {
-                        const isDuplicate = questionBank.some(question => question.title === value);
-                        if (isDuplicate) {
-                          return 'Question already exists';
-                        }
-                        return true;
-                      },
-                    })}
+                    {...register('title', { required: 'Title is required' })}
                     autoFocus
                     label="Title"
                     placeholder="Enter Question Title"
@@ -133,10 +139,12 @@ export default function QuestionAddModal() {
                     ))}
                   </Select>
                   <Textarea
-                    {...register('description')}
+                    {...register('description', { required: 'Description is required' })}
                     label="Description"
+                    isRequired
                     labelPlacement="outside"
                     placeholder="Enter Question Description"
+                    errorMessage={errors.description?.message as string}
                   />
                 </ModalBody>
               </form>

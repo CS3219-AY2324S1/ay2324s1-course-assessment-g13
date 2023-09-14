@@ -27,7 +27,7 @@ const QuestionDescriptionModal = ({ title, description }) => {
           {onClose => (
             <>
               <ModalHeader className="flex flex-col gap-1">{title}</ModalHeader>
-              <ModalBody>{description}</ModalBody>
+              <ModalBody className="whitespace-pre-line">{description}</ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="light" onPress={onClose}>
                   Close

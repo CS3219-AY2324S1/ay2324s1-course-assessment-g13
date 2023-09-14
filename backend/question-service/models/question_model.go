@@ -15,14 +15,14 @@ const (
 
 type Question struct {
 	Id          primitive.ObjectID `json:"id" bson:"_id,omitempty"`
-	Title       string             `json:"title" bson:"title" validate:"required"`
+	Title       string             `json:"title" bson:"title" validate:"required,alpha"`
 	Description string             `json:"description" bson:"description" validate:"required"`
 	Categories  []Category         `json:"categories" bson:"categories" validate:"required"`
 	Complexity  string             `json:"complexity" bson:"complexity" validate:"oneof=Easy Medium Hard"`
 }
 
 type EditRequest struct {
-	Title       string     `bson:"title,omitempty"`
+	Title       string     `bson:"title,omitempty" validate:"alpha"`
 	Description string     `bson:"description,omitempty"`
 	Categories  []Category `bson:"categories,omitempty" validate:"required"`
 	Complexity  string     `bson:"complexity,omitempty" validate:"omitempty,oneof=Easy Medium Hard"`

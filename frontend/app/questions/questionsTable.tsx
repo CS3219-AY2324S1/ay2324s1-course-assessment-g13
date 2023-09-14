@@ -7,11 +7,10 @@ import { Question } from '../types/question';
 import StyleCell from './style-cell';
 import axios from 'axios';
 
-const QuestionsTable = () => {
+const QuestionsTable = ({update, setUpdate}) => {
   const [questions, setQuestions] = useState([]);
   const [page, setPage] = useState(1);
   const rowsPerPage = 10;
-  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -21,13 +20,17 @@ const QuestionsTable = () => {
           "Accept": "application/json"
         };
         const response = await axios.get('http://localhost:8080/questions', { headers });
-        setQuestions(response.data);
+        setQuestions(response.data == null ? [] : response.data);
+        setUpdate(false);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     }
-    fetchData();
-  }, []);
+
+    if (update) {
+      fetchData();
+    }
+  }, [update]);
 
   const noOfPages = Math.ceil(questions.length / rowsPerPage)
     ? Math.ceil(questions.length / rowsPerPage)
@@ -85,7 +88,7 @@ const QuestionsTable = () => {
       <TableBody items={items} emptyContent={'No rows to display.'}>
         {item => (
           <TableRow key={item.id}>
-            {columnKey => <TableCell>{renderCell({ item, columnKey })}</TableCell>}
+            {columnKey => <TableCell>{renderCell({ item, columnKey, setUpdate })}</TableCell>}
           </TableRow>
         )}
       </TableBody>
