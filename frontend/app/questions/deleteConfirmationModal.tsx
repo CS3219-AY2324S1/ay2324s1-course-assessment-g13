@@ -10,8 +10,9 @@ import {
 } from '@nextui-org/react';
 import { DeleteIcon } from './assets/DeleteIcon';
 import { ToastContainer, toast } from 'react-toastify';
+import { deleteQuestion } from '../questionRequests';
 import 'react-toastify/dist/ReactToastify.css';
-import axios from 'axios';
+
 
 const DeleteConfirmationModal = ({ title, id, setUpdate}) => {
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
@@ -23,22 +24,22 @@ const DeleteConfirmationModal = ({ title, id, setUpdate}) => {
   });
 
   const handleDelete = async () => {
-    try {
-      const headers = {
-        "Content-Type": "application/json",
-        "Accept": "application/json"
-      };
-      axios.delete(`http://localhost:8080/questions/${id}`, { headers });
+    deleteQuestion(id)
+    .then(() => {
       setUpdate(true);
       notifyDelete();
-    } catch (error) {
+    })
+    .catch(error => {
       const status = error.response.status;
       if (status === 404) {
         notifyError("Not Found: Specified question has already been deleted");
       }
-    }
-    onClose();
+    })
+    .finally(() => {
+      onClose();
+    })
   };
+  
   return (
     <>
       <Tooltip content="Delete question">

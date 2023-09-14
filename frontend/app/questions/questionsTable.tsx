@@ -4,27 +4,28 @@ import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from 
 import { Pagination } from '@nextui-org/pagination';
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { Question } from '../types/question';
+import { getQuestions } from '../questionRequests';
+import { ToastContainer, toast } from 'react-toastify';
 import StyleCell from './style-cell';
-import axios from 'axios';
+import 'react-toastify/dist/ReactToastify.css';
 
 const QuestionsTable = ({update, setUpdate}) => {
   const [questions, setQuestions] = useState([]);
   const [page, setPage] = useState(1);
   const rowsPerPage = 10;
+  const notifyError = (err : string) => toast.warn(err, {
+    theme: "dark"
+  });
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const headers = {
-          "Content-Type": "application/json",
-          "Accept": "application/json"
-        };
-        const response = await axios.get('http://localhost:8080/questions', { headers });
+    const fetchData = () => {
+      getQuestions().then(response  => {
         setQuestions(response.data == null ? [] : response.data);
         setUpdate(false);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
+      })
+      .catch(error => {
+        notifyError("An error occurred while retrieving questions");
+      }) 
     }
 
     if (update) {
@@ -62,37 +63,40 @@ const QuestionsTable = ({update, setUpdate}) => {
   }, []);
 
   return (
-    <Table
-      aria-label="Questions Table"
-      bottomContent={
-        <div className="flex w-full justify-center">
-          <Pagination
-            isCompact
-            showControls
-            showShadow
-            color="secondary"
-            page={page}
-            total={noOfPages}
-            onChange={page => setPage(page)}
-          />
-        </div>
-      }
-    >
-      <TableHeader columns={columns}>
-        {column => (
-          <TableColumn key={column.key} align="center">
-            {column.label}
-          </TableColumn>
-        )}
-      </TableHeader>
-      <TableBody items={items} emptyContent={'No rows to display.'}>
-        {item => (
-          <TableRow key={item.id}>
-            {columnKey => <TableCell>{renderCell({ item, columnKey, setUpdate })}</TableCell>}
-          </TableRow>
-        )}
-      </TableBody>
-    </Table>
+    <>
+      <ToastContainer />
+      <Table
+        aria-label="Questions Table"
+        bottomContent={
+          <div className="flex w-full justify-center">
+            <Pagination
+              isCompact
+              showControls
+              showShadow
+              color="secondary"
+              page={page}
+              total={noOfPages}
+              onChange={page => setPage(page)}
+            />
+          </div>
+        }
+      >
+        <TableHeader columns={columns}>
+          {column => (
+            <TableColumn key={column.key} align="center">
+              {column.label}
+            </TableColumn>
+          )}
+        </TableHeader>
+        <TableBody items={items} emptyContent={'No rows to display.'}>
+          {item => (
+            <TableRow key={item.id}>
+              {columnKey => <TableCell>{renderCell({ item, columnKey, setUpdate })}</TableCell>}
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </>
   );
 };
 

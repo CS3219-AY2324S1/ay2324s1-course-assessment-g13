@@ -15,7 +15,7 @@ const (
 
 type Question struct {
 	Id          primitive.ObjectID `json:"id" bson:"_id,omitempty"`
-	Title       string             `json:"title" bson:"title" validate:"required,alpha"`
+	Title       string             `json:"title" bson:"title" validate:"required"`
 	Description string             `json:"description" bson:"description" validate:"required"`
 	Categories  []Category         `json:"categories" bson:"categories" validate:"required"`
 	Complexity  string             `json:"complexity" bson:"complexity" validate:"oneof=Easy Medium Hard"`

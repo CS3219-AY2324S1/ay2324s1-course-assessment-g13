@@ -16,8 +16,9 @@ import { Textarea } from '@nextui-org/react';
 import { Category, Complexity, Question } from '../types/question';
 import { useForm } from 'react-hook-form';
 import { ToastContainer, toast } from 'react-toastify';
+import { createQuestion } from '../questionRequests';
 import 'react-toastify/dist/ReactToastify.css';
-import axios from 'axios';
+
 
 export default function QuestionAddModal({setUpdate}) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -38,30 +39,30 @@ export default function QuestionAddModal({setUpdate}) {
   } = useForm();
 
   const onSubmit = handleSubmit(async (data: Question) => {
-    try {
       const modifiedData = {
         ...data,
         categories: (data.categories as string).split(',') as Category[],
       };
-      const headers = {
-        "Content-Type": "application/json"
-      }
-      await axios.post('http://localhost:8080/questions', modifiedData, { headers });
-      setUpdate(true);
-      notifyAdd();
-    } catch (error) {
-      const status = error.response.status;
-      if (status === 400) {
-        notifyError("Bad Request: Ensure title only consists of alphabetic characters.");
-      } else if (status === 409) {
-        notifyError("Conflict: This question already exists.");
-      } else {
-        notifyError("An error occurred. Please try again later.");
-      }
-    }
-    onOpenChange();
-    reset();
-  });
+      createQuestion(modifiedData)
+      .then(() => {
+        setUpdate(true);
+        notifyAdd();
+      })
+      .catch(error =>  {
+        const status = error.response.status;
+        if (status === 400) {
+          notifyError("Bad Request: Ensure data inputted is valid.");
+        } else if (status === 409) {
+          notifyError("Conflict: This question already exists.");
+        } else {
+          notifyError("An error occurred. Please try again later.");
+        }
+      })
+      .finally(() =>{
+        onOpenChange();
+        reset();
+      });
+    });
 
   return (
     <>
