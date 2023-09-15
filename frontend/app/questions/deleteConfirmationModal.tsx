@@ -13,13 +13,13 @@ import { notifyWarning, notifyError } from '../components/notifications';
 import axiosInstance from '../axios/axios';
 
 
-const DeleteConfirmationModal = ({ title, id, setUpdate}) => {
+const DeleteConfirmationModal = ({ title, id, fetchData }) => {
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
 
   const handleDelete = async () => {
     try {
       const response = await axiosInstance.delete(`/${id}`);
-      setUpdate(true);
+      fetchData();
       notifyWarning(response.data.message);
     } catch(error) {
       notifyError(error.response.data.error);

@@ -4,33 +4,15 @@ import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from 
 import { Pagination } from '@nextui-org/pagination';
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { Question } from '../types/question';
-import { notifyError } from '../components/notifications';
 import StyleCell from './style-cell';
-import  axiosInstance  from '../axios/axios';
 
-const QuestionsTable = ({update, setUpdate}) => {
-  const [questions, setQuestions] = useState([]);
+const QuestionsTable = ({questions, fetchData} : {questions: Question[]; fetchData: () => void}) => {
   const [page, setPage] = useState(1);
   const rowsPerPage = 10;
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axiosInstance.get('');
-        setQuestions(response.data == null ? [] : response.data);
-        setUpdate(false);
-      } catch (error) {
-        if (error.response) {
-          notifyError(error.response.data.error);
-        } else {
-          notifyError(error.message);
-        }
-      } 
-    }
-    if (update) {
       fetchData();
-    }
-  }, [update]);
+  }, []);
 
   const noOfPages = Math.ceil(questions.length / rowsPerPage)
     ? Math.ceil(questions.length / rowsPerPage)
@@ -40,7 +22,7 @@ const QuestionsTable = ({update, setUpdate}) => {
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
     const paginatedQuestions = questions.slice(start, end);
-    return paginatedQuestions.map((question, i) => {
+    return paginatedQuestions.map((question: Question, i: number) => {
       return {
         ...(question as Question),
         listId: i + 1 + start,
@@ -88,7 +70,7 @@ const QuestionsTable = ({update, setUpdate}) => {
       <TableBody items={items} emptyContent={'No rows to display.'}>
         {item => (
           <TableRow key={item.id}>
-            {columnKey => <TableCell>{renderCell({ item, columnKey, setUpdate })}</TableCell>}
+            {columnKey => <TableCell>{renderCell({ item, columnKey, fetchData })}</TableCell>}
           </TableRow>
         )}
       </TableBody>

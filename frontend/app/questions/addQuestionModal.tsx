@@ -19,7 +19,7 @@ import { notifySuccess, notifyError } from '../components/notifications';
 import axiosInstance from '../axios/axios';
 
 
-export default function QuestionAddModal({setUpdate}) {
+export default function QuestionAddModal({fetchData}) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const categories = Object.values(Category);
 
@@ -37,7 +37,7 @@ export default function QuestionAddModal({setUpdate}) {
       };
       try {
         const response = await axiosInstance.post('', modifiedData);
-        setUpdate(true);
+        fetchData();
         notifySuccess(response.data.message);
       } catch(error) {
         notifyError(error.response.data.error);
