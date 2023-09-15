@@ -9,30 +9,20 @@ import {
   Tooltip,
 } from '@nextui-org/react';
 import { DeleteIcon } from './assets/DeleteIcon';
-import { ToastContainer, toast } from 'react-toastify';
-import axiosInstance from '../requests';
-import 'react-toastify/dist/ReactToastify.css';
+import { notifyWarning, notifyError } from '../components/notifications';
+import axiosInstance from '../axios/axios';
 
 
 const DeleteConfirmationModal = ({ title, id, setUpdate}) => {
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
-  const notifyDelete = () => toast.error("Question Deleted Successfully", {
-    theme:"dark"
-  });
-  const notifyError = (err : string) => toast.warn(err, {
-    theme: "dark"
-  });
 
   const handleDelete = async () => {
     try {
-      axiosInstance.delete(`/${id}`);
+      const response = await axiosInstance.delete(`/${id}`);
       setUpdate(true);
-      notifyDelete();
+      notifyWarning(response.data.message);
     } catch(error) {
-      const status = error.response.status;
-      if (status === 404) {
-        notifyError("Not Found: Specified question has already been deleted");
-      }
+      notifyError(error.response.data.error);
     } finally {
       onClose();
     }
@@ -47,7 +37,6 @@ const DeleteConfirmationModal = ({ title, id, setUpdate}) => {
           </span>
         </Button>
       </Tooltip>
-      <ToastContainer/>
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>
           {onClose => (

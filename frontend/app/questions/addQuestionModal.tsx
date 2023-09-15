@@ -15,21 +15,13 @@ import { Chip } from '@nextui-org/chip';
 import { Textarea } from '@nextui-org/react';
 import { Category, Complexity, Question } from '../types/question';
 import { useForm } from 'react-hook-form';
-import { ToastContainer, toast } from 'react-toastify';
-import axiosInstance from '../requests';
-import 'react-toastify/dist/ReactToastify.css';
+import { notifySuccess, notifyError } from '../components/notifications';
+import axiosInstance from '../axios/axios';
 
 
 export default function QuestionAddModal({setUpdate}) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const categories = Object.values(Category);
-  const notifyAdd = () => toast.success("Question Added Successfully", {
-    theme: "dark"
-  });
-  const notifyError = (err : string) => toast.warn(err, {
-    theme: "dark"
-  });
-  
 
   const {
     register,
@@ -44,18 +36,11 @@ export default function QuestionAddModal({setUpdate}) {
         categories: (data.categories as string).split(',') as Category[],
       };
       try {
-        await axiosInstance.post('', modifiedData);
+        const response = await axiosInstance.post('', modifiedData);
         setUpdate(true);
-        notifyAdd();
+        notifySuccess(response.data.message);
       } catch(error) {
-        const status = error.response.status;
-        if (status === 400) {
-          notifyError("Bad Request: Ensure data inputted is valid");
-        } else if (status === 409) {
-          notifyError("Conflict: This question already exists");
-        } else {
-          notifyError("An error occurred. Please try again later");
-        }
+        notifyError(error.response.data.error);
       } finally {
         onOpenChange();
         reset();
@@ -64,7 +49,6 @@ export default function QuestionAddModal({setUpdate}) {
 
   return (
     <>
-      <ToastContainer />
       <Button color="primary" variant="ghost" className="text-lg py-5" onPress={onOpen}>
         Add Question
       </Button>
