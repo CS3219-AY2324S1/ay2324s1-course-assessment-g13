@@ -16,10 +16,10 @@ import { Textarea } from '@nextui-org/react';
 import { Category, Complexity, Question } from '../types/question';
 import { useForm } from 'react-hook-form';
 import { notifySuccess, notifyError } from '../components/notifications';
-import axiosInstance from '../axios/axios';
+import { createEntry } from '../axios/axios';
 
 
-export default function QuestionAddModal({fetchData}) {
+export default function QuestionAddModal({fetchQuestions}) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const categories = Object.values(Category);
 
@@ -30,21 +30,24 @@ export default function QuestionAddModal({fetchData}) {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = handleSubmit(async (data: Question) => {
+  const onSubmit = handleSubmit((data: Question) => {
       const modifiedData = {
         ...data,
         categories: (data.categories as string).split(',') as Category[],
       };
-      try {
-        const response = await axiosInstance.post('', modifiedData);
-        fetchData();
-        notifySuccess(response.data.message);
-      } catch(error) {
-        notifyError(error.response.data.error);
-      } finally {
+      createEntry('questions', modifiedData)
+      .then(res => {
+        if (res.status == 201) {
+          fetchQuestions();
+          notifySuccess(res.message);
+        } else {
+          notifyError(res.error);
+        }
+      })
+      .finally(() => {
         onOpenChange();
         reset();
-      }
+      });
   });
 
   return (

@@ -10,22 +10,23 @@ import {
 } from '@nextui-org/react';
 import { DeleteIcon } from './assets/DeleteIcon';
 import { notifyWarning, notifyError } from '../components/notifications';
-import axiosInstance from '../axios/axios';
+import { deleteEntry } from '../axios/axios';
 
 
-const DeleteConfirmationModal = ({ title, id, fetchData }) => {
+const DeleteConfirmationModal = ({ title, id, fetchQuestions }) => {
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
 
-  const handleDelete = async () => {
-    try {
-      const response = await axiosInstance.delete(`/${id}`);
-      fetchData();
-      notifyWarning(response.data.message);
-    } catch(error) {
-      notifyError(error.response.data.error);
-    } finally {
-      onClose();
-    }
+  const handleDelete = () => {
+    deleteEntry(`questions/${id}`)
+    .then(res => {
+      if (res.status == 200) {
+        fetchQuestions();
+        notifyWarning(res.message);
+      } else {
+        notifyError(res.error);
+      }
+    })
+    .finally(() => onClose());
   };
   
   return (

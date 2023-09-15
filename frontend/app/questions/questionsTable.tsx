@@ -6,12 +6,12 @@ import { useState, useMemo, useCallback, useEffect } from 'react';
 import { Question } from '../types/question';
 import StyleCell from './style-cell';
 
-const QuestionsTable = ({questions, fetchData} : {questions: Question[]; fetchData: () => void}) => {
+const QuestionsTable = ({questions, fetchQuestions} : {questions: Question[]; fetchQuestions: () => void}) => {
   const [page, setPage] = useState(1);
   const rowsPerPage = 10;
 
   useEffect(() => {
-      fetchData();
+      fetchQuestions();
   }, []);
 
   const noOfPages = Math.ceil(questions.length / rowsPerPage)
@@ -70,7 +70,7 @@ const QuestionsTable = ({questions, fetchData} : {questions: Question[]; fetchDa
       <TableBody items={items} emptyContent={'No rows to display.'}>
         {item => (
           <TableRow key={item.id}>
-            {columnKey => <TableCell>{renderCell({ item, columnKey, fetchData })}</TableCell>}
+            {columnKey => <TableCell>{renderCell({ item, columnKey, fetchQuestions })}</TableCell>}
           </TableRow>
         )}
       </TableBody>

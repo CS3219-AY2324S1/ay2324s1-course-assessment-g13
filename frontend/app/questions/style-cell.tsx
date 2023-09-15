@@ -7,10 +7,10 @@ import DeleteConfirmationModal from './deleteConfirmationModal';
 interface StyleCellProps {
   item: Question & { listId: number };
   columnKey: Key;
-  fetchData: () => void;
+  fetchQuestions: () => void;
 }
 
-const StyleCell: React.FC<StyleCellProps> = ({ item, columnKey, fetchData }) => {
+const StyleCell: React.FC<StyleCellProps> = ({ item, columnKey, fetchQuestions }) => {
   switch (columnKey) {
     case 'id':
       return <span>{item.listId}</span>;
@@ -32,7 +32,7 @@ const StyleCell: React.FC<StyleCellProps> = ({ item, columnKey, fetchData }) => 
       return (
         <div className="relative flex items-center gap-5">
           <QuestionDescriptionModal title={item.title} description={item.description} />
-          <DeleteConfirmationModal title={item.title} id={item.id} fetchData={fetchData} />
+          <DeleteConfirmationModal title={item.title} id={item.id} fetchQuestions={fetchQuestions} />
         </div>
       );
 

@@ -2,33 +2,30 @@
 import QuestionsTable from './questionsTable';
 import QuestionAddModal from './addQuestionModal';
 import { useState } from 'react';
-import axiosInstance from '../axios/axios';
+import { getData } from '../axios/axios';
 import { notifyError } from '../components/notifications';
 
 
 export default function Questions() {
   const [questions, setQuestions] = useState([]);
-  const fetchData = async () => {
-    try {
-      const response = await axiosInstance.get('');
-      setQuestions(response.data == null ? [] : response.data);
-    } catch (error) {
-      if (error.response) {
-        notifyError(error.response.data.error);
+  const fetchQuestions = () => {
+    getData('questions').then(res => {
+      if (res.status == 200) {
+        setQuestions(res.data);
       } else {
-        notifyError(error.message);
+        notifyError(res.error);
       }
-    } 
+    });
   }
 
   return (
     <div className="questions mx-auto max-w-7xl px-6 h-4/5 my-10">
       <div className="questions-header flex justify-between items-center mb-5">
         <span className="text-3xl">Question Bank</span>
-        <QuestionAddModal fetchData={fetchData} />
+        <QuestionAddModal fetchQuestions={fetchQuestions} />
       </div>
       <div className="table w-full">
-        <QuestionsTable fetchData={fetchData} questions={questions} />
+        <QuestionsTable fetchQuestions={fetchQuestions} questions={questions} />
       </div>
     </div>
   );
