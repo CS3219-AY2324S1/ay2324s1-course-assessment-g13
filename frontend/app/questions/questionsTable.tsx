@@ -6,7 +6,12 @@ import { useState, useMemo, useCallback, useEffect } from 'react';
 import { Question } from '../types/question';
 import StyleCell from './style-cell';
 
-const QuestionsTable = ({questions, fetchQuestions} : {questions: Question[]; fetchQuestions: () => void}) => {
+interface QuestionProps {
+  questions: Question[];
+  fetchQuestions: () => void;
+}
+
+const QuestionsTable = ({questions, fetchQuestions} : QuestionProps) => {
   const [page, setPage] = useState(1);
   const rowsPerPage = 10;
 

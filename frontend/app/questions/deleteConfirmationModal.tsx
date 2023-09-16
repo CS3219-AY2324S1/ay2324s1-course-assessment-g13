@@ -19,7 +19,7 @@ const DeleteConfirmationModal = ({ title, id, fetchQuestions }) => {
   const handleDelete = () => {
     deleteEntry(`questions/${id}`)
     .then(res => {
-      if (res.status == 200) {
+      if (res.message) {
         fetchQuestions();
         notifyWarning(res.message);
       } else {

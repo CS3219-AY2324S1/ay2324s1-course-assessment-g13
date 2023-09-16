@@ -37,16 +37,14 @@ export default function QuestionAddModal({fetchQuestions}) {
       };
       createEntry('questions', modifiedData)
       .then(res => {
-        if (res.status == 201) {
+        if (res.message) {
           fetchQuestions();
           notifySuccess(res.message);
+          onOpenChange();
+          reset();
         } else {
           notifyError(res.error);
         }
-      })
-      .finally(() => {
-        onOpenChange();
-        reset();
       });
   });
 

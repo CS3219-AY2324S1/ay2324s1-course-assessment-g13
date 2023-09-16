@@ -10,7 +10,7 @@ export default function Questions() {
   const [questions, setQuestions] = useState([]);
   const fetchQuestions = () => {
     getData('questions').then(res => {
-      if (res.status == 200) {
+      if (res.data) {
         setQuestions(res.data);
       } else {
         notifyError(res.error);
