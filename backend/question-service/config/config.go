@@ -3,6 +3,7 @@ package config
 import (
 	"context"
 	"log"
+	"os"
 	"question-service/models"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -16,15 +17,19 @@ var ctx = context.TODO()
 const minDocuments int64 = 5
 
 func ConnectDb() {
-	clientOptions := options.Client().ApplyURI("mongodb://db:27017")
+	MONGO_URI := os.Getenv("MONGO_URI")
+
+	clientOptions := options.Client().ApplyURI(MONGO_URI)
 	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
 		log.Fatal(err)
+		os.Exit(2)
 	}
 
 	err = client.Ping(ctx, nil)
 	if err != nil {
 		log.Fatal(err)
+		os.Exit(2)
 	}
 
 	Collection = client.Database("questions-service").Collection("questions")

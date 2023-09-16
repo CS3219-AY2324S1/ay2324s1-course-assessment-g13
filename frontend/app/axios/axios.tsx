@@ -10,7 +10,6 @@ const axiosInstance = axios.create({
 
 export const getData = async (url : string) => {
   try {
-    console.log(process.env.NEXT_PUBLIC_BACKEND_URL);
     const response = await axiosInstance.get(url);
     return {
       data: response.data == null ? [] : response.data
