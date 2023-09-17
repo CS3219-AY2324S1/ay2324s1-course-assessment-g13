@@ -16,7 +16,7 @@ import { Textarea } from '@nextui-org/react';
 import { Category, Complexity, Question } from '../types/question';
 import { useForm } from 'react-hook-form';
 import { notifySuccess, notifyError } from '../components/notifications';
-import { POST } from '../axios/axios';
+import { createEntry } from '../axios/axios';
 
 
 export default function QuestionAddModal({fetchQuestions}) {
@@ -35,7 +35,7 @@ export default function QuestionAddModal({fetchQuestions}) {
         ...data,
         categories: (data.categories as string).split(',') as Category[],
       };
-      POST('questions', modifiedData)
+      createEntry('questions', modifiedData)
       .then(res => {
         if (res.message) {
           fetchQuestions();

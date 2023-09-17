@@ -2,14 +2,14 @@
 import QuestionsTable from './questionsTable';
 import QuestionAddModal from './addQuestionModal';
 import { useState } from 'react';
-import { GET } from '../axios/axios';
+import { getData } from '../axios/axios';
 import { notifyError } from '../components/notifications';
 
 
 export default function Questions() {
   const [questions, setQuestions] = useState([]);
   const fetchQuestions = () => {
-    GET('questions').then(res => {
+    getData('questions').then(res => {
       if (res.data) {
         setQuestions(res.data);
       } else {
