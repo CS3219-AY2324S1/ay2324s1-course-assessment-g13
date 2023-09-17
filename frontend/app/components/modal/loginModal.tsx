@@ -9,14 +9,9 @@ import {
   ModalHeader,
   useDisclosure,
 } from '@nextui-org/react';
-import React from 'react';
 import { useForm } from 'react-hook-form';
 
-interface SignUpProps {
-  isNav?: boolean;
-}
-
-const SignupModal: React.FC<SignUpProps> = ({ isNav = false }) => {
+const LoginModal = () => {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 
   const {
@@ -28,22 +23,15 @@ const SignupModal: React.FC<SignUpProps> = ({ isNav = false }) => {
 
   const onSubmit = handleSubmit(async data => {
     // eslint-disable-next-line no-console
-    console.log(data); //add in your api call to add user at backend
+    console.log(data); //add in your api call to check login
     reset();
     onClose();
   });
   return (
     <>
-      <div className="w-full md:w-4/5 lg:w-1/2 px-4 max-w-lg">
-        <Button
-          onPress={onOpen}
-          color="primary"
-          variant={isNav ? 'flat' : 'solid'}
-          fullWidth={true}
-        >
-          Sign Up
-        </Button>
-      </div>
+      <Button onPress={onOpen} variant="light" color="default">
+        Login
+      </Button>
       <Modal
         isOpen={isOpen}
         onOpenChange={() => {
@@ -52,21 +40,9 @@ const SignupModal: React.FC<SignUpProps> = ({ isNav = false }) => {
         }}
       >
         <ModalContent>
-          <ModalHeader className="flex flex-col gap-1 text-center">Sign Up Now</ModalHeader>
+          <ModalHeader className="flex flex-col gap-1 text-center">Login</ModalHeader>
           <form className="flex flex-col gap-8">
             <ModalBody>
-              <Input
-                {...register('username', {
-                  required: 'Username is required',
-                })}
-                label="Username"
-                autoFocus
-                isRequired
-                variant="bordered"
-                placeholder="Enter your username"
-                labelPlacement="outside"
-                errorMessage={errors.username?.message as string}
-              />
               <Input
                 {...register('email', {
                   required: 'Email is required',
@@ -93,7 +69,7 @@ const SignupModal: React.FC<SignUpProps> = ({ isNav = false }) => {
           </form>
           <ModalFooter>
             <Button color="primary" onClick={onSubmit}>
-              Sign Up
+              Login
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -102,4 +78,4 @@ const SignupModal: React.FC<SignUpProps> = ({ isNav = false }) => {
   );
 };
 
-export default SignupModal;
+export default LoginModal;
