@@ -8,7 +8,7 @@ const axiosInstance = axios.create({
   },
 });
 
-export const getData = async (url : string) => {
+export const GET = async (url : string) => {
   try {
     const response = await axiosInstance.get(url);
     return {
@@ -21,7 +21,7 @@ export const getData = async (url : string) => {
   }
 }
 
-export const createEntry = async (url : string, data: any) => {
+export const POST = async (url : string, data: any) => {
   try {
     const response = await axiosInstance.post(url, data);
     return {
@@ -34,7 +34,7 @@ export const createEntry = async (url : string, data: any) => {
   }
 }
 
-export const deleteEntry = async (url : string) => {
+export const DELETE = async (url : string) => {
   try {
     const response = await axiosInstance.delete(url);
     return {
