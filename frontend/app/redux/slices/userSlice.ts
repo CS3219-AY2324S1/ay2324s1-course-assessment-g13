@@ -13,8 +13,8 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     login: (state, action) => {
-        console.log(action.payload);
-    //   state.username = action.payload;
+        // console.log(action.payload);
+      state.username = action.payload;
     },
     logout: (state) => {
       state.usernmae = null;
