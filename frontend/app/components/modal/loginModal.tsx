@@ -11,12 +11,14 @@ import {
 } from '@nextui-org/react';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
+import { useRouter } from 'next/navigation';
 import { POST } from '../../axios/axios';
 import { login } from '../../redux/slices/userSlice';
 
 const LoginModal = () => {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const dispatch = useDispatch();
+  const router = useRouter();
 
   const {
     register,
@@ -34,6 +36,7 @@ const LoginModal = () => {
     }
 
     dispatch(login(response.data.username));
+    router.push('/questions');
 
     reset();
     onClose();
