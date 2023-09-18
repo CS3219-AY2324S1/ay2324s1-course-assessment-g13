@@ -27,7 +27,6 @@ const DeleteConfirmationModal = ({ title, id, fetchQuestions }) => {
       onClose();
     }
   };
-
   return (
     <>
       <Tooltip content="Delete question">
