@@ -8,10 +8,9 @@ on:
       - 'README.md'
       - 'backup/**'
       - '**/*.draft.md'
-      - '**/*.toml'
-      - '**/*.yaml'
-      - '.gitignore'
-      - 'Dockerfile.*'
+      - '**.toml'
+      - '**.yaml'
+      - '**/.gitignore'
 
 jobs:
   linelint:
