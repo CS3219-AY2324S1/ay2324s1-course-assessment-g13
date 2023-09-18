@@ -26,7 +26,7 @@ services:
     container_name: collaboration-service
     build:
       context: ./backend/collaboration-service
-      dockerfile: Dockerfile.stage
+      dockerfile: backend/collaboration-service/Dockerfile.dev
     ports:
       - "5005:8080" # Maps container port 8080 to local 5005
     volumes:
@@ -36,7 +36,7 @@ services:
     container_name: user-service
     build:
       context: ./backend/user-service
-      dockerfile: Dockerfile.stage
+      dockerfile: backend/user-service/Dockerfile.dev
     env_file:
       - ./backend/user-service/.env
     ports:
@@ -51,7 +51,7 @@ services:
     container_name: matching-service
     build:
       context: ./backend/matching-service
-      dockerfile: Dockerfile.stage
+      dockerfile: backend/matching-service/Dockerfile.dev
     ports:
       - "5007:8080" # Maps container port 8080 to local 5007
     volumes:
@@ -61,7 +61,7 @@ services:
       container_name: question-service
       build:
         context: ./backend/question-service
-        dockerfile: Dockerfile.stage
+        dockerfile: backend/question-service/Dockerfile.dev
       env_file:
         - ./backend/question-service/.env
       environment:

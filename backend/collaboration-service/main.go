@@ -1,13 +1,14 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
+	"github.com/labstack/echo/v4"
+	"net/http"
 )
 
 func main() {
-	r := gin.Default()
-	r.GET("/ping", func(c *gin.Context) {
-		c.String(200, "I am the collaboration microservice!")
+	e := echo.New()
+	e.GET("/", func(c echo.Context) error {
+		return c.String(http.StatusOK, "I am the collaboration microservice!")
 	})
-	r.Run()
+	e.Logger.Fatal(e.Start(":3000"))
 }

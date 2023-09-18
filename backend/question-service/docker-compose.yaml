@@ -4,7 +4,7 @@ services:
   question-service:
     container_name: question-service
     build:
-      dockerfile: Dockerfile.stage
+      dockerfile: Dockerfile.dev
     ports:
       - "5008:8080"
     volumes:
