@@ -30,7 +30,7 @@ const LoginModal = () => {
   const onSubmit = handleSubmit(async data => {
     // eslint-disable-next-line no-console
     const response = await POST('/login', data);
-    console.log(response); //add in your api call to check login
+    // console.log(response); //add in your api call to check login
     if (response.status != 200) {
       return;
     }
