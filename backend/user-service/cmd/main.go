@@ -30,5 +30,7 @@ func main() {
 	e.GET("/logout", handlers.Logout)
 	e.GET("/refresh", handlers.Refresh)
 
+	e.Any("/questions/*", handlers.HandleQuestions)
+
 	e.Start(":3000")
 }

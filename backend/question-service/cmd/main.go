@@ -1,6 +1,7 @@
 package main
 
 import (
+	auth "question-service/common"
 	"question-service/config"
 	"question-service/controllers"
 
@@ -13,11 +14,11 @@ func main() {
 	e := echo.New()
 
 	questionGroup := e.Group("/questions")
-	questionGroup.GET("", controllers.GetQuestions)
+	questionGroup.GET("/", controllers.GetQuestions)
 	questionGroup.GET("/:id", controllers.GetQuestion)
-	questionGroup.POST("", controllers.CreateQuestion)
-	questionGroup.DELETE("/:id", controllers.DeleteQuestion)
-	questionGroup.PATCH("/:id", controllers.EditQuestion)
+	questionGroup.POST("/", controllers.CreateQuestion, auth.AllowAdminOnly)
+	questionGroup.DELETE("/:id", controllers.DeleteQuestion, auth.AllowAdminOnly)
+	questionGroup.PATCH("/:id", controllers.EditQuestion, auth.AllowAdminOnly)
 
 	e.Start(":8080")
 }

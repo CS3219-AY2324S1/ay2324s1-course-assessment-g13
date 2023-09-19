@@ -17,6 +17,7 @@ var noLoginRequiredList = map[string]bool{
 const USER_ALREADY_LOGGED_IN_MESSAGE = "You have already logged in"
 
 func UserLoginRequired(next echo.HandlerFunc) echo.HandlerFunc {
+
 	return func(c echo.Context) error {
 		_, ok := noLoginRequiredList[c.Request().RequestURI]
 		if ok {
