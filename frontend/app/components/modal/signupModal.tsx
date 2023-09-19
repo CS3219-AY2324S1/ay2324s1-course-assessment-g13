@@ -12,6 +12,7 @@ import {
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { POST } from '../../axios/axios';
+import { notifyError, notifySuccess } from '../notifications';
 
 interface SignUpProps {
   isNav?: boolean;
@@ -28,11 +29,14 @@ const SignupModal: React.FC<SignUpProps> = ({ isNav = false }) => {
   } = useForm();
 
   const onSubmit = handleSubmit(async data => {
-    // eslint-disable-next-line no-console
-    POST('/users', data);
-    // console.log(data); //add in your api call to add user at backend
-    reset();
-    onClose();
+    await POST('/users', data).then((res) => {
+      notifySuccess(res.data)
+      reset();
+      onClose();
+    }).catch(err => {
+      notifyError(err.response.data)
+    })
+
   });
   return (
     <>
@@ -69,23 +73,13 @@ const SignupModal: React.FC<SignUpProps> = ({ isNav = false }) => {
                 labelPlacement="outside"
                 errorMessage={errors.username?.message as string}
               />
-              {/* <Input
-                {...register('email', {
-                  required: 'Email is required',
-                })}
-                label="Email"
-                isRequired
-                variant="bordered"
-                placeholder="Enter your email"
-                labelPlacement="outside"
-                errorMessage={errors.email?.message as string}
-              /> */}
               <Input
                 {...register('password', {
                   required: 'Password is required',
                 })}
                 label="Password"
                 isRequired
+                type='password'
                 variant="bordered"
                 placeholder="Enter your password"
                 labelPlacement="outside"

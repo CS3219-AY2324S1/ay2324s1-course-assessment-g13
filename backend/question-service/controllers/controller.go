@@ -40,6 +40,7 @@ func GetQuestions(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to decode questions"})
 	}
 
+	fmt.Println(questions)
 	return c.JSON(http.StatusOK, questions)
 }
 

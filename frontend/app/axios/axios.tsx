@@ -8,27 +8,18 @@ const axiosInstance = axios.create({
   },
 });
 
-const ErrorResponse = {
-  status: 500,
-  data: "Internal Server Error",
-};
-
 export const GET = async (url : string) => {
   try {
     const response = await axiosInstance.get(url);
     return response;
   } catch (error) {
-    return ErrorResponse;
+    return error;
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const POST = async (url : string, data: any) => {
-  try {
-    const response = await axiosInstance.post(url, data);
-    return response;
-  } catch (error) {
-    return ErrorResponse;
-  }
+  return await axiosInstance.post(url, data)
 }
 
 export const DELETE = async (url : string) => {
@@ -36,7 +27,7 @@ export const DELETE = async (url : string) => {
     const response = await axiosInstance.delete(url);
     return response;
   } catch (error) {
-    return ErrorResponse;
+    return error;
   }
 }
 
@@ -53,6 +44,7 @@ export const getData = async (url : string) => {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const createEntry = async (url : string, data: any) => {
   try {
     const response = await axiosInstance.post(url, data);

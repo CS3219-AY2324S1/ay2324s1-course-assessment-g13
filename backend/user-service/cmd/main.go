@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 
 	"user-service/config"
 	"user-service/handlers"
@@ -20,6 +21,7 @@ func main() {
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"http://localhost:3000"},
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+		AllowMethods: []string{http.MethodGet, http.MethodHead, http.MethodPut, http.MethodPatch, http.MethodPost, http.MethodDelete},
 	}))
 	e.Use(session.Middleware(sessions.NewCookieStore([]byte("Secret"))))
 
@@ -31,5 +33,5 @@ func main() {
 
 	e.POST("/login", handlers.Login)
 
-	e.Start(":3000")
+	e.Logger.Fatal(e.Start(":8080"))
 }
