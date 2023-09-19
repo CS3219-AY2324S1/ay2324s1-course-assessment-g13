@@ -10,9 +10,15 @@ import {
   useDisclosure,
 } from '@nextui-org/react';
 import { useForm } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
+import { useRouter } from 'next/navigation';
+import { POST } from '../../axios/axios';
+import { login } from '../../redux/slices/userSlice';
 
 const LoginModal = () => {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+  const dispatch = useDispatch();
+  const router = useRouter();
 
   const {
     register,
@@ -23,7 +29,15 @@ const LoginModal = () => {
 
   const onSubmit = handleSubmit(async data => {
     // eslint-disable-next-line no-console
-    console.log(data); //add in your api call to check login
+    const response = await POST('/login', data);
+    // console.log(response); //add in your api call to check login
+    if (response.status != 200) {
+      return;
+    }
+
+    dispatch(login(response.data.username));
+    router.push('/questions');
+
     reset();
     onClose();
   });
@@ -44,15 +58,15 @@ const LoginModal = () => {
           <form className="flex flex-col gap-8">
             <ModalBody>
               <Input
-                {...register('email', {
-                  required: 'Email is required',
+                {...register('username', {
+                  required: 'Username is required',
                 })}
-                label="Email"
+                label="Username"
                 isRequired
                 variant="bordered"
-                placeholder="Enter your email"
+                placeholder="Enter your username"
                 labelPlacement="outside"
-                errorMessage={errors.email?.message as string}
+                errorMessage={errors.username?.message as string}
               />
               <Input
                 {...register('password', {

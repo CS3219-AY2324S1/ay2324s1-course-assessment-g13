@@ -38,6 +38,10 @@ func Login(c echo.Context) error {
 	sess.Values["userId"] = strconv.FormatUint(uint64(user.ID), 10)
 	sess.Save(c.Request(), c.Response())
 
-	return c.JSON(http.StatusOK, "Login successful")
+	res := &model.LoginResponse{
+		Username: user.Username,
+	}
+
+	return c.JSON(http.StatusOK, res)
 
 }

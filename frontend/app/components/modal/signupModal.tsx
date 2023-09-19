@@ -11,6 +11,7 @@ import {
 } from '@nextui-org/react';
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { POST } from '../../axios/axios';
 
 interface SignUpProps {
   isNav?: boolean;
@@ -28,7 +29,8 @@ const SignupModal: React.FC<SignUpProps> = ({ isNav = false }) => {
 
   const onSubmit = handleSubmit(async data => {
     // eslint-disable-next-line no-console
-    console.log(data); //add in your api call to add user at backend
+    POST('/users', data);
+    // console.log(data); //add in your api call to add user at backend
     reset();
     onClose();
   });
@@ -67,7 +69,7 @@ const SignupModal: React.FC<SignUpProps> = ({ isNav = false }) => {
                 labelPlacement="outside"
                 errorMessage={errors.username?.message as string}
               />
-              <Input
+              {/* <Input
                 {...register('email', {
                   required: 'Email is required',
                 })}
@@ -77,7 +79,7 @@ const SignupModal: React.FC<SignUpProps> = ({ isNav = false }) => {
                 placeholder="Enter your email"
                 labelPlacement="outside"
                 errorMessage={errors.email?.message as string}
-              />
+              /> */}
               <Input
                 {...register('password', {
                   required: 'Password is required',
