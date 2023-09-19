@@ -3,9 +3,9 @@ package handlers
 import (
 	"net/http"
 	"user-service/common/auth"
-	constants "user-service/common/constants"
 	"user-service/common/cookie"
 	"user-service/common/errors"
+	constants "user-service/common/utils"
 	"user-service/config"
 	model "user-service/models"
 
@@ -13,10 +13,18 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+const (
+	INVALID_JSON_REQUEST_MESSAGE         = "Invalid JSON Request"
+	INVALID_USERNAME_OR_PASSWORD_MESSAGE = "Invalid Username or Password"
+	LOGIN_SUCCESSFUL_MESSAGE             = "Login Successful"
+	TOKEN_REFRESH_MESSAGE                = "Token Refreshed"
+	LOGOUT_SUCCESSFUL_MESSAGE            = "Logout Successful"
+)
+
 func Login(c echo.Context) error {
 	req := new(model.LoginRequest)
 	if err := c.Bind(req); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Invalid JSON Request"})
+		return c.JSON(http.StatusBadRequest, map[string]string{"message": INVALID_JSON_REQUEST_MESSAGE})
 	}
 
 	var user model.User
@@ -24,7 +32,7 @@ func Login(c echo.Context) error {
 
 	err := bcrypt.CompareHashAndPassword([]byte(user.HashedPassword), []byte(req.Password))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Invalid Username or Password"})
+		return c.JSON(http.StatusBadRequest, map[string]string{"message": INVALID_USERNAME_OR_PASSWORD_MESSAGE})
 	}
 
 	expirationTime := auth.GetExpirationTime()
@@ -39,7 +47,7 @@ func Login(c echo.Context) error {
 	cookie := cookie.CreateCookie(constants.JWT_COOKIE_NAME, tokenString, expirationTime)
 	c.SetCookie(cookie)
 
-	return c.JSON(http.StatusOK, map[string]string{"message": "Login Successful"})
+	return c.JSON(http.StatusOK, map[string]string{"message": LOGIN_SUCCESSFUL_MESSAGE})
 }
 
 func Refresh(c echo.Context) error {
@@ -57,7 +65,7 @@ func Refresh(c echo.Context) error {
 	cookie := cookie.CreateCookie(constants.JWT_COOKIE_NAME, newTokenString, expirationTime)
 	c.SetCookie(cookie)
 
-	return c.JSON(http.StatusOK, map[string]string{"message": "Token Refresh"})
+	return c.JSON(http.StatusOK, map[string]string{"message": TOKEN_REFRESH_MESSAGE})
 }
 
 func Logout(c echo.Context) error {
@@ -67,5 +75,5 @@ func Logout(c echo.Context) error {
 		return c.JSON(status, map[string]string{"message": message})
 	}
 	c.SetCookie(cookie)
-	return c.JSON(http.StatusOK, map[string]string{"message": "Logout Successful"})
+	return c.JSON(http.StatusOK, map[string]string{"message": LOGOUT_SUCCESSFUL_MESSAGE})
 }

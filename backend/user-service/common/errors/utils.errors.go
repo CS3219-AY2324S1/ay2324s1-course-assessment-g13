@@ -2,9 +2,14 @@ package errors
 
 import "net/http"
 
+const (
+	INTERNAL_SERVER_ERROR_MESSAGE = "Internal Server Error"
+	INVALID_TOKEN_MESSAGE         = "Invalid Token"
+)
+
 func InternalServerError() ServiceError {
 	return NewServiceError(
-		"Internal Server Erorr",
+		INTERNAL_SERVER_ERROR_MESSAGE,
 		http.StatusInternalServerError,
 	)
 }
@@ -18,7 +23,7 @@ func UnauthorisedError(message string) ServiceError {
 
 func InvalidTokenError() ServiceError {
 	return NewServiceError(
-		"Invalid Token",
+		INVALID_TOKEN_MESSAGE,
 		http.StatusBadRequest,
 	)
 }
@@ -35,5 +40,5 @@ func ParseErrorToServiceError(err error) (int, string) {
 	if ok {
 		return serviceError.GetStatus(), serviceError.Error()
 	}
-	return http.StatusInternalServerError, "Internal Server Error"
+	return http.StatusInternalServerError, INTERNAL_SERVER_ERROR_MESSAGE
 }

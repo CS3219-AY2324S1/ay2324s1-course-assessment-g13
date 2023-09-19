@@ -3,8 +3,8 @@ package auth
 import (
 	"os"
 	"time"
-	"user-service/common/constants"
 	"user-service/common/errors"
+	constants "user-service/common/utils"
 	model "user-service/models"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -18,6 +18,11 @@ type TokenServiceI interface {
 type tokenService struct {
 	jwtSecretKey []byte
 }
+
+const (
+	INVALID_SIGNATURE_MESSAGE = "Invalid Signature"
+	TOKEN_EXPIRES_MESSAGE     = "Token Expires"
+)
 
 var TokenService = CreateTokenService()
 
@@ -44,13 +49,13 @@ func (service *tokenService) Validate(tokenString string) (*model.Claims, errors
 	})
 	if err != nil {
 		if err == jwt.ErrSignatureInvalid {
-			return nil, errors.UnauthorisedError("Invalid Signature")
+			return nil, errors.UnauthorisedError(INVALID_SIGNATURE_MESSAGE)
 		}
 		return nil, errors.InvalidTokenError()
 	}
 
 	if !token.Valid {
-		return nil, errors.UnauthorisedError("Token Expires")
+		return nil, errors.UnauthorisedError(TOKEN_EXPIRES_MESSAGE)
 	}
 
 	return claims, nil

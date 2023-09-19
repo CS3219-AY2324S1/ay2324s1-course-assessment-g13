@@ -7,6 +7,10 @@ import (
 )
 
 const rootPath = "/"
+const (
+	NOT_LOGIN_MESSAGE   = "Not Login"
+	BAD_REQUEST_MESSAGE = "Bad Request"
+)
 
 func CreateCookie(name string, value string, expires time.Time) *http.Cookie {
 	newCookie := new(http.Cookie)
@@ -20,10 +24,10 @@ func CreateCookie(name string, value string, expires time.Time) *http.Cookie {
 func GetCookieValue(cookie *http.Cookie, err error) (string, errors.ServiceError) {
 	if err != nil {
 		if err == http.ErrNoCookie {
-			return "", errors.UnauthorisedError("Not Login")
+			return "", errors.UnauthorisedError(NOT_LOGIN_MESSAGE)
 		}
 		return "", errors.NewServiceError(
-			"Bad Request",
+			BAD_REQUEST_MESSAGE,
 			http.StatusBadRequest,
 		)
 	}
@@ -33,10 +37,10 @@ func GetCookieValue(cookie *http.Cookie, err error) (string, errors.ServiceError
 func SetCookieExpires(cookie *http.Cookie, err error) (*http.Cookie, errors.ServiceError) {
 	if err != nil {
 		if err == http.ErrNoCookie {
-			return nil, errors.UnauthorisedError("Not Login")
+			return nil, errors.UnauthorisedError(NOT_LOGIN_MESSAGE)
 		}
 		return nil, errors.NewServiceError(
-			"Bad Request",
+			BAD_REQUEST_MESSAGE,
 			http.StatusBadRequest,
 		)
 	}

@@ -1,4 +1,4 @@
-package constants
+package utils
 
 const (
 	JWT_COOKIE_NAME    = "jwt-token"
