@@ -18,13 +18,15 @@ func main() {
 	e := echo.New()
 	e.Use(session.Middleware(sessions.NewCookieStore([]byte("Secret"))))
 
-	e.POST("/users", handlers.CreateUser)
 	e.GET("/users", handlers.GetUsers)
 	e.GET("/users/:id", handlers.GetUser)
 	e.PUT("/users/:id", handlers.UpdateUser)
 	e.DELETE("/users", handlers.DeleteUser)
 
+	e.POST("/register", handlers.CreateUser)
 	e.POST("/login", handlers.Login)
+	e.POST("/logout", handlers.Logout)
+	e.POST("/refresh", handlers.Refresh)
 
 	e.Start(":3000")
 }
