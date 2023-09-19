@@ -2,13 +2,14 @@ package handlers
 
 import (
 	"net/http"
+	"time"
+	"user-service/common/auth"
+	constants "user-service/common/constants"
+	"user-service/common/cookie"
+	"user-service/common/errors"
 	"user-service/config"
 	model "user-service/models"
 
-	"strconv"
-
-	"github.com/gorilla/sessions"
-	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -16,7 +17,7 @@ import (
 func Login(c echo.Context) error {
 	req := new(model.LoginRequest)
 	if err := c.Bind(req); err != nil {
-		return c.JSON(http.StatusBadRequest, "Invalid JSON request")
+		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Invalid JSON Request"})
 	}
 
 	var user model.User
@@ -24,20 +25,48 @@ func Login(c echo.Context) error {
 
 	err := bcrypt.CompareHashAndPassword([]byte(user.HashedPassword), []byte(req.Password))
 	if err != nil {
-		// Passwords don't match
-		return c.JSON(http.StatusBadRequest, "Invalid request")
+		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Invalid Username or Password"})
 	}
 
-	sess, _ := session.Get("session", c)
-	sess.Options = &sessions.Options{
-		Path:     "/",
-		MaxAge:   86400 * 7,
-		HttpOnly: false,
-		Secure:   false, // have to change to true in production
+	expirationTime := time.Now().Add(5 * time.Minute)
+
+	tokenString, err := auth.TokenService.Generate(&user, expirationTime)
+
+	if err != nil {
+		status, message := errors.ParseErrorToServiceError(err)
+		return c.JSON(status, map[string]string{"message": message})
 	}
-	sess.Values["userId"] = strconv.FormatUint(uint64(user.ID), 10)
-	sess.Save(c.Request(), c.Response())
 
-	return c.JSON(http.StatusOK, "Login successful")
+	cookie := cookie.CreateCookie(constants.JWT_COOKIE_NAME, tokenString, expirationTime)
+	c.SetCookie(cookie)
 
+	return c.JSON(http.StatusOK, map[string]string{"message": "Login Successful"})
+}
+
+func Refresh(c echo.Context) error {
+	claims := c.Get("claims").(*model.Claims)
+
+	user := claims.User
+	expirationTime := time.Now().Add(5 * time.Minute)
+
+	newTokenString, err := auth.TokenService.Generate(&user, expirationTime)
+	if err != nil {
+		status, message := errors.ParseErrorToServiceError(err)
+		return c.JSON(status, map[string]string{"message": message})
+	}
+
+	cookie := cookie.CreateCookie(constants.JWT_COOKIE_NAME, newTokenString, expirationTime)
+	c.SetCookie(cookie)
+
+	return c.JSON(http.StatusOK, map[string]string{"message": "Token Refresh"})
+}
+
+func Logout(c echo.Context) error {
+	cookie, err := cookie.SetCookieExpires(c.Cookie(constants.JWT_COOKIE_NAME))
+	if err != nil {
+		status, message := errors.ParseErrorToServiceError(err)
+		return c.JSON(status, map[string]string{"message": message})
+	}
+	c.SetCookie(cookie)
+	return c.JSON(http.StatusOK, map[string]string{"message": "Logout Successful"})
 }
