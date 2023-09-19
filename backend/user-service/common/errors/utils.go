@@ -23,6 +23,13 @@ func InvalidTokenError() ServiceError {
 	)
 }
 
+func MethodNotAllowedError(message string) ServiceError {
+	return NewServiceError(
+		message,
+		http.StatusMethodNotAllowed,
+	)
+}
+
 func ParseErrorToServiceError(err error) (int, string) {
 	serviceError, ok := err.(ServiceError)
 	if ok {

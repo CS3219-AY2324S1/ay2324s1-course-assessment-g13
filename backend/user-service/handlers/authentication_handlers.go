@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"net/http"
-	"time"
 	"user-service/common/auth"
 	constants "user-service/common/constants"
 	"user-service/common/cookie"
@@ -28,7 +27,7 @@ func Login(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Invalid Username or Password"})
 	}
 
-	expirationTime := time.Now().Add(5 * time.Minute)
+	expirationTime := auth.GetExpirationTime()
 
 	tokenString, err := auth.TokenService.Generate(&user, expirationTime)
 
@@ -44,10 +43,10 @@ func Login(c echo.Context) error {
 }
 
 func Refresh(c echo.Context) error {
-	claims := c.Get("claims").(*model.Claims)
+	claims := c.Get(constants.CLAIMS_KEY).(*model.Claims)
 
 	user := claims.User
-	expirationTime := time.Now().Add(5 * time.Minute)
+	expirationTime := auth.GetExpirationTime()
 
 	newTokenString, err := auth.TokenService.Generate(&user, expirationTime)
 	if err != nil {

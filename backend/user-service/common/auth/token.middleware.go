@@ -33,7 +33,7 @@ func UserLoginRequired(next echo.HandlerFunc) echo.HandlerFunc {
 			return c.JSON(status, map[string]string{"message": message})
 		}
 
-		c.Set("claims", claims)
+		c.Set(constants.CLAIMS_KEY, claims)
 
 		return next(c)
 

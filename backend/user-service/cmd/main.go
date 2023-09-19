@@ -22,6 +22,9 @@ func main() {
 	e.PUT("/users/:id", handlers.UpdateUser)
 	e.DELETE("/users", handlers.DeleteUser)
 
+	e.POST("/users/upgrade", handlers.UpgradeRole)
+	e.POST("/users/downgrade", handlers.DowngradeRole)
+
 	e.POST("/register", handlers.CreateUser, auth.PreventLoggedInUser)
 	e.POST("/login", handlers.Login, auth.PreventLoggedInUser)
 	e.GET("/logout", handlers.Logout)

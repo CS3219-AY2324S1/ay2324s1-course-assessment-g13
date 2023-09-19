@@ -6,11 +6,14 @@ import (
 	"user-service/common/errors"
 )
 
+const rootPath = "/"
+
 func CreateCookie(name string, value string, expires time.Time) *http.Cookie {
 	newCookie := new(http.Cookie)
 	newCookie.Name = name
 	newCookie.Value = value
 	newCookie.Expires = expires
+	newCookie.Path = rootPath
 	return newCookie
 }
 
