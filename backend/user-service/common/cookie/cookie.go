@@ -18,6 +18,7 @@ func CreateCookie(name string, value string, expires time.Time) *http.Cookie {
 	newCookie.Value = value
 	newCookie.Expires = expires
 	newCookie.Path = rootPath
+	newCookie.HttpOnly = true
 	return newCookie
 }
 
