@@ -37,7 +37,6 @@ func (service *tokenService) Generate(user *model.User, expirationTime time.Time
 	return tokenString, nil
 }
 
-// Validate implements TokenServiceI.
 func (service *tokenService) Validate(tokenString string) (*model.Claims, errors.ServiceError) {
 	claims := &model.Claims{}
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {

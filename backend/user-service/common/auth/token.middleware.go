@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"net/http"
 	"user-service/common/constants"
 	"user-service/common/cookie"
 	"user-service/common/errors"
@@ -36,5 +37,15 @@ func UserLoginRequired(next echo.HandlerFunc) echo.HandlerFunc {
 
 		return next(c)
 
+	}
+}
+
+func PreventLoggedInUser(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		sessionCookie, err := c.Cookie(constants.JWT_COOKIE_NAME)
+		if err == nil && sessionCookie != nil {
+			return c.JSON(http.StatusForbidden, map[string]string{"message": "You have already logged in"})
+		}
+		return next(c)
 	}
 }

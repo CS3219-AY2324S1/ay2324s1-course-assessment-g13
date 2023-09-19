@@ -22,8 +22,8 @@ func main() {
 	e.PUT("/users/:id", handlers.UpdateUser)
 	e.DELETE("/users", handlers.DeleteUser)
 
-	e.POST("/register", handlers.CreateUser)
-	e.POST("/login", handlers.Login)
+	e.POST("/register", handlers.CreateUser, auth.PreventLoggedInUser)
+	e.POST("/login", handlers.Login, auth.PreventLoggedInUser)
 	e.GET("/logout", handlers.Logout)
 	e.GET("/refresh", handlers.Refresh)
 
