@@ -1,5 +1,7 @@
-import { Link } from '@nextui-org/link';
+'use client'
 
+import { Link } from '@nextui-org/link';
+import { usePathname } from 'next/navigation';
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem } from '@nextui-org/navbar';
 import React from 'react';
 import LoginModal from './modal/loginModal';
@@ -7,7 +9,8 @@ import SignupModal from './modal/signupModal';
 
 const Nav = () => {
   // TODO: Check login status here
-  const isLoggedIn = false;
+  const isLoggedIn = true;
+  const pathname = usePathname();
   return (
     <Navbar
       isBordered
@@ -37,13 +40,13 @@ const Nav = () => {
       </NavbarBrand>
       {isLoggedIn && (
         <NavbarContent className="hidden sm:flex gap-4" justify="center">
-          <NavbarItem isActive>
-            <Link href="/questions" aria-current="page">
+          <NavbarItem isActive={pathname === '/questions'}>
+            <Link color={pathname === '/questions' ? 'primary' : 'foreground'} href="/questions" aria-current="page">
               Questions
             </Link>
           </NavbarItem>
-          <NavbarItem>
-            <Link color="foreground" href="#">
+          <NavbarItem isActive={pathname === '/interviews'}>
+            <Link color={pathname === '/interviews' ? 'primary' : 'foreground'} href="/interviews" aria-current="page">
               Interviews
             </Link>
           </NavbarItem>
