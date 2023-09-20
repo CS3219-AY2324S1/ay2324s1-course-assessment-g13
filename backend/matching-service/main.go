@@ -10,5 +10,5 @@ func main() {
 	e.GET("/ping", func(c echo.Context) error {
 		return c.String(http.StatusOK, "I am the matching microservice!")
 	})
-	e.Logger.Fatal(e.Start(":3000"))
+	e.Logger.Fatal(e.Start(":8080"))
 }
