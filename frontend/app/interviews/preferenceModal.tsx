@@ -12,7 +12,7 @@ import {
 import { Button } from '@nextui-org/button';
 import { Select, SelectItem } from '@nextui-org/select';
 import { Chip } from '@nextui-org/chip';
-import { Category, Complexity, Question } from '../types/question';
+import { Category, Complexity } from '../types/question';
 import { useForm } from 'react-hook-form';
 import { notifySuccess} from '../components/notifications';
 import { Preference } from '../types/preference';
@@ -33,7 +33,7 @@ export default function SetPreferencesModal() {
       categories: (data.categories as string).split(',') as Category[],
       complexities: (data.complexities as string).split(',') as Complexity[],
     };
-    // TODO: Use the modifiedData for matching
+    // TODO: Use the modifiedData for matching and keeping track of their currently set preferences
     notifySuccess("Preferences Set!");
     onOpenChange();
     reset();
