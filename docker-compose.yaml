@@ -26,23 +26,23 @@ services:
     container_name: collaboration-service
     build:
       context: ./backend/collaboration-service
-      dockerfile: backend/collaboration-service/Dockerfile.dev
+      dockerfile: Dockerfile.dev
     ports:
       - "5005:8080" # Maps container port 8080 to local 5005
     volumes:
-      - .:/usr/src/app
+      -  ./backend/collaboration-service:/usr/src/app
 
   user-service:
     container_name: user-service
     build:
       context: ./backend/user-service
-      dockerfile: backend/user-service/Dockerfile.dev
+      dockerfile: Dockerfile.dev
     env_file:
       - ./backend/user-service/.env
     ports:
       - "5006:8080" # Maps container port 8080 to local 5006
     volumes:
-      - .:/usr/src/app
+      - ./backend/user-service:/usr/src/app
     depends_on:
       db:
         condition: service_started
@@ -51,17 +51,17 @@ services:
     container_name: matching-service
     build:
       context: ./backend/matching-service
-      dockerfile: backend/matching-service/Dockerfile.dev
+      dockerfile: Dockerfile.dev
     ports:
       - "5007:8080" # Maps container port 8080 to local 5007
     volumes:
-      - .:/usr/src/app
+      - ./backend/matching-service:/usr/src/app
 
   question-service:
       container_name: question-service
       build:
         context: ./backend/question-service
-        dockerfile: backend/question-service/Dockerfile.dev
+        dockerfile: Dockerfile.dev
       env_file:
         - ./backend/question-service/.env
       environment:
@@ -69,7 +69,7 @@ services:
       ports:
         - "5008:8080" # Maps container port 8080 to local 5008
       volumes:
-        - .:/usr/src/app
+        - ./backend/question-service:/usr/src/app
       depends_on:
         mongodb:
           condition: service_started

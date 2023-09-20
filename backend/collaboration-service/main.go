@@ -7,8 +7,8 @@ import (
 
 func main() {
 	e := echo.New()
-	e.GET("/", func(c echo.Context) error {
+	e.GET("/ping", func(c echo.Context) error {
 		return c.String(http.StatusOK, "I am the collaboration microservice!")
 	})
-	e.Logger.Fatal(e.Start(":3000"))
+	e.Logger.Fatal(e.Start(":8080"))
 }
