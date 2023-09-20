@@ -1,7 +1,7 @@
 package main
 
 import (
-	auth "question-service/common"
+	"question-service/common/auth"
 	"question-service/config"
 	"question-service/controllers"
 
