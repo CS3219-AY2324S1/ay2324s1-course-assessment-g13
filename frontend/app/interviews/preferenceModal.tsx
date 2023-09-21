@@ -20,6 +20,7 @@ import { Preference } from '../types/preference';
 export default function SetPreferencesModal() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const categories = Object.values(Category);
+  const complexities = Object.values(Complexity);
 
   const {
     register,
@@ -67,8 +68,19 @@ export default function SetPreferencesModal() {
                     variant="bordered"
                     labelPlacement="outside"
                     errorMessage={errors.complexity?.message as string}
+                    renderValue={items => {
+                      return (
+                        <div className="flex flex-wrap gap-2">
+                          {items.map(item => (
+                            <Chip key={item.key} variant="bordered">
+                              {item.key}
+                            </Chip>
+                          ))}
+                        </div>
+                      );
+                    }}
                   >
-                    {Object.values(Complexity).map(c => (
+                    {complexities.map(c => (
                       <SelectItem key={c} value={c}>
                         {c.toUpperCase()}
                       </SelectItem>
