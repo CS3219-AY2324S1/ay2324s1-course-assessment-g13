@@ -1,7 +1,7 @@
 version: "3"
 
 services:
-  frontend:
+  # frontend:
     # depends_on:
     #   matching-service:
     #     condition: service_started
@@ -11,16 +11,16 @@ services:
     #     condition: service_started
     #   question-service:
     #     condition: service_started
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: frontend
-    volumes:
-      - ./frontend:/usr/src/app
-      - /usr/src/app/node_modules
-      - /usr/src/app/.next
-    ports:
-      - "3000:3000"
+    # build:
+    #   context: ./frontend
+    #   dockerfile: Dockerfile
+    # container_name: frontend
+    # volumes:
+    #   - ./frontend:/usr/src/app
+    #   - /usr/src/app/node_modules
+    #   - /usr/src/app/.next
+    # ports:
+    #   - "3000:3000"
 
   # collaboration-service:
   #   container_name: collaboration-service
@@ -74,9 +74,11 @@ services:
     ports:
       - "5007:8080"
     environment:
-      AMQP_SERVER_URL: amqp://guest:guest@rabbitmq/
+      AMQP_SERVER_URL: amqp://guest:guest@rabbitmq:5672/
     networks:
       - rabbitmq-network
+    volumes:
+      - ./backend/matching-service/producer:/usr/src/app
     depends_on:
       - rabbitmq
 
@@ -91,6 +93,8 @@ services:
       AMQP_SERVER_URL: amqp://guest:guest@rabbitmq/
     networks:
       - rabbitmq-network
+    volumes:
+      - ./backend/matching-service/consumer:/usr/src/app
     depends_on:
       - rabbitmq
 
@@ -139,9 +143,9 @@ services:
   #   volumes:
   #     - data:/var/lib/postgresql/data
 
-volumes:
-  data: {}
-  db-data: {}
+# volumes:
+#   data: {}
+#   db-data: {}
 
 networks:
   rabbitmq-network:

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"os"
 
 	"github.com/streadway/amqp"
@@ -15,6 +16,36 @@ func main() {
 	}
 	defer connectRabbitMQ.Close()
 
-	println("Successfully connected to RabbitMQ instance")
+	channelRabbitMQ, err := connectRabbitMQ.Channel()
+	if err != nil {
+		panic(err)
+	}
+	defer channelRabbitMQ.Close()
 
+	messages, err := channelRabbitMQ.Consume(
+		"MatchingService", // queue name
+		"",                // consumer
+		true,              // auto-ack
+		false,             // exclusive
+		false,             // no local
+		false,             // no wait
+		nil,               // arguments
+	)
+	if err != nil {
+		log.Println(err)
+	}
+
+	log.Println("Successfully connected to RabbitMQ")
+	log.Println("Waiting for messages")
+
+	forever := make(chan bool)
+
+	go func() {
+		for message := range messages {
+			// For example, show received message in a console.
+			log.Printf(" > Received message: %s\n", message.Body)
+		}
+	}()
+
+	<-forever
 }
