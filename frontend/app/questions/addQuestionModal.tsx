@@ -15,11 +15,10 @@ import { Chip } from '@nextui-org/chip';
 import { Textarea } from '@nextui-org/react';
 import { Category, Complexity, Question } from '../types/question';
 import { useForm } from 'react-hook-form';
-import { notifySuccess, notifyError } from '../components/notifications';
+import { notifySuccess, notifyError } from '../components/Notifications';
 import { createEntry } from '../axios/axios';
 
-
-export default function QuestionAddModal({fetchQuestions}) {
+export default function QuestionAddModal({ fetchQuestions }) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const categories = Object.values(Category);
 
@@ -31,21 +30,20 @@ export default function QuestionAddModal({fetchQuestions}) {
   } = useForm();
 
   const onSubmit = handleSubmit((data: Question) => {
-      const modifiedData = {
-        ...data,
-        categories: (data.categories as string).split(',') as Category[],
-      };
-      createEntry('questions', modifiedData)
-      .then(res => {
-        if (res.message) {
-          fetchQuestions();
-          notifySuccess(res.message);
-          onOpenChange();
-          reset();
-        } else {
-          notifyError(res.error);
-        }
-      });
+    const modifiedData = {
+      ...data,
+      categories: (data.categories as string).split(',') as Category[],
+    };
+    createEntry('questions', modifiedData).then(res => {
+      if (res.message) {
+        fetchQuestions();
+        notifySuccess(res.message);
+        onOpenChange();
+        reset();
+      } else {
+        notifyError(res.error);
+      }
+    });
   });
 
   return (
@@ -69,14 +67,12 @@ export default function QuestionAddModal({fetchQuestions}) {
               <form>
                 <ModalBody>
                   <Input
-                    {...register('title', 
-                      { required: 'Title is required',
-                        validate: { 
-                          noNumbers : (value) => !/\d/.test(value) 
-                          || 'Title should not contain numbers',
-                        },
-                      }
-                    )}
+                    {...register('title', {
+                      required: 'Title is required',
+                      validate: {
+                        noNumbers: value => !/\d/.test(value) || 'Title should not contain numbers',
+                      },
+                    })}
                     autoFocus
                     label="Title"
                     placeholder="Enter Question Title"
@@ -130,15 +126,14 @@ export default function QuestionAddModal({fetchQuestions}) {
                     ))}
                   </Select>
                   <Textarea
-                    {...register('description', 
-                      { 
-                        required: 'Description is required',
-                        validate: {
-                          notEmpty: (value) => value.trim() !== '' 
-                          || 'Description cannot be empty or contain only whitespace',
-                        }, 
-                      }
-                    )}
+                    {...register('description', {
+                      required: 'Description is required',
+                      validate: {
+                        notEmpty: value =>
+                          value.trim() !== '' ||
+                          'Description cannot be empty or contain only whitespace',
+                      },
+                    })}
                     label="Description"
                     isRequired
                     labelPlacement="outside"

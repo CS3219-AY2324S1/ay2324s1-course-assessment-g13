@@ -12,7 +12,7 @@ import {
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { POST } from '../../axios/axios';
-import { notifyError, notifySuccess } from '../notifications';
+import { notifyError, notifySuccess } from '../Notifications';
 
 interface SignUpProps {
   isNav?: boolean;
@@ -29,14 +29,15 @@ const SignupModal: React.FC<SignUpProps> = ({ isNav = false }) => {
   } = useForm();
 
   const onSubmit = handleSubmit(async data => {
-    await POST('/users', data).then((res) => {
-      notifySuccess(res.data)
-      reset();
-      onClose();
-    }).catch(err => {
-      notifyError(err.response.data)
-    })
-
+    await POST('/users', data)
+      .then(res => {
+        notifySuccess(res.data);
+        reset();
+        onClose();
+      })
+      .catch(err => {
+        notifyError(err.response.data);
+      });
   });
   return (
     <>
@@ -79,7 +80,7 @@ const SignupModal: React.FC<SignUpProps> = ({ isNav = false }) => {
                 })}
                 label="Password"
                 isRequired
-                type='password'
+                type="password"
                 variant="bordered"
                 placeholder="Enter your password"
                 labelPlacement="outside"

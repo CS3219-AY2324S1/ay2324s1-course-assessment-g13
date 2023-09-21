@@ -9,26 +9,25 @@ import {
   Tooltip,
 } from '@nextui-org/react';
 import { DeleteIcon } from './assets/DeleteIcon';
-import { notifyWarning, notifyError } from '../components/notifications';
+import { notifyWarning, notifyError } from '../components/Notifications';
 import { deleteEntry } from '../axios/axios';
-
 
 const DeleteConfirmationModal = ({ title, id, fetchQuestions }) => {
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
 
   const handleDelete = () => {
     deleteEntry(`questions/${id}`)
-    .then(res => {
-      if (res.message) {
-        fetchQuestions();
-        notifyWarning(res.message);
-      } else {
-        notifyError(res.error);
-      }
-    })
-    .finally(() => onClose());
+      .then(res => {
+        if (res.message) {
+          fetchQuestions();
+          notifyWarning(res.message);
+        } else {
+          notifyError(res.error);
+        }
+      })
+      .finally(() => onClose());
   };
-  
+
   return (
     <>
       <Tooltip content="Delete question">

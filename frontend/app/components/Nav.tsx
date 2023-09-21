@@ -10,12 +10,13 @@ import useAuth from '../hook/useAuth';
 import { Avatar, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@nextui-org/react';
 import { useDispatch } from 'react-redux';
 import { logout } from '../redux/slices/userSlice';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 const Nav = () => {
   const { isLoggedIn } = useAuth();
   const dispatch = useDispatch();
   const router = useRouter();
+  const pathname = usePathname();
 
   const handleLogout = () => {
     dispatch(logout());
@@ -51,14 +52,18 @@ const Nav = () => {
       </NavbarBrand>
       {isLoggedIn && (
         <>
-          <NavbarContent className="hidden sm:flex gap-4" justify="center">
-            <NavbarItem isActive>
-              <Link href="/questions" aria-current="page">
+          <NavbarContent className="flex gap-4" justify="center">
+            <NavbarItem isActive={pathname === '/questions'}>
+              <Link
+                href="/questions"
+                color={pathname === '/questions' ? 'primary' : 'foreground'}
+                aria-current="page"
+              >
                 Questions
               </Link>
             </NavbarItem>
             <NavbarItem>
-              <Link color="foreground" href="#">
+              <Link color={pathname === '/interviews' ? 'primary' : 'foreground'} href="#">
                 Interviews
               </Link>
             </NavbarItem>
@@ -76,7 +81,11 @@ const Nav = () => {
                   />
                 </DropdownTrigger>
                 <DropdownMenu aria-label="Profile Actions" variant="flat">
-                  <DropdownItem key="profile">My Profile</DropdownItem>
+                  <DropdownItem key="profile" color="primary">
+                    <Link href="/profile" className="text-white text-sm w-full">
+                      Profile
+                    </Link>
+                  </DropdownItem>
                   <DropdownItem key="logout" color="danger" onClick={handleLogout}>
                     Log Out
                   </DropdownItem>

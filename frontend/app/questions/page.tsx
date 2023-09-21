@@ -3,8 +3,7 @@ import QuestionsTable from './questionsTable';
 import QuestionAddModal from './addQuestionModal';
 import { useState } from 'react';
 import { getData } from '../axios/axios';
-import { notifyError } from '../components/notifications';
-
+import { notifyError } from '../components/Notifications';
 
 export default function Questions() {
   const [questions, setQuestions] = useState([]);
@@ -16,7 +15,7 @@ export default function Questions() {
         notifyError(res.error);
       }
     });
-  }
+  };
 
   return (
     <div className="questions mx-auto max-w-7xl px-6 h-4/5 my-10">
