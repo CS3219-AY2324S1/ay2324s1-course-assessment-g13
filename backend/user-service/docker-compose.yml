@@ -10,6 +10,8 @@ services:
       - "3000:3000"
     volumes:
       - .:/usr/src/app
+    networks:
+      - peerpreps-backend
   db:
     image: postgres:16rc1-alpine3.18
     container_name: postgres
@@ -21,6 +23,13 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
     volumes:
       - data:/var/lib/postgresql/data
+    networks:
+      - peerpreps-backend
 
 volumes:
   data:
+
+networks:
+  peerpreps-backend:
+    external:
+      true
