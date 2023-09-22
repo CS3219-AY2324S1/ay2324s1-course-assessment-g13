@@ -66,10 +66,10 @@ services:
       - "5672:5672"
       - "15672:15672"
     healthcheck:
-        test: rabbitmq-diagnostics -q ping
-        interval: 5s
-        timeout: 10s
-        retries: 5
+      test: [ "CMD", "nc", "-z", "rabbitmq", "5672" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
 
   matching-producer:
     container_name: matching-producer
@@ -86,7 +86,7 @@ services:
       - ./backend/matching-service/producer:/usr/src/app
     depends_on:
       rabbitmq:
-          condition: service_healthy
+        condition: service_healthy
 
   matching-consumer:
     container_name: matching-consumer
@@ -103,7 +103,9 @@ services:
       - ./backend/matching-service/consumer:/usr/src/app
     depends_on:
       matching-producer:
-          condition: service_started
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
 
   # question-service:
   #     container_name: question-service

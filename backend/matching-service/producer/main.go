@@ -23,7 +23,7 @@ func main() {
 	}
 	defer channelRabbitMQ.Close()
 
-	_, err = channelRabbitMQ.QueueDeclare(
+	q, err := channelRabbitMQ.QueueDeclare(
 		"MatchingService", // queue name
 		true,              // durable
 		false,             // auto delete
@@ -42,11 +42,11 @@ func main() {
 			Body:        []byte("hello"),
 		}
 		if err := channelRabbitMQ.Publish(
-			"",                // exchange
-			"MatchingService", // queue name
-			false,             // mandatory
-			false,             // immediate
-			message,           // message to publish
+			"",      // exchange
+			q.Name,  // queue name
+			false,   // mandatory
+			false,   // immediate
+			message, // message to publish
 		); err != nil {
 			return err
 		}

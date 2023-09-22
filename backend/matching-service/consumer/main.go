@@ -22,14 +22,26 @@ func main() {
 	}
 	defer channelRabbitMQ.Close()
 
-	messages, err := channelRabbitMQ.Consume(
-		"MatchingService", // queue name
-		"",                // consumer
-		true,              // auto-ack
+	q, err := channelRabbitMQ.QueueDeclare(
+		"MatchingService", // name
+		true,              // durable
+		false,             // delete when unused
 		false,             // exclusive
-		false,             // no local
-		false,             // no wait
+		false,             // no-wait
 		nil,               // arguments
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	messages, err := channelRabbitMQ.Consume(
+		q.Name, // queue name
+		"",     // consumer
+		true,   // auto-ack
+		false,  // exclusive
+		false,  // no local
+		false,  // no wait
+		nil,    // arguments
 	)
 	if err != nil {
 		log.Println(err)
