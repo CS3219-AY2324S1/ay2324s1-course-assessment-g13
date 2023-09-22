@@ -17,6 +17,7 @@ const (
 	SUCCESS_LOGOUT             = "Logout Successfully"
 	SUCCESS_ROLE_UPGRADED      = "User Role Upgraded Successfully!"
 	SUCCESS_ROLE_DOWNGRADED    = "User Role Downgraded Successfully!"
+	SUCCESS_TOKEN_REFRESHED    = "Token Refreshed Successfully!"
 )
 
 const (

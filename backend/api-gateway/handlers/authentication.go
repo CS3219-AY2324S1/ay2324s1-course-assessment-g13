@@ -49,3 +49,20 @@ func Logout(c echo.Context) error {
 	c.SetCookie(cookie_)
 	return c.JSON(http.StatusOK, message.CreateSuccessMessage(SUCCESS_LOGOUT))
 }
+
+func Refresh(c echo.Context) error {
+	tokenClaims := c.Get(TOKEN_CLAIMS_KEY).(*models.Claims)
+
+	user := tokenClaims.User
+	expirationTime := expiry.ExpireIn5Minutes()
+
+	tokenString, statusCode, responseMessage := token.Service.Generate(&user, expirationTime)
+	if statusCode != http.StatusOK {
+		return c.JSON(statusCode, message.CreateErrorMessage(responseMessage))
+	}
+
+	cookie_ := cookie.Service.CreateCookie(JWT_COOKIE_NAME, tokenString, expirationTime)
+	c.SetCookie(cookie_)
+
+	return c.JSON(http.StatusOK, message.CreateSuccessMessage(SUCCESS_TOKEN_REFRESHED))
+}

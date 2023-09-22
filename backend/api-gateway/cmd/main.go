@@ -25,6 +25,7 @@ func main() {
 
 	API_GATEWAY.POST(path.LOGIN, handlers.Login)
 	API_GATEWAY.GET(path.LOGOUT, handlers.Logout)
+	API_GATEWAY.GET(path.REFRESH, handlers.Refresh)
 
 	API_GATEWAY.PUT(path.AUTH_USER_UPGRADE, handlers.UpgradeUser)
 	API_GATEWAY.PUT(path.AUTH_USER_DOWNGRADE, handlers.DowngradeUser)
