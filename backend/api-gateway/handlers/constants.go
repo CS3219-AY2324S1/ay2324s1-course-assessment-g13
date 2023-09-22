@@ -21,8 +21,12 @@ const (
 )
 
 const (
-	JWT_COOKIE_NAME  = "jwt"
-	TOKEN_CLAIMS_KEY = "token-claims"
+	JWT_COOKIE_NAME             = "jwt"
+	TOKEN_CLAIMS_CONTEXT_KEY    = "token-claims"
+	USER_CONTEXT_KEY            = "user"
+	SUCCESS_MESSAGE_CONTEXT_KEY = "success-message"
+	EXPIRATION_TIME_CONTEXT_KEY = "expiration-time"
+	GITHUB_DATA_CONTEXT_KEY     = "github-data"
 )
 
 const (

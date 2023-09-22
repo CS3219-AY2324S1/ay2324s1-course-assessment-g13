@@ -20,15 +20,15 @@ func main() {
 	API_GATEWAY.Use(handlers.PreventLoginMiddleware, handlers.RequireAuthenticationMiddleWare)
 
 	API_GATEWAY.POST(path.REGISTER, handlers.CreateUser)
-	API_GATEWAY.POST(path.REGISTER_GITHUB, handlers.GithubLogin)
+	API_GATEWAY.GET(path.REGISTER_GITHUB, handlers.GithubEntry)
 	API_GATEWAY.GET(path.AUTH_USER, handlers.GetUser)
 	API_GATEWAY.DELETE(path.AUTH_USER, handlers.DeleteUser)
 
 	API_GATEWAY.POST(path.LOGIN, handlers.Login)
-	API_GATEWAY.GET(path.LOGIN_GITHUB, handlers.GithubLogin)
-	API_GATEWAY.GET(path.LOGIN_GITHUB_CALLBACK, handlers.GithubCallback)
 	API_GATEWAY.GET(path.LOGOUT, handlers.Logout)
 	API_GATEWAY.GET(path.REFRESH, handlers.Refresh)
+	API_GATEWAY.GET(path.LOGIN_GITHUB, handlers.GithubEntry)
+	API_GATEWAY.GET(path.GITHUB_CALLBACK, handlers.GithubCallback)
 
 	API_GATEWAY.PUT(path.AUTH_USER_UPGRADE, handlers.UpgradeUser)
 	API_GATEWAY.PUT(path.AUTH_USER_DOWNGRADE, handlers.DowngradeUser)

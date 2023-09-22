@@ -12,10 +12,10 @@ import (
 )
 
 var bypassLoginList = map[string]bool{
-	path.REGISTER:              true,
-	path.LOGIN:                 true,
-	path.LOGIN_GITHUB:          true,
-	path.LOGIN_GITHUB_CALLBACK: true,
+	path.REGISTER:        true,
+	path.LOGIN:           true,
+	path.LOGIN_GITHUB:    true,
+	path.GITHUB_CALLBACK: true,
 }
 
 func RequireAuthenticationMiddleWare(next echo.HandlerFunc) echo.HandlerFunc {
@@ -36,7 +36,7 @@ func RequireAuthenticationMiddleWare(next echo.HandlerFunc) echo.HandlerFunc {
 			return c.JSON(statusCode, message.CreateErrorMessage(responseMessage))
 		}
 
-		c.Set(TOKEN_CLAIMS_KEY, tokenClaims)
+		c.Set(TOKEN_CLAIMS_CONTEXT_KEY, tokenClaims)
 		return next(c)
 	}
 }

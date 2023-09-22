@@ -3,11 +3,9 @@ package handlers
 import (
 	"api-gateway/config"
 	"api-gateway/models"
-	"api-gateway/utils/cookie"
 	"api-gateway/utils/env"
 	"api-gateway/utils/expiry"
 	"api-gateway/utils/message"
-	"api-gateway/utils/token"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -38,7 +36,7 @@ const (
 	HTTP_APPLICATION_JSON     = "application/json"
 )
 
-func GithubLogin(c echo.Context) error {
+func GithubEntry(c echo.Context) error {
 	githubClientID := env.GetGitHubClientID()
 	redirectURL := fmt.Sprintf(
 		GITHUB_OAUTH_AUTHORIZE_URL_FORMAT,
@@ -67,11 +65,14 @@ func GithubCallback(c echo.Context) error {
 	config.DB.Where("o_auth_provider = ? AND o_auth_user_id = ?", provider, githubUserID).First(&existingUser)
 
 	if existingUser.ID == 0 {
-		c.Set("GithubData", githubData)
+		c.Set(GITHUB_DATA_CONTEXT_KEY, githubData)
 		return oauthCreateUser(c)
 	}
-	c.Set("user", existingUser)
-	return oauthLogin(c)
+	c.Set(USER_CONTEXT_KEY, existingUser)
+	c.Set(SUCCESS_MESSAGE_CONTEXT_KEY, GITHUB_USER_DATA_SUCCESS)
+	c.Set(EXPIRATION_TIME_CONTEXT_KEY, expiry.ExpireIn5Minutes())
+
+	return GenerateTokenAndSetCookie(c)
 }
 
 func getGithubAccessToken(code string) (accessToken string, statusCode int, message string) {
@@ -135,20 +136,6 @@ func getGithubData(accessToken string) (githubData *models.GithubDataResponseBod
 	json.Unmarshal(responseBody, &githubDataResponseBody)
 
 	return githubDataResponseBody, http.StatusOK, GITHUB_USER_DATA_SUCCESS
-}
-
-func oauthLogin(c echo.Context) error {
-	user := c.Get("user").(models.User)
-	expirationTime := expiry.ExpireIn5Minutes()
-	token, statusCode, responseMessage := token.Service.Generate(&user, expirationTime)
-	if statusCode != http.StatusOK {
-		return c.JSON(statusCode, message.CreateErrorMessage(responseMessage))
-	}
-
-	cookie_ := cookie.Service.CreateCookie(JWT_COOKIE_NAME, token, expirationTime)
-	c.SetCookie(cookie_)
-
-	return c.JSON(http.StatusOK, message.CreateSuccessUserMessage(GITHUB_USER_DATA_SUCCESS, user))
 }
 
 func oauthCreateUser(c echo.Context) error {

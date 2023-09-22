@@ -45,7 +45,7 @@ func CreateUser(c echo.Context) error {
 }
 
 func GetUser(c echo.Context) error {
-	tokenClaims := c.Get(TOKEN_CLAIMS_KEY).(*models.Claims)
+	tokenClaims := c.Get(TOKEN_CLAIMS_CONTEXT_KEY).(*models.Claims)
 
 	user := tokenClaims.User
 
@@ -53,7 +53,7 @@ func GetUser(c echo.Context) error {
 }
 
 func DeleteUser(c echo.Context) error {
-	tokenClaims := c.Get(TOKEN_CLAIMS_KEY).(*models.Claims)
+	tokenClaims := c.Get(TOKEN_CLAIMS_CONTEXT_KEY).(*models.Claims)
 
 	user := tokenClaims.User
 

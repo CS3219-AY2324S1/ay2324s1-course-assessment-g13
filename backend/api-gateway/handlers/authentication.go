@@ -6,7 +6,6 @@ import (
 	"api-gateway/utils/cookie"
 	"api-gateway/utils/expiry"
 	"api-gateway/utils/message"
-	"api-gateway/utils/token"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -29,16 +28,11 @@ func Login(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(FAILURE_HASHING_PASSWORD))
 	}
 
-	expirationTime := expiry.ExpireIn5Minutes()
-	token, statusCode, responseMessage := token.Service.Generate(&user, expirationTime)
-	if statusCode != http.StatusOK {
-		return c.JSON(statusCode, message.CreateErrorMessage(responseMessage))
-	}
+	c.Set(USER_CONTEXT_KEY, user)
+	c.Set(SUCCESS_MESSAGE_CONTEXT_KEY, SUCCESS_LOGIN)
+	c.Set(EXPIRATION_TIME_CONTEXT_KEY, expiry.ExpireIn5Minutes())
 
-	cookie_ := cookie.Service.CreateCookie(JWT_COOKIE_NAME, token, expirationTime)
-	c.SetCookie(cookie_)
-
-	return c.JSON(http.StatusOK, message.CreateSuccessUserMessage(SUCCESS_LOGIN, user))
+	return GenerateTokenAndSetCookie(c)
 }
 
 func Logout(c echo.Context) error {
@@ -51,18 +45,13 @@ func Logout(c echo.Context) error {
 }
 
 func Refresh(c echo.Context) error {
-	tokenClaims := c.Get(TOKEN_CLAIMS_KEY).(*models.Claims)
+	tokenClaims := c.Get(TOKEN_CLAIMS_CONTEXT_KEY).(*models.Claims)
 
 	user := tokenClaims.User
-	expirationTime := expiry.ExpireIn5Minutes()
 
-	tokenString, statusCode, responseMessage := token.Service.Generate(&user, expirationTime)
-	if statusCode != http.StatusOK {
-		return c.JSON(statusCode, message.CreateErrorMessage(responseMessage))
-	}
+	c.Set(USER_CONTEXT_KEY, user)
+	c.Set(SUCCESS_MESSAGE_CONTEXT_KEY, SUCCESS_TOKEN_REFRESHED)
+	c.Set(EXPIRATION_TIME_CONTEXT_KEY, expiry.ExpireIn5Minutes())
 
-	cookie_ := cookie.Service.CreateCookie(JWT_COOKIE_NAME, tokenString, expirationTime)
-	c.SetCookie(cookie_)
-
-	return c.JSON(http.StatusOK, message.CreateSuccessMessage(SUCCESS_TOKEN_REFRESHED))
+	return GenerateTokenAndSetCookie(c)
 }
