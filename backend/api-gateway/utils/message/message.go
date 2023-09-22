@@ -8,15 +8,21 @@ func CreateErrorMessage(message string) models.ErrorMessage {
 	}
 }
 
-func CreateSuccessMessage(message string, data ...interface{}) models.SuccessMessage {
-	var incomingData interface{}
-
-	if len(data) > 0 {
-		incomingData = data[0]
-	}
-
+func CreateSuccessMessage(message string) models.SuccessMessage {
 	return models.SuccessMessage{
 		Message: message,
-		Data:    incomingData,
+	}
+}
+
+func CreateSuccessUserMessage(message string, user ...models.User) models.SuccessUserMessage {
+	var userData models.User
+
+	if len(user) > 0 {
+		userData = user[0]
+	}
+
+	return models.SuccessUserMessage{
+		Message: message,
+		User:    userData,
 	}
 }

@@ -52,7 +52,7 @@ func CreateUser(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(FAILURE_CREATE_USER))
 	}
 
-	return c.JSON(http.StatusCreated, message.CreateSuccessMessage(SUCCESS_USER_CREATED, user))
+	return c.JSON(http.StatusCreated, message.CreateSuccessUserMessage(SUCCESS_USER_CREATED, *user))
 }
 
 func GetUser(c echo.Context) error {
@@ -64,7 +64,7 @@ func GetUser(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, message.CreateErrorMessage(INVALID_USER_NOT_FOUND))
 	}
 
-	return c.JSON(http.StatusOK, message.CreateSuccessMessage(SUCCESS_USER_FOUND, user))
+	return c.JSON(http.StatusOK, message.CreateSuccessUserMessage(SUCCESS_USER_FOUND, user))
 }
 
 func DeleteUser(c echo.Context) error {
@@ -77,5 +77,5 @@ func DeleteUser(c echo.Context) error {
 	}
 
 	config.DB.Delete(&user)
-	return c.JSON(http.StatusOK, message.CreateSuccessMessage(SUCCESS_USER_DELETED, user))
+	return c.JSON(http.StatusOK, message.CreateSuccessUserMessage(SUCCESS_USER_DELETED, user))
 }

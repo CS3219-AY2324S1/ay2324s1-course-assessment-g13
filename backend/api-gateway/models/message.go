@@ -4,7 +4,11 @@ type ErrorMessage struct {
 	Message string `json:"error"`
 }
 
+type SuccessUserMessage struct {
+	Message string `json:"message"`
+	User    User   `json:"data,omitempty"`
+}
+
 type SuccessMessage struct {
-	Message string      `json:"message"`
-	Data    interface{} `json:"data,omitempty"`
+	Message string `json:"message"`
 }
