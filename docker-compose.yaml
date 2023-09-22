@@ -65,6 +65,11 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    healthcheck:
+        test: rabbitmq-diagnostics -q ping
+        interval: 5s
+        timeout: 10s
+        retries: 5
 
   matching-producer:
     container_name: matching-producer
@@ -80,7 +85,8 @@ services:
     volumes:
       - ./backend/matching-service/producer:/usr/src/app
     depends_on:
-      - rabbitmq
+      rabbitmq:
+          condition: service_healthy
 
   matching-consumer:
     container_name: matching-consumer
@@ -96,7 +102,8 @@ services:
     volumes:
       - ./backend/matching-service/consumer:/usr/src/app
     depends_on:
-      - rabbitmq
+      matching-producer:
+          condition: service_started
 
   # question-service:
   #     container_name: question-service

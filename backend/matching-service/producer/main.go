@@ -24,7 +24,7 @@ func main() {
 	defer channelRabbitMQ.Close()
 
 	_, err = channelRabbitMQ.QueueDeclare(
-		"matchingService", // queue name
+		"MatchingService", // queue name
 		true,              // durable
 		false,             // auto delete
 		false,             // exclusive
