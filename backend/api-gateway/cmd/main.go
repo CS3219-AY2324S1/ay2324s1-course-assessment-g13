@@ -2,6 +2,7 @@ package main
 
 import (
 	"api-gateway/config"
+	"api-gateway/handlers"
 	"log"
 	"net/http"
 
@@ -15,8 +16,10 @@ func main() {
 	API_GATEWAY := echo.New()
 
 	API_GATEWAY.GET("/", hello)
-	// API_GATEWAY.POST("/auth/register", createUser)
-	// API_GATEWAY.GET("/auth/users", getUsers)
+	API_GATEWAY.POST("/auth/register", handlers.CreateUser)
+	API_GATEWAY.GET("/auth/users", handlers.GetUsers)
+	API_GATEWAY.GET("/auth/users/:id", handlers.GetUser)
+	API_GATEWAY.DELETE("/auth/users/:id", handlers.DeleteUser)
 
 	API_GATEWAY.Start(":1234")
 }
