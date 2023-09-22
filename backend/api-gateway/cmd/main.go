@@ -17,9 +17,10 @@ func main() {
 
 	API_GATEWAY := echo.New()
 
-	// API_GATEWAY.Use(handlers.PreventLoginMiddleware, handlers.RequireAuthenticationMiddleWare)
+	API_GATEWAY.Use(handlers.PreventLoginMiddleware, handlers.RequireAuthenticationMiddleWare)
 
 	API_GATEWAY.POST(path.REGISTER, handlers.CreateUser)
+	API_GATEWAY.POST(path.REGISTER_GITHUB, handlers.GithubLogin)
 	API_GATEWAY.GET(path.AUTH_USER, handlers.GetUser)
 	API_GATEWAY.DELETE(path.AUTH_USER, handlers.DeleteUser)
 

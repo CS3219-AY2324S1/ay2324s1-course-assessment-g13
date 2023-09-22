@@ -2,6 +2,7 @@ package path
 
 const (
 	REGISTER              = "/auth/register"
+	REGISTER_GITHUB       = "/auth/login/github"
 	LOGIN                 = "/auth/login"
 	LOGIN_GITHUB          = "/auth/login/github"
 	LOGIN_GITHUB_CALLBACK = "/auth/login/github/callback"

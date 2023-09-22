@@ -8,11 +8,11 @@ type User struct {
 	Role                   string `json:"role" gorm:"default:'user'"`
 	HashedPassword         string `json:"-"`
 	OAuthProvider          string `json:"oauthProvider,omitempty"`
-	OAuthUserID            int    `json:"oauthUserId,omitempty"`
+	OAuthUserID            int    `json:"-"`
 	OAuthUsername          string `json:"oauthUsername,omitempty"`
-	OAuthEmail             string `json:"oauthEmail,omitempty"`
-	OAuthProfilePictureURL string `json:"oauthProfilePictureUrl,omitempty"`
-	OAuthProfileURl        string `json:"oauthProfileUrl,omitempty"`
+	OAuthEmail             string `json:"-"`
+	OAuthProfilePictureURL string `json:"-"`
+	OAuthProfileURL        string `json:"-"`
 }
 
 type UserCredential struct {
