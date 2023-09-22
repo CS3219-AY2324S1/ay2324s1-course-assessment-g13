@@ -23,7 +23,7 @@ func main() {
 
 	API_GATEWAY := echo.New()
 
-	API_GATEWAY.Use(handlers.RequireAuthenticationMiddleWare)
+	API_GATEWAY.Use(handlers.PreventLoginMiddleware, handlers.RequireAuthenticationMiddleWare)
 
 	API_GATEWAY.POST(REGISTER, handlers.CreateUser)
 	API_GATEWAY.GET(AUTH_USER, handlers.GetUser)

@@ -16,8 +16,8 @@ var bypassLoginList = map[string]bool{
 
 func RequireAuthenticationMiddleWare(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		_, ok := bypassLoginList[c.Request().RequestURI]
-		if ok {
+		_, isInList := bypassLoginList[c.Request().RequestURI]
+		if isInList {
 			return next(c)
 		}
 
@@ -32,6 +32,20 @@ func RequireAuthenticationMiddleWare(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 
 		c.Set(TOKEN_CLAIMS_KEY, tokenClaims)
+		return next(c)
+	}
+}
+
+func PreventLoginMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		_, isInList := bypassLoginList[c.Request().RequestURI]
+		if !isInList {
+			return next(c)
+		}
+		_, statusCode, _ := cookie.Service.GetCookieValue(c.Cookie(JWT_COOKIE_NAME))
+		if statusCode == http.StatusOK {
+			return c.JSON(http.StatusForbidden, message.CreateErrorMessage(FAILURE_USER_ALREADY_LOGIN))
+		}
 		return next(c)
 	}
 }
