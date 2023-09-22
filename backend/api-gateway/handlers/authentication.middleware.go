@@ -3,6 +3,7 @@ package handlers
 import (
 	"api-gateway/utils/cookie"
 	"api-gateway/utils/message"
+	"api-gateway/utils/path"
 	"api-gateway/utils/token"
 	"net/http"
 
@@ -10,8 +11,8 @@ import (
 )
 
 var bypassLoginList = map[string]bool{
-	"/auth/register": true,
-	"/auth/login":    true,
+	path.REGISTER: true,
+	path.LOGIN:    true,
 }
 
 func RequireAuthenticationMiddleWare(next echo.HandlerFunc) echo.HandlerFunc {
