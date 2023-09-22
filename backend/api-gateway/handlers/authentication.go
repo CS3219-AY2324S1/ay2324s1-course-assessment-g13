@@ -13,12 +13,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-const (
-	JWT_COOKIE_NAME = "jwt"
-	SUCCESS_LOGIN   = "Login Successfully"
-	SUCCESS_LOGOUT  = "Logout Successfully"
-)
-
 func Login(c echo.Context) error {
 	requestBody := new(models.UserCredential)
 	if err := c.Bind(requestBody); err != nil {
