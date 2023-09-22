@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	ENV_JWT_SECRET_KEY = "JWT_SECRET_KEY"
+	JWT_SECRET_KEY_ENV_KEY = "JWT_SECRET_KEY"
 
 	INVALID_TOKEN_SIGNATURE    = "Invalid Signature!"
 	FAILURE_TOKEN_UNSIGN       = "Unable to Sign Token!"
@@ -65,7 +65,7 @@ func (service *tokenService) Validate(tokenString string) (*models.Claims, int, 
 }
 
 func CreateTokenService() TokenService {
-	secret := os.Getenv(ENV_JWT_SECRET_KEY)
+	secret := os.Getenv(JWT_SECRET_KEY_ENV_KEY)
 	return &tokenService{
 		secretKey: []byte(secret),
 	}
