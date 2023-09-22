@@ -33,5 +33,8 @@ func main() {
 	API_GATEWAY.PUT(path.AUTH_USER_UPGRADE, handlers.UpgradeUser)
 	API_GATEWAY.PUT(path.AUTH_USER_DOWNGRADE, handlers.DowngradeUser)
 
+	API_GATEWAY.Any("/users*", handlers.HandleUserService)
+	API_GATEWAY.POST("/login", handlers.HandleUserService)
+
 	API_GATEWAY.Start(API_GATEWAY_PORT)
 }

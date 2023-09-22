@@ -10,17 +10,25 @@ services:
       - "1234:1234"
     volumes:
       - .:/usr/src/app
+    networks:
+      - peerpreps-backend
   db:
     image: postgres:16rc1-alpine3.18
-    container_name: postgres
+    container_name: postgres-api-gateway
     ports:
-      - "5432:5432"
+      - "5433:5432"
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
     volumes:
       - data:/var/lib/postgresql/data
+    networks:
+      - peerpreps-backend
 
 volumes:
   data:
+
+networks:
+  peerpreps-backend:
+    external: true
