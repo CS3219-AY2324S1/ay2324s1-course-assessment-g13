@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	FAILURE_COOKIE_NOT_FOUND = "No Cookie Found!"
+	FAILURE_COOKIE_NOT_FOUND = "No Cookie Found, Please Login!"
 	FAILURE_GETTING_COOKIE   = "An Error Occured while Trying to Get Cookie"
 	SUCCESS_COOKIE_FOUND     = "Cookie Value Found"
 	SUCCESS_COOKIE_EXPIRED   = "Cookie has Expired"

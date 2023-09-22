@@ -14,3 +14,5 @@ const (
 	SUCCESS_LOGIN            = "Login Successfully"
 	SUCCESS_LOGOUT           = "Logout Successfully"
 )
+
+const TOKEN_CLAIMS_KEY = "token-claims"

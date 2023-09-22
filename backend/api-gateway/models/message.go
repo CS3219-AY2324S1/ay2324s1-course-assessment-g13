@@ -6,7 +6,7 @@ type ErrorMessage struct {
 
 type SuccessUserMessage struct {
 	Message string `json:"message"`
-	User    User   `json:"data,omitempty"`
+	User    User   `json:"user,omitempty"`
 }
 
 type SuccessMessage struct {

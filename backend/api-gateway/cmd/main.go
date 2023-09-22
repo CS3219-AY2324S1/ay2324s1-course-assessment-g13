@@ -15,6 +15,8 @@ func main() {
 
 	API_GATEWAY := echo.New()
 
+	API_GATEWAY.Use(handlers.RequireAuthenticationMiddleWare)
+
 	API_GATEWAY.GET("/", hello)
 	API_GATEWAY.POST("/auth/register", handlers.CreateUser)
 	API_GATEWAY.GET("/auth/users/:id", handlers.GetUser)
