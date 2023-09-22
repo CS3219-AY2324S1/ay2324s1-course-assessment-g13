@@ -12,3 +12,7 @@ const (
 var MatchCriterias = []MatchCriteria{
 	None, Easy, Medium, Hard,
 }
+
+func ConstructResultChanIdentifier(str string) string {
+	return "results/" + str
+}

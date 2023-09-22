@@ -2,7 +2,9 @@ package rmq
 
 import (
 	"consumer/utils"
+	"fmt"
 	amqp "github.com/rabbitmq/amqp091-go"
+	"log"
 	"os"
 )
 
@@ -15,17 +17,20 @@ func Init() {
 
 	connectRabbitMQ, err := amqp.Dial(amqpServerURL)
 	if err != nil {
+		msg := fmt.Sprintf("[Init] Error dialing TCP connection | err: %v", err)
+		log.Println(msg)
 		panic(err)
 	}
 
 	OpenChannelsMap = make(map[utils.MatchCriteria]*amqp.Channel, 4)
-
-	println("Successfully connected to RabbitMQ instance")
+	Conn = connectRabbitMQ
 
 	// Construct requests MQ
 	for _, channelType := range utils.MatchCriterias {
 		channelRabbitMQ, err := connectRabbitMQ.Channel()
 		if err != nil {
+			msg := fmt.Sprintf("[Init] Error creating unique criteria channel | err: %v", err)
+			log.Println(msg)
 			panic(err)
 		}
 
@@ -40,6 +45,8 @@ func Init() {
 			nil,                 // arguments
 		)
 		if err != nil {
+			msg := fmt.Sprintf("[Init] Error declaring criteria MQ | err: %v", err)
+			log.Println(msg)
 			panic(err)
 		}
 	}
@@ -47,6 +54,8 @@ func Init() {
 	// Constructs result MQ
 	mq, err := connectRabbitMQ.Channel()
 	if err != nil {
+		msg := fmt.Sprintf("[Init] Error creating unique results channel | err: %v", err)
+		log.Println(msg)
 		panic(err)
 	}
 	ResultChannel = mq
@@ -59,6 +68,8 @@ func Init() {
 		nil,       // arguments
 	)
 	if err != nil {
+		msg := fmt.Sprintf("[Init] Error declaring results MQ | err: %v", err)
+		log.Println(msg)
 		panic(err)
 	}
 }
@@ -68,17 +79,23 @@ func Reset() {
 	for _, openChannel := range OpenChannelsMap {
 		err = openChannel.Close()
 		if err != nil {
+			msg := fmt.Sprintf("[Reset] Error closing criteria channels | err: %v", err)
+			log.Println(msg)
 			panic(err)
 		}
 	}
 
 	err = Conn.Close()
 	if err != nil {
+		msg := fmt.Sprintf("[Reset] Error closing TCP connection | err: %v", err)
+		log.Println(msg)
 		panic(err)
 	}
 
 	err = ResultChannel.Close()
 	if err != nil {
+		msg := fmt.Sprintf("[Reset] Error closing result channel | err: %v", err)
+		log.Println(msg)
 		panic(err)
 	}
 }

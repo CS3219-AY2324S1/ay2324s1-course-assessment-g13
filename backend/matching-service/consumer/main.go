@@ -11,7 +11,7 @@ func main() {
 	defer rmq.Reset()
 	forever := make(chan bool)
 
-	// Sets off worker goroutines
+	// Sets off worker goroutines to listen at each criteria channel
 	for _, criteria := range utils.MatchCriterias {
 		worker.SpinMQConsumer(criteria)
 	}

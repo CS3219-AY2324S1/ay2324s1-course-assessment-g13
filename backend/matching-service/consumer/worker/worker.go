@@ -19,8 +19,9 @@ func SpinMQConsumer(criteria utils.MatchCriteria) {
 		if curr, ok := rmq.OpenChannelsMap[criteria]; ok {
 			channel = curr
 		} else {
-			fmt.Println("[SpinMQConsumer] Error getting open channel")
-
+			msg := fmt.Sprintf("[SpinMQConsumer] Criteria channel is unknown | ok: %v", ok)
+			log.Println(msg)
+			return
 		}
 
 		messages, err := channel.Consume(
@@ -33,38 +34,99 @@ func SpinMQConsumer(criteria utils.MatchCriteria) {
 			nil,              // arguments
 		)
 		if err != nil {
-			fmt.Println("[SpinMQConsumer] Error consuming from channel")
+			msg := fmt.Sprintf("[SpinMQConsumer] Error consuming from channel | err: %v", err)
+			log.Println(msg)
+			return
 		}
 
 		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 		defer cancel()
 
+		resultChan, err := rmq.Conn.Channel()
+		if err != nil {
+			msg := fmt.Sprintf("[SpinMQConsumer] Error creating unique result channel | err: %v", err)
+			log.Println(msg)
+			return
+		}
+		defer resultChan.Close()
+
+		//matchMakingBufferMap := map[string]models.MessageQueueRequestPacket{}
+		matchMakingBuffer := []models.MessageQueueRequestPacket{}
+
 		for message := range messages {
-			// For example, show received message in a console.
 			res := models.MessageQueueRequestPacket{}
 			err := json.Unmarshal(message.Body, &res)
 			if err != nil {
-				fmt.Println(err)
+				msg := fmt.Sprintf("[SpinMQConsumer] Error unmarshalling request packet | err: %v", err)
+				log.Println(msg)
+				return
 			}
-			log.Printf(" > Received message: %s\n", res)
 
-			pubMsg := fmt.Sprintf("Consumer received msg from %s", res.RequestBody.Username)
+			isReplaced := false
 
-			err = channel.PublishWithContext(
-				ctx,
-				"",        // exchange
-				"results", // queue name
-				false,     // mandatory
-				false,     // immediate
-				amqp.Publishing{
-					ContentType: "text/plain",
-					Body:        []byte(pubMsg), // message to publish
-				},
-			)
-			if err != nil {
-				msg := fmt.Sprintf("[MatchHandler] Error publishing message | err: %v", err)
-				fmt.Println(msg)
+			// Check if user is currently stale data in map
+			for index, bufferedUser := range matchMakingBuffer {
+				if bufferedUser.RequestBody.Username == res.RequestBody.Username {
+					matchMakingBuffer[index] = res
+					isReplaced = true
+				}
 			}
+
+			if !isReplaced {
+				matchMakingBuffer = append(matchMakingBuffer, res)
+			}
+
+			// Match found
+			if len(matchMakingBuffer) == 2 {
+				fmt.Println("Found a match!")
+				for index, user := range matchMakingBuffer {
+					pubMsg := models.MessageQueueResponsePacket{
+						ResponseBody: models.MatchResponse{
+							MatchUser:    matchMakingBuffer[(index+1)%2].RequestBody.Username,
+							MatchStatus:  1,
+							RedirectURL:  "https://google.com", // Redirect link to collaboration site
+							ErrorMessage: "",
+						},
+					}
+
+					responsePacket, err := json.Marshal(pubMsg)
+					if err != nil {
+						msg := fmt.Sprintf("[SpinMQConsumer] Error marshalling response packet | err: %v", err)
+						log.Println(msg)
+						return
+					}
+
+					// Declare unique result queue
+					resultQueue, err := resultChan.QueueDeclare(
+						utils.ConstructResultChanIdentifier(user.RequestBody.Username),
+						false,
+						false,
+						false,
+						false,
+						nil,
+					)
+
+					err = resultChan.PublishWithContext(
+						ctx,
+						"",               // exchange
+						resultQueue.Name, // queue name
+						false,            // mandatory
+						false,            // immediate
+						amqp.Publishing{
+							ContentType: "text/plain",
+							Body:        responsePacket, // message to publish
+						},
+					)
+					if err != nil {
+						msg := fmt.Sprintf("[SpinMQConsumer] Error publishing message to results channel | err: %v", err)
+						log.Println(msg)
+						return
+					}
+				}
+				matchMakingBuffer = nil
+			}
+
+			log.Printf(" > Received message: %s with buffer size %d\n", res, len(matchMakingBuffer))
 		}
 	}()
 }
