@@ -17,9 +17,10 @@ func main() {
 
 	API_GATEWAY.GET("/", hello)
 	API_GATEWAY.POST("/auth/register", handlers.CreateUser)
-	API_GATEWAY.GET("/auth/users", handlers.GetUsers)
 	API_GATEWAY.GET("/auth/users/:id", handlers.GetUser)
 	API_GATEWAY.DELETE("/auth/users/:id", handlers.DeleteUser)
+	API_GATEWAY.POST("/auth/login", handlers.Login)
+	API_GATEWAY.GET("/auth/logout", handlers.Logout)
 
 	API_GATEWAY.Start(":1234")
 }
