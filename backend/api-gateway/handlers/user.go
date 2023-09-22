@@ -3,6 +3,7 @@ package handlers
 import (
 	"api-gateway/config"
 	"api-gateway/models"
+	"api-gateway/utils/cookie"
 	"api-gateway/utils/message"
 	"net/http"
 
@@ -44,26 +45,25 @@ func CreateUser(c echo.Context) error {
 }
 
 func GetUser(c echo.Context) error {
-	id := c.Param("id")
+	tokenClaims := c.Get(TOKEN_CLAIMS_KEY).(*models.Claims)
 
-	var user models.User
-	config.DB.Where("id = ?", id).First(&user)
-	if user.ID == 0 {
-		return c.JSON(http.StatusNotFound, message.CreateErrorMessage(INVALID_USER_NOT_FOUND))
-	}
+	user := tokenClaims.User
 
 	return c.JSON(http.StatusOK, message.CreateSuccessUserMessage(SUCCESS_USER_FOUND, user))
 }
 
 func DeleteUser(c echo.Context) error {
-	id := c.Param("id")
+	tokenClaims := c.Get(TOKEN_CLAIMS_KEY).(*models.Claims)
 
-	var user models.User
-	config.DB.Where("id = ?", id).First(&user)
-	if user.ID == 0 {
-		return c.JSON(http.StatusNotFound, message.CreateErrorMessage(INVALID_USER_NOT_FOUND))
-	}
+	user := tokenClaims.User
 
 	config.DB.Delete(&user)
+
+	cookie_, statusCode, responseMessage := cookie.Service.SetCookieExpires(c.Cookie(JWT_COOKIE_NAME))
+	if statusCode != http.StatusOK {
+		return c.JSON(statusCode, message.CreateErrorMessage(responseMessage))
+	}
+	c.SetCookie(cookie_)
+
 	return c.JSON(http.StatusOK, message.CreateSuccessUserMessage(SUCCESS_USER_DELETED, user))
 }

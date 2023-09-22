@@ -4,10 +4,18 @@ import (
 	"api-gateway/config"
 	"api-gateway/handlers"
 	"log"
-	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
+
+const (
+	REGISTER  = "/auth/register"
+	AUTH_USER = "/auth/user"
+	LOGIN     = "/auth/login"
+	LOGOUT    = "/auth/logout"
+)
+
+const API_GATEWAY_PORT = ":1234"
 
 func main() {
 	config.ConnectDb()
@@ -17,16 +25,11 @@ func main() {
 
 	API_GATEWAY.Use(handlers.RequireAuthenticationMiddleWare)
 
-	API_GATEWAY.GET("/", hello)
-	API_GATEWAY.POST("/auth/register", handlers.CreateUser)
-	API_GATEWAY.GET("/auth/users/:id", handlers.GetUser)
-	API_GATEWAY.DELETE("/auth/users/:id", handlers.DeleteUser)
-	API_GATEWAY.POST("/auth/login", handlers.Login)
-	API_GATEWAY.GET("/auth/logout", handlers.Logout)
+	API_GATEWAY.POST(REGISTER, handlers.CreateUser)
+	API_GATEWAY.GET(AUTH_USER, handlers.GetUser)
+	API_GATEWAY.DELETE(AUTH_USER, handlers.DeleteUser)
+	API_GATEWAY.POST(LOGIN, handlers.Login)
+	API_GATEWAY.GET(LOGOUT, handlers.Logout)
 
-	API_GATEWAY.Start(":1234")
-}
-
-func hello(c echo.Context) error {
-	return c.JSON(http.StatusOK, map[string]string{"message": "Hello from Echo!"})
+	API_GATEWAY.Start(API_GATEWAY_PORT)
 }
