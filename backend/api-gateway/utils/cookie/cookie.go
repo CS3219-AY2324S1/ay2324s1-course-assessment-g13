@@ -13,6 +13,8 @@ const (
 	SUCCESS_COOKIE_EXPIRED   = "Cookie has Expired"
 )
 
+const ROOT_PATH = "/"
+
 type CookieService interface {
 	CreateCookie(name string, value string, expirationTime time.Time) (cookie *http.Cookie)
 	GetCookieValue(cookie *http.Cookie, err error) (cookieValue string, statusCode int, message string)
@@ -29,6 +31,7 @@ func (*cookieService) CreateCookie(name string, value string, expirationTime tim
 	cookie.Value = value
 	cookie.Expires = expirationTime
 	cookie.HttpOnly = true
+	cookie.Path = ROOT_PATH
 	return cookie
 }
 

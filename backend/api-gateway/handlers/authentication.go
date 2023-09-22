@@ -24,7 +24,6 @@ func Login(c echo.Context) error {
 	if user.ID == 0 {
 		return c.JSON(http.StatusNotFound, message.CreateErrorMessage(INVALID_USER_NOT_FOUND))
 	}
-
 	err := bcrypt.CompareHashAndPassword([]byte(user.HashedPassword), []byte(requestBody.Password))
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(FAILURE_HASHING_PASSWORD))
