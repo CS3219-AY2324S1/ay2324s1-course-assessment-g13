@@ -13,24 +13,50 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { POST } from '../../axios/axios';
 import { notifyError, notifySuccess } from '../Notifications';
+import { useRouter } from 'next/navigation';
+import { useDispatch } from 'react-redux';
+import { login } from '../../redux/slices/userSlice';
 
+interface SignUpData {
+  username: string;
+  password: string;
+  confirmPassword: string;
+}
 interface SignUpProps {
   isNav?: boolean;
 }
 
 const SignupModal: React.FC<SignUpProps> = ({ isNav = false }) => {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+  const router = useRouter();
+  const dispatch = useDispatch();
 
   const {
     register,
     handleSubmit,
     reset,
+    getValues,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      username: '',
+      password: '',
+      confirmPassword: '',
+    },
+  });
 
-  const onSubmit = handleSubmit(async data => {
+  const onSubmit = handleSubmit(async (data: SignUpData) => {
     try {
-      const response = await POST('', data);
+      const response = await POST('', {
+        username: data.username,
+        password: data.password,
+      });
+      router.push('/questions');
+      dispatch(
+        login({
+          ...response.data,
+        }),
+      );
       notifySuccess(response.data);
       reset();
       onClose();
@@ -76,6 +102,10 @@ const SignupModal: React.FC<SignUpProps> = ({ isNav = false }) => {
               <Input
                 {...register('password', {
                   required: 'Password is required',
+                  minLength: {
+                    value: 8,
+                    message: 'Password must be at least 8 characters long',
+                  },
                 })}
                 label="Password"
                 isRequired
@@ -84,6 +114,19 @@ const SignupModal: React.FC<SignUpProps> = ({ isNav = false }) => {
                 placeholder="Enter your password"
                 labelPlacement="outside"
                 errorMessage={errors.password?.message as string}
+              />
+              <Input
+                {...register('confirmPassword', {
+                  required: 'Password is required',
+                  validate: value => value === getValues().password || 'The passwords do not match',
+                })}
+                label="Confirm Password"
+                isRequired
+                type="password"
+                variant="bordered"
+                placeholder="Comfirm your password"
+                labelPlacement="outside"
+                errorMessage={errors.confirmPassword?.message as string}
               />
             </ModalBody>
           </form>
