@@ -26,9 +26,10 @@ export default function QuestionAddModal() {
   const { questionBank } = useSelector((state: AppState) => state.questionBank);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const categories = Object.values(Category);
-  const notifyAdd = () => toast.success("Question Added Successfully", {
-    theme: "dark"
-  });
+  const notifyAdd = () =>
+    toast.success('Question Added Successfully', {
+      theme: 'dark',
+    });
 
   const {
     register,
@@ -133,10 +134,12 @@ export default function QuestionAddModal() {
                     ))}
                   </Select>
                   <Textarea
-                    {...register('description')}
+                    {...register('description', { required: 'Description is required' })}
                     label="Description"
                     labelPlacement="outside"
+                    isRequired
                     placeholder="Enter Question Description"
+                    errorMessage={errors.description?.message as string}
                   />
                 </ModalBody>
               </form>
