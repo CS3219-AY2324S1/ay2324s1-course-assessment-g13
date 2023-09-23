@@ -4,15 +4,18 @@ import { Avatar, Divider } from '@nextui-org/react';
 import useAuth from '../hook/useAuth';
 import { useSelector } from 'react-redux';
 import { AppState } from '../redux/store';
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 
 const profileSideBar = [
-  { name: 'Info', path: '/info' },
-  { name: 'Account', path: '/account' },
+  { name: 'Info', path: '/profile/info' },
+  { name: 'Account', path: '/profile/account' },
 ];
 
 const ProfileLayout = ({ children }) => {
   const photoUrl = useSelector((state: AppState) => state.user.photoUrl);
   const { username } = useAuth();
+  const pathname = usePathname();
 
   return (
     <div className="flex flex-row justify-center px-2">
@@ -31,9 +34,15 @@ const ProfileLayout = ({ children }) => {
         <div className="grid grid-cols-[max-content_1fr]">
           <div className="flex flex-col auto-cols-max py-2 mr-12 ml-3">
             {profileSideBar.map(item => (
-              <aside className="p-2 self-start rounded" key={item.name}>
+              <Link
+                className={`px-2 py-1 self-start rounded w-full ${
+                  pathname === item.path ? 'bg-gray-800' : ''
+                }`}
+                key={item.name}
+                href={item.path}
+              >
                 {item.name}
-              </aside>
+              </Link>
             ))}
           </div>
           <div className="p-4 auto-cols-fr">{children}</div>

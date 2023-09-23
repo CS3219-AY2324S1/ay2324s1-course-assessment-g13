@@ -41,7 +41,7 @@ export const DELETE = async (url: string) => {
     const response = await axiosInstance.delete(url);
     return response;
   } catch (error) {
-    return error;
+    throw new AxiosError({ ...error.response });
   }
 };
 
