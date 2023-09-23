@@ -5,6 +5,7 @@ import (
 	"api-gateway/handlers"
 	"api-gateway/utils/path"
 	"log"
+	"net/http"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -18,12 +19,14 @@ func main() {
 
 	API_GATEWAY := echo.New()
 
-	API_GATEWAY.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"http://localhost:3000"},
-		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
-	}))
+	corsMiddleware := middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{http.MethodPut, http.MethodGet, http.MethodPost, http.MethodDelete, http.MethodPatch},
+		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+		AllowCredentials: true,
+	})
 
-	API_GATEWAY.Use(handlers.PreventLoginMiddleware, handlers.RequireAuthenticationMiddleWare)
+	API_GATEWAY.Use(corsMiddleware, handlers.PreventLoginMiddleware, handlers.RequireAuthenticationMiddleWare)
 
 	API_GATEWAY.POST(path.REGISTER, handlers.CreateUser)
 	API_GATEWAY.GET(path.REGISTER_GITHUB, handlers.GithubEntry)

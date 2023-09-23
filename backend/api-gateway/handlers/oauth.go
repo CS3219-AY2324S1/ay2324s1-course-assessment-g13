@@ -28,8 +28,6 @@ const (
 	GITHUB_ACCESS_TOKEN_SUCCESS        = "Aquire Github Access Token Successfully"
 	GITHUB_USER_DATA_SUCCESS           = "Aquire Github User Data Successfully!"
 
-	HTTP_POST                 = "POST"
-	HTTP_GET                  = "GET"
 	HTTP_HEADER_CONTENT_TYPE  = "Content-Type"
 	HTTP_HEADER_ACCEPT        = "Accept"
 	HTTP_HEADER_AUTHORIZATION = "Authorization"
@@ -88,7 +86,7 @@ func getGithubAccessToken(code string) (accessToken string, statusCode int, mess
 	requestBodyJSON, _ := json.Marshal(requestBody)
 
 	request, requestErr := http.NewRequest(
-		HTTP_POST,
+		http.MethodPost,
 		GITHUB_OAUTH_ACCESS_TOKEN_URL,
 		bytes.NewBuffer(requestBodyJSON),
 	)
@@ -115,7 +113,7 @@ func getGithubAccessToken(code string) (accessToken string, statusCode int, mess
 
 func getGithubData(accessToken string) (githubData *models.GithubDataResponseBody, statusCode int, message string) {
 	request, requestErr := http.NewRequest(
-		HTTP_GET,
+		http.MethodGet,
 		GITHUB_USER_API_URL,
 		nil,
 	)
