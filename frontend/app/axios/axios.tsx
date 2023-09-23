@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_BACKEND_USER_URL,
+  baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json',
@@ -13,7 +13,7 @@ export const GET = async (url: string) => {
     const response = await axiosInstance.get(url);
     return response;
   } catch (error) {
-    return error;
+    throw new AxiosError({ ...error.response });
   }
 };
 

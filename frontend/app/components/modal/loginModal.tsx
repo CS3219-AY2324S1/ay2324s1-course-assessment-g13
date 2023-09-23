@@ -30,7 +30,7 @@ const LoginModal = () => {
 
   const onSubmit = handleSubmit(async data => {
     try {
-      const response = await POST('/login', data);
+      const response = await POST('/users/login', data);
       dispatch(
         login({
           ...response.data,

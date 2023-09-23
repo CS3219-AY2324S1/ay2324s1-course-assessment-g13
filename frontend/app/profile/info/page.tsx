@@ -38,7 +38,7 @@ const InfoPage = () => {
 
   const onSubmit = handleSubmit(async (data: UserInfo) => {
     try {
-      const response = await PUT(`/info/${id}`, data);
+      const response = await PUT(`/users/info/${id}`, data);
       dispatch(updateUser({ ...data }));
       notifySuccess(response.data);
     } catch (error) {

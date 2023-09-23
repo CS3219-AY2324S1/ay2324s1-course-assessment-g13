@@ -47,7 +47,7 @@ const SignupModal: React.FC<SignUpProps> = ({ isNav = false }) => {
 
   const onSubmit = handleSubmit(async (data: SignUpData) => {
     try {
-      const response = await POST('', {
+      const response = await POST('/users', {
         username: data.username,
         password: data.password,
       });

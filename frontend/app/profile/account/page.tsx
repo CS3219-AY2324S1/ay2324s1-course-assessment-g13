@@ -36,7 +36,7 @@ const AccountPage = () => {
 
   const onSubmit = handleSubmit(async (data: ChangePassword) => {
     try {
-      const response = await PUT(`/password/${id}`, {
+      const response = await PUT(`/users/password/${id}`, {
         oldPassword: data.oldPassword,
         newPassword: data.newPassword,
       });

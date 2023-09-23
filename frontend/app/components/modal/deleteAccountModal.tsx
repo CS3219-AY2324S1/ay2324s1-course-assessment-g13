@@ -22,7 +22,7 @@ const DeleteAccountModal = () => {
 
   const handleDelete = async () => {
     try {
-      const response = await DELETE(`/delete/${id}`);
+      const response = await DELETE(`/users/delete/${id}`);
       dispatch(logout());
       router.push('/');
       notifySuccess(response.data);
