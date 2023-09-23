@@ -29,15 +29,14 @@ const SignupModal: React.FC<SignUpProps> = ({ isNav = false }) => {
   } = useForm();
 
   const onSubmit = handleSubmit(async data => {
-    await POST('/users', data)
-      .then(res => {
-        notifySuccess(res.data);
-        reset();
-        onClose();
-      })
-      .catch(err => {
-        notifyError(err.response.data);
-      });
+    try {
+      const response = await POST('', data);
+      notifySuccess(response.data);
+      reset();
+      onClose();
+    } catch (error) {
+      notifyError(error.message.data);
+    }
   });
   return (
     <>

@@ -14,6 +14,7 @@ import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import { POST } from '../../axios/axios';
 import { login } from '../../redux/slices/userSlice';
+import { notifyError, notifySuccess } from '../Notifications';
 
 const LoginModal = () => {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
@@ -28,17 +29,22 @@ const LoginModal = () => {
   } = useForm();
 
   const onSubmit = handleSubmit(async data => {
-    const response = await POST('/login', data);
-    if (response.status != 200) {
-      return;
+    try {
+      const response = await POST('/login', data);
+      dispatch(
+        login({
+          ...response.data,
+        }),
+      );
+      router.push('/questions');
+      notifySuccess(response.data.statusText);
+      reset();
+      onClose();
+    } catch (error) {
+      notifyError(error.message.data);
     }
-
-    dispatch(login(response.data.username));
-    router.push('/questions');
-
-    reset();
-    onClose();
   });
+
   return (
     <>
       <Button onPress={onOpen} variant="light" color="default">

@@ -8,11 +8,13 @@ import LoginModal from './modal/loginModal';
 import SignupModal from './modal/signupModal';
 import useAuth from '../hook/useAuth';
 import { Avatar, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@nextui-org/react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../redux/slices/userSlice';
 import { usePathname, useRouter } from 'next/navigation';
+import { AppState } from '../redux/store';
 
 const Nav = () => {
+  const photoUrl = useSelector((state: AppState) => state.user.photoUrl);
   const { isLoggedIn } = useAuth();
   const dispatch = useDispatch();
   const router = useRouter();
@@ -72,17 +74,11 @@ const Nav = () => {
             <NavbarItem>
               <Dropdown placement="bottom-end">
                 <DropdownTrigger>
-                  <Avatar
-                    showFallback
-                    src="https://images.unsplash.com/broken"
-                    isBordered
-                    as="button"
-                    color="primary"
-                  />
+                  <Avatar showFallback src={photoUrl} isBordered as="button" color="primary" />
                 </DropdownTrigger>
                 <DropdownMenu aria-label="Profile Actions" variant="flat">
                   <DropdownItem key="profile" color="primary">
-                    <Link href="/profile" className="text-white text-sm w-full">
+                    <Link href="/profile/info" className="text-white text-sm w-full">
                       Profile
                     </Link>
                   </DropdownItem>

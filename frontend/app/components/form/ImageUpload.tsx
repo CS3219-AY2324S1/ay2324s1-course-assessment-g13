@@ -9,19 +9,23 @@ declare global {
 }
 
 interface ImageUploadProps {
-  onChange: (value: string) => void;
+  setImage: (value: string) => void;
 }
 
-const ImageUpload: React.FC<ImageUploadProps> = ({ onChange }) => {
+const ImageUpload: React.FC<ImageUploadProps> = ({ setImage }) => {
   const handleUpload = useCallback(
     result => {
-      onChange(result.info.secure_url);
+      setImage(result.info.secure_url);
     },
-    [onChange],
+    [setImage],
   );
 
   return (
-    <CldUploadWidget onUpload={handleUpload} uploadPreset="usohal3c" options={{ maxFiles: 1 }}>
+    <CldUploadWidget
+      onUpload={handleUpload}
+      uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
+      options={{ maxFiles: 1 }}
+    >
       {({ open }) => {
         return (
           <div
