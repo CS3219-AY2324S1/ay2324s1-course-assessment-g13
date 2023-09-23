@@ -17,9 +17,10 @@ import 'react-toastify/dist/ReactToastify.css';
 const DeleteConfirmationModal = ({ title }: { title: string }) => {
   const dispatch = useDispatch();
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
-  const notifyDelete = () => toast.error("Question Deleted Successfully", {
-    theme:"dark"
-  });
+  const notifyDelete = () =>
+    toast.success('Question Deleted Successfully', {
+      theme: 'dark',
+    });
 
   const handleDelete = () => {
     dispatch(deleteQuestion(title));
@@ -35,7 +36,7 @@ const DeleteConfirmationModal = ({ title }: { title: string }) => {
           </span>
         </Button>
       </Tooltip>
-      <ToastContainer/>
+      <ToastContainer />
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>
           {onClose => (
