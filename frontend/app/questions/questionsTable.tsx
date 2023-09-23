@@ -23,7 +23,6 @@ const QuestionsTable = () => {
     const end = start + rowsPerPage;
 
     const questions = questionBank.slice(start, end);
-    // return questionBank.slice(start, end);
     return questions.map((question, i) => {
       return {
         ...question,
