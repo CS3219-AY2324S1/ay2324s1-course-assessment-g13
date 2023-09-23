@@ -1,9 +1,13 @@
 import { Link } from '@nextui-org/link';
-import { Button } from '@nextui-org/button';
 
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem } from '@nextui-org/navbar';
+import React from 'react';
+import LoginModal from './modal/loginModal';
+import SignupModal from './modal/signupModal';
 
 const Nav = () => {
+  // TODO: Check login status here
+  const isLoggedIn = false;
   return (
     <Navbar
       isBordered
@@ -27,30 +31,34 @@ const Nav = () => {
       }}
     >
       <NavbarBrand>
-        <p className="font-bold text-inherit">PeerPrep</p>
+        <Link href={isLoggedIn ? '/questions' : '/'} className="font-bold text-inherit">
+          PeerPrep
+        </Link>
       </NavbarBrand>
-      <NavbarContent className="hidden sm:flex gap-4" justify="center">
-        <NavbarItem isActive>
-          <Link href="#" aria-current="page">
-            Questions
-          </Link>
-        </NavbarItem>
-        <NavbarItem>
-          <Link color="foreground" href="#">
-            Interviews
-          </Link>
-        </NavbarItem>
-      </NavbarContent>
-      <NavbarContent justify="end">
-        <NavbarItem className="hidden lg:flex">
-          <Link href="#">Login</Link>
-        </NavbarItem>
-        <NavbarItem>
-          <Button as={Link} color="primary" href="#" variant="flat">
-            Sign Up
-          </Button>
-        </NavbarItem>
-      </NavbarContent>
+      {isLoggedIn && (
+        <NavbarContent className="hidden sm:flex gap-4" justify="center">
+          <NavbarItem isActive>
+            <Link href="/questions" aria-current="page">
+              Questions
+            </Link>
+          </NavbarItem>
+          <NavbarItem>
+            <Link color="foreground" href="#">
+              Interviews
+            </Link>
+          </NavbarItem>
+        </NavbarContent>
+      )}
+      {!isLoggedIn && (
+        <NavbarContent justify="end">
+          <NavbarItem>
+            <LoginModal />
+          </NavbarItem>
+          <NavbarItem className="hidden lg:flex">
+            <SignupModal isNav={true} />
+          </NavbarItem>
+        </NavbarContent>
+      )}
     </Navbar>
   );
 };

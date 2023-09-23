@@ -2,17 +2,21 @@ package models
 
 import "go.mongodb.org/mongo-driver/bson/primitive"
 
-type Question struct {
-	ID          primitive.ObjectID `bson:"_id,omitempty"`
-	Title       string             `bson:"title" validate:"required"`
-	Description string             `bson:"description" validate:"required"`
-	Categories  []string           `bson:"categories" validate:"min=1,dive,min=5"`
-	Complexity  string             `bson:"complexity" validate:"oneof=Easy Medium Hard"`
-}
+type Category string
 
-type EditRequest struct {
-	Title       string   `bson:"title,omitempty"`
-	Description string   `bson:"description,omitempty"`
-	Categories  []string `bson:"categories,omitempty" validate:"omitempty,min=1,dive,min=5"`
-	Complexity  string   `bson:"complexity,omitempty" validate:"omitempty,oneof=Easy Medium Hard"`
+const (
+	Algorithms         Category = "Algorithms"
+	DataStructures     Category = "Data Structures"
+	BrainTeaser        Category = "Brain Teaser"
+	Strings            Category = "Strings"
+	BitManipulation    Category = "Bit Manipulation"
+	DynamicProgramming Category = "Dynamic Programming"
+)
+
+type Question struct {
+	Id          primitive.ObjectID `json:"id" bson:"_id,omitempty"`
+	Title       string             `json:"title" bson:"title" validate:"required"`
+	Description string             `json:"description" bson:"description" validate:"required"`
+	Categories  []Category         `json:"categories" bson:"categories" validate:"required"`
+	Complexity  string             `json:"complexity" bson:"complexity" validate:"oneof=Easy Medium Hard"`
 }

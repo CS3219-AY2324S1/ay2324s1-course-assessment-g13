@@ -15,20 +15,13 @@ import { Chip } from '@nextui-org/chip';
 import { Textarea } from '@nextui-org/react';
 import { Category, Complexity, Question } from '../types/question';
 import { useForm } from 'react-hook-form';
-import { useDispatch, useSelector } from 'react-redux';
-import { addQuestion } from '../redux/slices/questionBankSlice';
-import { AppState } from '../redux/store';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { notifySuccess, notifyError } from '../components/notifications';
+import { createEntry } from '../axios/axios';
 
-export default function QuestionAddModal() {
-  const dispatch = useDispatch();
-  const { questionBank } = useSelector((state: AppState) => state.questionBank);
+
+export default function QuestionAddModal({fetchQuestions}) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const categories = Object.values(Category);
-  const notifyAdd = () => toast.success("Question Added Successfully", {
-    theme: "dark"
-  });
 
   const {
     register,
@@ -37,20 +30,26 @@ export default function QuestionAddModal() {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = handleSubmit(async (data: Question) => {
-    const modifiedData = {
-      ...data,
-      categories: (data.categories as string).split(',') as Category[],
-    };
-    dispatch(addQuestion(modifiedData));
-    notifyAdd();
-    onOpenChange();
-    reset();
+  const onSubmit = handleSubmit((data: Question) => {
+      const modifiedData = {
+        ...data,
+        categories: (data.categories as string).split(',') as Category[],
+      };
+      createEntry('questions', modifiedData)
+      .then(res => {
+        if (res.message) {
+          fetchQuestions();
+          notifySuccess(res.message);
+          onOpenChange();
+          reset();
+        } else {
+          notifyError(res.error);
+        }
+      });
   });
 
   return (
     <>
-      <ToastContainer />
       <Button color="primary" variant="ghost" className="text-lg py-5" onPress={onOpen}>
         Add Question
       </Button>
@@ -70,16 +69,14 @@ export default function QuestionAddModal() {
               <form>
                 <ModalBody>
                   <Input
-                    {...register('title', {
-                      required: 'Title is required',
-                      validate: value => {
-                        const isDuplicate = questionBank.some(question => question.title === value);
-                        if (isDuplicate) {
-                          return 'Question already exists';
-                        }
-                        return true;
-                      },
-                    })}
+                    {...register('title', 
+                      { required: 'Title is required',
+                        validate: { 
+                          noNumbers : (value) => !/\d/.test(value) 
+                          || 'Title should not contain numbers',
+                        },
+                      }
+                    )}
                     autoFocus
                     label="Title"
                     placeholder="Enter Question Title"
@@ -133,10 +130,20 @@ export default function QuestionAddModal() {
                     ))}
                   </Select>
                   <Textarea
-                    {...register('description')}
+                    {...register('description', 
+                      { 
+                        required: 'Description is required',
+                        validate: {
+                          notEmpty: (value) => value.trim() !== '' 
+                          || 'Description cannot be empty or contain only whitespace',
+                        }, 
+                      }
+                    )}
                     label="Description"
+                    isRequired
                     labelPlacement="outside"
                     placeholder="Enter Question Description"
+                    errorMessage={errors.description?.message as string}
                   />
                 </ModalBody>
               </form>
