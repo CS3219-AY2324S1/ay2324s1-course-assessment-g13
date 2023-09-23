@@ -64,13 +64,13 @@ const InfoPage = () => {
         <Divider className="my-4 " />
         <div className="flex flex-col gap-2 md:grid md:grid-cols-4">
           <p className="text-start font-medium text-sm md:text-base">Photo</p>
-          <div className="grid grid-cols-3 col-span-3">
+          <div className="flex flex-col md:grid md:grid-cols-3 md:col-span-3">
             <Avatar
               showFallback
               src={photo}
               isBordered
               color="primary"
-              className="h-20 w-20 md:h-32 md:w-32 self-center justify-self-center"
+              className="h-20 w-20 md:h-32 md:w-32 self-center justify-self-center md: mb-4"
             />
             <div className="col-span-2 col-start-2">
               <Controller
