@@ -6,6 +6,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Provider } from 'react-redux';
 import { store } from './libs/redux/store';
+import ProtectedRoute from './libs/_protected/ProtectedRoute';
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
@@ -13,7 +14,9 @@ export function Providers({ children }: { children: ReactNode }) {
       <ToastContainer />
       <NextUIProvider>
         <Provider store={store}>
-          {children}
+          <ProtectedRoute>
+            {children}
+          </ProtectedRoute>
         </Provider>
       </NextUIProvider>
     </>

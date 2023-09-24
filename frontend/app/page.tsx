@@ -1,3 +1,4 @@
+"use client";
 import SignUpButton from './components/Nav/SignUpButton';
 
 export const metadata = {
@@ -5,6 +6,7 @@ export const metadata = {
 };
 
 export default function Home() {
+
   return (
     <div className="flex flex-col justify-center items-center text-center mt-40 max-w-4xl mx-auto">
       <p className="text-6xl font-extrabold my-6">Elevate Your Tech Interview with PeerPrep!</p>

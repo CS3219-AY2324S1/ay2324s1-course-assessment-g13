@@ -1,22 +1,28 @@
 import { useEffect } from 'react';
 import useAuth from '../../(auth)/hooks/useAuth';
+import { usePathname, useRouter } from 'next/navigation';
 
 const isBrowser = () => typeof window !== "undefined";
 
-export default function ProtectedRoute({router, children}) {
+export default function ProtectedRoute({children}) {
+    const pathName = usePathname();
+    const router = useRouter()
     const { isAuthenticated } = useAuth();
 
     let protectedRoutes = [
         "/questions"
     ]
 
-    let pathIsProtected = protectedRoutes.indexOf(router.pathname) !== -1;
+    let pathIsProtected = protectedRoutes.indexOf(pathName) !== -1;
 
     useEffect(() => {
-        if (isBrowser() && !isAuthenticated && !pathIsProtected) {
-            router.push("/");
+        if (isBrowser() && !isAuthenticated && pathIsProtected) {
+            router.replace("/");
         }
-    }, [pathIsProtected, isAuthenticated])
+        if (isBrowser() && isAuthenticated && !pathIsProtected) {
+            router.back();
+        }
+    }, [pathIsProtected])
 
     return children;
 }
