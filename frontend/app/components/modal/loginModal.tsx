@@ -12,8 +12,8 @@ import {
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/navigation';
-import { POST } from '../../axios/axios';
-import { login } from '../../redux/slices/userSlice';
+import { POST } from '../../libs/axios/axios';
+import { login } from '../../libs/redux/slices/userSlice';
 
 const LoginModal = () => {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
@@ -29,8 +29,7 @@ const LoginModal = () => {
 
   const onSubmit = handleSubmit(async data => {
     // eslint-disable-next-line no-console
-    const response = await POST('/login', data);
-    // console.log(response); //add in your api call to check login
+    const response = await POST('/auth/login', data);
     if (response.status != 200) {
       return;
     }
@@ -73,6 +72,7 @@ const LoginModal = () => {
                   required: 'Password is required',
                 })}
                 label="Password"
+                type='password'
                 isRequired
                 variant="bordered"
                 placeholder="Enter your password"

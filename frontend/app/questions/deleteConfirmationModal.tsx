@@ -9,8 +9,8 @@ import {
   Tooltip,
 } from '@nextui-org/react';
 import { DeleteIcon } from './assets/DeleteIcon';
-import { notifyWarning, notifyError } from '../components/notifications';
-import { deleteEntry } from '../axios/axios';
+import { notifyWarning, notifyError } from '../components/toast/notifications';
+import { deleteEntry } from '../libs/axios/axios';
 
 
 const DeleteConfirmationModal = ({ title, id, fetchQuestions }) => {

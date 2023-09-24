@@ -11,7 +11,7 @@ import {
 } from '@nextui-org/react';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { POST } from '../../axios/axios';
+import { POST } from '../../libs/axios/axios';
 
 interface SignUpProps {
   isNav?: boolean;

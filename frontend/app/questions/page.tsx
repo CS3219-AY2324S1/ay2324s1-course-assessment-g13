@@ -2,8 +2,8 @@
 import QuestionsTable from './questionsTable';
 import QuestionAddModal from './addQuestionModal';
 import { useState } from 'react';
-import { getData } from '../axios/axios';
-import { notifyError } from '../components/notifications';
+import { getData } from '../libs/axios/axios';
+import { notifyError } from '../components/toast/notifications';
 
 
 export default function Questions() {

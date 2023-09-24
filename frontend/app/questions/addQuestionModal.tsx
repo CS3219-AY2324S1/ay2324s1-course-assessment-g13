@@ -15,8 +15,8 @@ import { Chip } from '@nextui-org/chip';
 import { Textarea } from '@nextui-org/react';
 import { Category, Complexity, Question } from '../types/question';
 import { useForm } from 'react-hook-form';
-import { notifySuccess, notifyError } from '../components/notifications';
-import { createEntry } from '../axios/axios';
+import { notifySuccess, notifyError } from '../components/toast/notifications';
+import { createEntry } from '../libs/axios/axios';
 
 
 export default function QuestionAddModal({fetchQuestions}) {

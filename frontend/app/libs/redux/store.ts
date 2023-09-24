@@ -9,9 +9,15 @@ import {
   persistReducer,
   persistStore,
 } from 'redux-persist';
-import questionBankReducer from './slices/questionBankSlice';
+import questionBankReducer, { QuestionBankState } from './slices/questionBankSlice';
 import userReducer from './slices/userSlice';
 import createWebStorage from 'redux-persist/lib/storage/createWebStorage';
+import { UserState } from './slices/userSlice'
+
+export interface RootState {
+  user: UserState,
+  questionBank: QuestionBankState
+}
 
 const createNoopStorage = () => {
   return {
@@ -32,7 +38,7 @@ const storage = typeof window !== 'undefined' ? createWebStorage('local') : crea
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['questionBank'],
+  whitelist: ['questionBank', 'user'],
 };
 
 const rootReducer = combineReducers({
