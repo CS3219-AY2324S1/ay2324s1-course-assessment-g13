@@ -56,13 +56,24 @@ export default function useAuth() {
         router.push('/');
     }
 
-    const handleRefresh = async() => {
+    const handleRefresh = async () => {
         const response = await GET('/auth/refresh')
         if (response.status != 200) {
             return;
         }
     }
 
-    return {register, errors, handleLogin, handleLogout}
+    const handleSignUp = handleSubmit(async (data) => {
+        const response = await POST('/auth/register', data)
+        if (response.status != 201) {
+            notifyError(response.data.error);
+            return;
+        }
+        notifySuccess(response.data.message);
+        router.push('/login');
+        reset();
+    })
+
+    return {register, errors, handleLogin, handleLogout, handleSignUp}
 
 }

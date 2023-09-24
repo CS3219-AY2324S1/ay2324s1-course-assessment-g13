@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../libs/redux/store';
 import useAuth from '../../auth/hooks/useAuth';
 import LogoutButton from './LogoutButton';
+import SignUpButton from './SignUpButton';
 
 const Nav = () => {
   const user = useSelector((state: RootState) => state.user)
@@ -24,7 +25,7 @@ const Nav = () => {
       maxWidth="xl"
     >
       <NavbarBrand>
-        <Link className="font-bold text-inherit">
+        <Link href={isLoggedIn ? "/questions" : "/"} className="font-bold text-inherit">
           PeerPrep
         </Link>
       </NavbarBrand>
@@ -49,10 +50,12 @@ const Nav = () => {
           : <LoginButton />
         }
         </NavbarItem>
-        <NavbarItem className="hidden lg:flex">
-          
-        </NavbarItem>
-      </NavbarContent>
+        {!isLoggedIn &&  
+          <NavbarItem className="hidden lg:flex">
+            <SignUpButton />
+          </NavbarItem>
+        }
+        </NavbarContent>
     </Navbar>
   );
 };

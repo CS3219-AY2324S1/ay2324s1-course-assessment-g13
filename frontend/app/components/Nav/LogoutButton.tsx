@@ -4,7 +4,7 @@ import Link from "next/link";
 export default function LogoutButton({handleLogout}) {
     return (
         <Button  
-            variant="light" 
+            variant="bordered" 
             color="default"
             onClick={handleLogout}
         >
