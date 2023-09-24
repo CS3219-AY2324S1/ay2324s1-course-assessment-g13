@@ -9,17 +9,12 @@ const axiosInstance = axios.create({
   withCredentials: true
 });
 
-const ErrorResponse = {
-  status: 500,
-  data: "Internal Server Error",
-};
-
 export const GET = async (url : string) => {
   try {
     const response = await axiosInstance.get(url);
     return response;
   } catch (error) {
-    return ErrorResponse;
+    return error.response;
   }
 }
 
@@ -28,7 +23,7 @@ export const POST = async (url : string, data: any) => {
     const response = await axiosInstance.post(url, data);
     return response;
   } catch (error) {
-    return ErrorResponse;
+    return error.response;
   }
 }
 
@@ -37,7 +32,7 @@ export const DELETE = async (url : string) => {
     const response = await axiosInstance.delete(url);
     return response;
   } catch (error) {
-    return ErrorResponse;
+    return error.response;
   }
 }
 

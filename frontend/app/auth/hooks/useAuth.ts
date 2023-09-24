@@ -6,6 +6,7 @@ import { GET, POST } from "../../libs/axios/axios";
 import { login, logout } from "../../libs/redux/slices/userSlice";
 import { useSelector } from "react-redux";
 import { RootState } from '../../libs/redux/store';
+import { notifyError, notifySuccess } from "../../components/toast/notifications";
 
 export default function useAuth() {
     const [refreshInterval, setRefreshInterval] = useState(null);
@@ -37,9 +38,11 @@ export default function useAuth() {
     const handleLogin = handleSubmit(async data => {
         const response = await POST('/auth/login', data);
         if (response.status != 200) {
+            notifyError(response.data.error);
             return;
         }
         dispatch(login(response.data.user));
+        notifySuccess(response.data.message);
         router.push('/questions');
         reset();
     })
