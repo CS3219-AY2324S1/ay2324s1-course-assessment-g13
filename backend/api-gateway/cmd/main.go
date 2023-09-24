@@ -20,7 +20,7 @@ func main() {
 	API_GATEWAY := echo.New()
 
 	corsMiddleware := middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins:     []string{"*"},
+		AllowOrigins:     []string{"http://localhost:3000"},
 		AllowMethods:     []string{http.MethodPut, http.MethodGet, http.MethodPost, http.MethodDelete, http.MethodPatch},
 		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
 		AllowCredentials: true,
