@@ -68,7 +68,7 @@ export default function useAuth() {
 
     const handleSignUp = handleSubmit(async (data) => {
         const response = await POST('/auth/register', data)
-        if (response.status != 201) {
+        if (response.status != 200) {
             notifyError(response.data.error);
             return;
         }
@@ -77,6 +77,35 @@ export default function useAuth() {
         reset();
     })
 
-    return {register, errors, handleLogin, handleLogout, handleSignUp, isAuthenticated, userRole}
+    const handleGithubLogin = async () => {
+        const clientId = "e2d4b8fe671589d0d378"
+        const redirectUrl = "http://localhost:3000/oauth/callback"
+        const github_authorize_url = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUrl}`
+        window.location.href = github_authorize_url;
+    }
+
+    const handleGithubLoginCallback = async (code: string) => {
+        const response = await GET(`/auth/login/github?code=${code}`)
+        if (response.status != 200) {
+            notifyError(response.data.error);
+            router.push("/login")
+            return;
+        }
+        notifySuccess(response.data.message);
+        dispatch(login(response.data.user));
+        router.push('/questions')
+    } 
+
+    return {
+        register, 
+        errors, 
+        handleLogin, 
+        handleLogout, 
+        handleSignUp, 
+        handleGithubLogin, 
+        handleGithubLoginCallback, 
+        isAuthenticated, 
+        userRole
+    }
 
 }

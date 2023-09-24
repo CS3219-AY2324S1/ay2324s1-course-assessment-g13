@@ -4,7 +4,7 @@ import { Input } from "@nextui-org/input"
 import  useAuth  from "../hooks/useAuth"
 
 export default function LoginForm() {
-    const { register, errors, handleLogin } = useAuth();
+    const { register, errors, handleLogin, handleGithubLogin } = useAuth();
 
     return (
         <>
@@ -39,8 +39,15 @@ export default function LoginForm() {
             <Button
                 onClick={handleLogin}
                 color="primary"
+                className="mb-5"
             >
                 Login
+            </Button>
+            <Button
+                onClick={handleGithubLogin}
+                color="primary"
+            >
+                Login with Github
             </Button>
         </>
     )
