@@ -17,7 +17,7 @@ export default function Questions() {
 
   useEffect(() => {
     setIsAdmin(userRole === "admin");
-  }, [isAdmin])
+  }, [])
 
   const fetchQuestions = () => {
     getData('questions').then(res => {
