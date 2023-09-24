@@ -1,5 +1,3 @@
-import { useSelector } from 'react-redux';
-import { RootState } from '../redux/store';
 import useAuth from '../../(auth)/hooks/useAuth';
 
 const isBrowser = () => typeof window !== "undefined";

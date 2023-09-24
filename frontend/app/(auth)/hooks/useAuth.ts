@@ -8,10 +8,12 @@ import { useSelector } from "react-redux";
 import { RootState } from '../../libs/redux/store';
 import { notifyError, notifySuccess } from "../../components/toast/notifications";
 
+let resetInteveralId: NodeJS.Timeout;
+
 export default function useAuth() {
-    const [refreshInterval, setRefreshInterval] = useState(null);
-    const userId =  useSelector((state: RootState) => state.user.userId)
-    const isAuthenticated = userId !== 0
+    const user =  useSelector((state: RootState) => state.user);
+    const userId = user.userId;
+    const userRole = user.userRole;
     const dispatch = useDispatch();
     const router = useRouter();
     const oneMinute = 60000;
@@ -22,17 +24,19 @@ export default function useAuth() {
         formState: { errors }
     } = useForm()
 
-    useEffect(()=>{
-        if (isAuthenticated) {
-            const initialRefreshInterval = setInterval(() => {
-                handleRefresh();
-            }, oneMinute);
-            setRefreshInterval(initialRefreshInterval);
-        }
+    const isAuthenticated = userId !== 0;
 
-        return () => {
-            clearInterval(refreshInterval)
+    useEffect(()=>{
+        if (isAuthenticated && !resetInteveralId) {
+            console.log("should only print once")
+            resetInteveralId = setInterval(handleRefresh, oneMinute);
         }
+        return () => {
+            if (resetInteveralId) {
+              clearInterval(resetInteveralId);
+              resetInteveralId = null;
+            }
+        };
     }, [isAuthenticated])
 
     const handleLogin = handleSubmit(async data => {
@@ -74,6 +78,6 @@ export default function useAuth() {
         reset();
     })
 
-    return {register, errors, handleLogin, handleLogout, handleSignUp, isAuthenticated}
+    return {register, errors, handleLogin, handleLogout, handleSignUp, isAuthenticated, userRole}
 
 }

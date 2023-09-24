@@ -4,8 +4,6 @@ import { Link } from '@nextui-org/link';
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem } from '@nextui-org/navbar';
 import React, { useEffect, useState } from 'react';
 import LoginButton from './LoginButton';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../libs/redux/store';
 import useAuth from '../../(auth)/hooks/useAuth';
 import LogoutButton from './LogoutButton';
 import SignUpButton from './SignUpButton';
