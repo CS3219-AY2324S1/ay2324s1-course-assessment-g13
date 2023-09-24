@@ -2,7 +2,7 @@
 import { Link } from '@nextui-org/link';
 
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem } from '@nextui-org/navbar';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import LoginButton from './LoginButton';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../libs/redux/store';
@@ -11,8 +11,13 @@ import LogoutButton from './LogoutButton';
 
 const Nav = () => {
   const user = useSelector((state: RootState) => state.user)
-  const isLoggedIn = user.userId !== 0
+  const [isLoggedIn, setIsLoggedIn] = useState(true)
   const {handleLogout} = useAuth();
+
+  useEffect(() => {
+    setIsLoggedIn(user.userId !== 0);
+  })
+
   return (
     <Navbar
       isBordered
@@ -23,7 +28,8 @@ const Nav = () => {
           PeerPrep
         </Link>
       </NavbarBrand>
-      <NavbarContent className="hidden sm:flex gap-4" justify="center">
+      {isLoggedIn &&
+      <NavbarContent justify="center">
         <NavbarItem isActive>
           <Link href="/questions" aria-current="page">
             Questions
@@ -35,12 +41,13 @@ const Nav = () => {
           </Link>
         </NavbarItem>
       </NavbarContent>
+      }
       <NavbarContent justify="end">
         <NavbarItem>
-          {isLoggedIn 
-            ? <LogoutButton handleLogout={handleLogout}/>
-            : <LoginButton /> 
-          }
+        {isLoggedIn
+          ? <LogoutButton  handleLogout={handleLogout}/>
+          : <LoginButton />
+        }
         </NavbarItem>
         <NavbarItem className="hidden lg:flex">
           
