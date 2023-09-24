@@ -2,6 +2,8 @@
 import { Button } from "@nextui-org/button";
 import { Input } from "@nextui-org/input"
 import  useAuth  from "../hooks/useAuth"
+import { Divider } from "@nextui-org/react";
+import { GithubIcon } from "../assets/GithubIcon";
 
 export default function LoginForm() {
     const { register, errors, handleLogin, handleGithubLogin } = useAuth();
@@ -43,9 +45,12 @@ export default function LoginForm() {
             >
                 Login
             </Button>
+            <Divider/>
             <Button
                 onClick={handleGithubLogin}
-                color="primary"
+                color="default"
+                className="mt-5"
+                startContent={<GithubIcon />}
             >
                 Login with Github
             </Button>

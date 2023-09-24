@@ -2,9 +2,11 @@
 import { Button } from "@nextui-org/button";
 import { Input } from "@nextui-org/input"
 import  useAuth  from "../hooks/useAuth"
+import { Divider } from "@nextui-org/divider";
+import { GithubIcon } from "../assets/GithubIcon";
 
 export default function SignUpForm() {
-    const { register, errors, handleSignUp } = useAuth();
+    const { register, errors, handleSignUp, handleGithubLogin } = useAuth();
 
     return (
         <>
@@ -39,8 +41,18 @@ export default function SignUpForm() {
             <Button
                 onClick={handleSignUp}
                 color="primary"
+                className="mb-5"
             >
                 Sign Up
+            </Button>
+            <Divider/>
+            <Button
+                onClick={handleGithubLogin}
+                color="default"
+                className="mt-5"
+                startContent={<GithubIcon />}
+            >
+                Sign up with Github
             </Button>
         </>
     )
