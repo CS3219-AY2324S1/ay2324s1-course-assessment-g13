@@ -28,7 +28,6 @@ export default function useAuth() {
 
     useEffect(()=>{
         if (isAuthenticated && !resetInteveralId) {
-            console.log("should only print once")
             resetInteveralId = setInterval(handleRefresh, oneMinute);
         }
         return () => {
