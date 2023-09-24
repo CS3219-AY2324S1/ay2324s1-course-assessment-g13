@@ -6,7 +6,7 @@ export default function SignUpButton({width=null}) {
         <Button  
             color="primary"
             as={Link}
-            href="/auth/signup"
+            href="/signup"
             className={width}
         >
             Sign Up

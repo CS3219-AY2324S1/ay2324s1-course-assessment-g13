@@ -7,7 +7,7 @@ export default function LoginButton() {
             variant="bordered" 
             color="default"
             as={Link}
-            href="/auth/login"
+            href="/login"
             className="hover:red"
         >
             Login
