@@ -17,8 +17,6 @@ import (
 
 const (
 	GITHUB                             = "Github"
-	GITHUB_OAUTH_AUTHORIZE_URL_FORMAT  = "https://github.com/login/oauth/authorize?client_id=%s&redirect_uri=%s"
-	GITHUB_OAUTH_CALLBACK_URL          = "http://localhost:1234/auth/login/github/callback"
 	GITHUB_OAUTH_ACCESS_TOKEN_URL      = "https://github.com/login/oauth/access_token"
 	GITHUB_USER_API_URL                = "https://api.github.com/user"
 	GITHUB_CALLBACK_REQUEST_QUERY_CODE = "code"
@@ -34,17 +32,7 @@ const (
 	HTTP_APPLICATION_JSON     = "application/json"
 )
 
-func GithubEntry(c echo.Context) error {
-	githubClientID := env.GetGitHubClientID()
-	redirectURL := fmt.Sprintf(
-		GITHUB_OAUTH_AUTHORIZE_URL_FORMAT,
-		githubClientID,
-		GITHUB_OAUTH_CALLBACK_URL,
-	)
-	return c.Redirect(http.StatusMovedPermanently, redirectURL)
-}
-
-func GithubCallback(c echo.Context) error {
+func GithubLogin(c echo.Context) error {
 	code := c.Request().URL.Query().Get(GITHUB_CALLBACK_REQUEST_QUERY_CODE)
 
 	githubAccessToken, statusCode, responseMessage := getGithubAccessToken(code)
