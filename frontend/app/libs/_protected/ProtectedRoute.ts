@@ -1,11 +1,11 @@
 import { useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
+import useAuth from '../../(auth)/hooks/useAuth';
 
 const isBrowser = () => typeof window !== "undefined";
 
 export default function ProtectedRoute({router, children}) {
-    const user = useSelector((state: RootState) => state.user);
-    const isLoggedIn = user.userId !== 0;
+    const { isAuthenticated } = useAuth();
 
     let protectedRoutes = [
         "/questions"
@@ -13,7 +13,7 @@ export default function ProtectedRoute({router, children}) {
 
     let pathIsProtected = protectedRoutes.indexOf(router.pathname) !== -1;
 
-    if (isBrowser() && !isLoggedIn && !pathIsProtected) {
+    if (isBrowser() && !isAuthenticated && !pathIsProtected) {
         router.push("/");
     }
 

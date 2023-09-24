@@ -11,13 +11,12 @@ import LogoutButton from './LogoutButton';
 import SignUpButton from './SignUpButton';
 
 const Nav = () => {
-  const user = useSelector((state: RootState) => state.user)
-  const [isLoggedIn, setIsLoggedIn] = useState(true)
-  const {handleLogout} = useAuth();
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const {handleLogout, isAuthenticated} = useAuth();
 
   useEffect(() => {
-    setIsLoggedIn(user.userId !== 0);
-  })
+    setIsLoggedIn(isAuthenticated);
+  }, [isAuthenticated])
 
   return (
     <Navbar

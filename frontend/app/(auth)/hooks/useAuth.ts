@@ -11,7 +11,7 @@ import { notifyError, notifySuccess } from "../../components/toast/notifications
 export default function useAuth() {
     const [refreshInterval, setRefreshInterval] = useState(null);
     const userId =  useSelector((state: RootState) => state.user.userId)
-    const isLogin = userId !== 0
+    const isAuthenticated = userId !== 0
     const dispatch = useDispatch();
     const router = useRouter();
     const oneMinute = 60000;
@@ -23,7 +23,7 @@ export default function useAuth() {
     } = useForm()
 
     useEffect(()=>{
-        if (isLogin) {
+        if (isAuthenticated) {
             const initialRefreshInterval = setInterval(() => {
                 handleRefresh();
             }, oneMinute);
@@ -33,7 +33,7 @@ export default function useAuth() {
         return () => {
             clearInterval(refreshInterval)
         }
-    }, [isLogin])
+    }, [isAuthenticated])
 
     const handleLogin = handleSubmit(async data => {
         const response = await POST('/auth/login', data);
@@ -74,6 +74,6 @@ export default function useAuth() {
         reset();
     })
 
-    return {register, errors, handleLogin, handleLogout, handleSignUp}
+    return {register, errors, handleLogin, handleLogout, handleSignUp, isAuthenticated}
 
 }
