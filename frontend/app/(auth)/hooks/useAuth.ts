@@ -51,11 +51,11 @@ export default function useAuth() {
     })
 
     const handleLogout = async () => {
+        dispatch(logout());
         const response = await GET('/auth/logout')
         if (response.status != 200) {
             return;
         }
-        dispatch(logout());
         router.push('/');
     }
 

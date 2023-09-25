@@ -20,7 +20,7 @@ export default function ProtectedRoute({children}) {
             router.replace("/");
         }
         if (isBrowser() && isAuthenticated && !pathIsProtected) {
-            router.back();
+            router.replace("/questions");
         }
     }, [pathIsProtected])
 
