@@ -1,8 +1,8 @@
 import { Chip } from '@nextui-org/chip';
-import QuestionDescriptionModal from './descriptionModal';
+import QuestionDescriptionModal from './modal/descriptionModal';
 import { Category, ComplexityToColor, Question } from '../types/question';
 import { Key } from 'react';
-import DeleteConfirmationModal from './deleteConfirmationModal';
+import DeleteConfirmationModal from './modal/deleteConfirmationModal';
 
 interface StyleCellProps {
   isAdmin: boolean,

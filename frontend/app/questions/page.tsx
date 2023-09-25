@@ -1,10 +1,11 @@
 'use client';
 import QuestionsTable from './questionsTable';
-import QuestionAddModal from './addQuestionModal';
+import QuestionAddModal from './modal/addQuestionModal';
 import { useEffect, useState } from 'react';
 import { getData } from '../libs/axios/axios';
 import { notifyError } from '../components/toast/notifications';
 import useAuth from '../(auth)/hooks/useAuth';
+import LoadingTable from './Loading/LoadingTable';
 
 
 export default function Questions() {
@@ -17,6 +18,7 @@ export default function Questions() {
   }, [])
 
   const fetchQuestions = () => {
+    setTimeout(()=>{}, 10000)
     getData('questions').then(res => {
       if (res.data) {
         setQuestions(res.data);
