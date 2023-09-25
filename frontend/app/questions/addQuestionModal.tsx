@@ -21,6 +21,10 @@ import { POST } from '../axios/axios';
 export default function QuestionAddModal({ fetchQuestions }) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const categories = Object.values(Category);
+  const notifyAdd = () =>
+    toast.success('Question Added Successfully', {
+      theme: 'dark',
+    });
 
   const {
     register,

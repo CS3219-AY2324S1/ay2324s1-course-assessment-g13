@@ -14,6 +14,10 @@ import { DELETE } from '../axios/axios';
 
 const DeleteConfirmationModal = ({ title, id, fetchQuestions }) => {
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
+  const notifyDelete = () =>
+    toast.success('Question Deleted Successfully', {
+      theme: 'dark',
+    });
 
   const handleDelete = async () => {
     try {
@@ -36,6 +40,7 @@ const DeleteConfirmationModal = ({ title, id, fetchQuestions }) => {
           </span>
         </Button>
       </Tooltip>
+      <ToastContainer />
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>
           {onClose => (
