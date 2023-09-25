@@ -1,5 +1,5 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-import { Question } from '../../types/question';
+import { Question } from '../../../types/question';
 
 export interface QuestionBankState {
   questionBank: Question[];

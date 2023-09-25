@@ -1,10 +1,9 @@
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react"
+import { useEffect } from "react"
 import { useForm } from "react-hook-form"
-import { useDispatch } from "react-redux";
 import { GET, POST } from "../../libs/axios/axios";
 import { login, logout } from "../../libs/redux/slices/userSlice";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { RootState } from '../../libs/redux/store';
 import { notifyError, notifySuccess } from "../../components/toast/notifications";
 
@@ -52,11 +51,11 @@ export default function useAuth() {
 
     const handleLogout = async () => {
         dispatch(logout());
+        router.push('/');
         const response = await GET('/auth/logout')
         if (response.status != 200) {
             return;
         }
-        router.push('/');
     }
 
     const handleRefresh = async () => {
@@ -86,7 +85,7 @@ export default function useAuth() {
 
     const handleGithubLoginCallback = async (code: string) => {
         const response = await GET(`/auth/login/github?code=${code}`)
-        if (response.status != 200) {
+        if (response?.status != 200) {
             notifyError(response.data.error);
             router.push("/login")
             return;

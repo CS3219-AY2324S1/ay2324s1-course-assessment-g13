@@ -2,7 +2,6 @@
 import { Table, TableBody, TableHeader, TableColumn, TableCell, TableRow } from "@nextui-org/table";
 import { Skeleton } from "@nextui-org/skeleton";
 import { useMemo } from "react";
-import LoadingRow from "./LoadingRow";
 
 export default function LoadingTable() {
     const columns = useMemo(() => {

@@ -9,11 +9,11 @@ export default function ProtectedRoute({children}) {
     const router = useRouter()
     const { isAuthenticated } = useAuth();
 
-    let protectedRoutes = [
+    const protectedRoutes = [
         "/questions"
     ]
 
-    let pathIsProtected = protectedRoutes.indexOf(pathName) !== -1;
+    const pathIsProtected = protectedRoutes.indexOf(pathName) !== -1;
 
     useEffect(() => {
         if (isBrowser() && !isAuthenticated && pathIsProtected) {
@@ -22,7 +22,7 @@ export default function ProtectedRoute({children}) {
         if (isBrowser() && isAuthenticated && !pathIsProtected) {
             router.replace("/questions");
         }
-    }, [pathIsProtected])
+    }, [pathIsProtected, isAuthenticated, router])
 
     return children;
 }
