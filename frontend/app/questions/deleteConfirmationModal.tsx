@@ -9,24 +9,24 @@ import {
   Tooltip,
 } from '@nextui-org/react';
 import { DeleteIcon } from './assets/DeleteIcon';
-import { useDispatch } from 'react-redux';
-import { deleteQuestion } from '../redux/slices/questionBankSlice';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { notifyWarning, notifyError } from '../components/Notifications';
+import { DELETE } from '../axios/axios';
 
-const DeleteConfirmationModal = ({ title }: { title: string }) => {
-  const dispatch = useDispatch();
+const DeleteConfirmationModal = ({ title, id, fetchQuestions }) => {
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
-  const notifyDelete = () =>
-    toast.success('Question Deleted Successfully', {
-      theme: 'dark',
-    });
 
-  const handleDelete = () => {
-    dispatch(deleteQuestion(title));
-    notifyDelete();
-    onClose();
+  const handleDelete = async () => {
+    try {
+      const response = await DELETE(`questions/${id}`);
+      fetchQuestions();
+      notifyWarning(response.data);
+    } catch (error) {
+      notifyError(error.message.data);
+    } finally {
+      onClose();
+    }
   };
+
   return (
     <>
       <Tooltip content="Delete question">
@@ -36,7 +36,6 @@ const DeleteConfirmationModal = ({ title }: { title: string }) => {
           </span>
         </Button>
       </Tooltip>
-      <ToastContainer />
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>
           {onClose => (

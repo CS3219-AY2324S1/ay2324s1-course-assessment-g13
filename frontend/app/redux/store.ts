@@ -10,6 +10,7 @@ import {
   persistStore,
 } from 'redux-persist';
 import questionBankReducer from './slices/questionBankSlice';
+import userReducer from './slices/userSlice';
 import createWebStorage from 'redux-persist/lib/storage/createWebStorage';
 
 const createNoopStorage = () => {
@@ -31,11 +32,12 @@ const storage = typeof window !== 'undefined' ? createWebStorage('local') : crea
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['questionBank'],
+  whitelist: ['questionBank', 'user'],
 };
 
 const rootReducer = combineReducers({
   questionBank: questionBankReducer,
+  user: userReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
