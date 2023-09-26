@@ -40,7 +40,6 @@ const DeleteConfirmationModal = ({ title, id, fetchQuestions }) => {
           </span>
         </Button>
       </Tooltip>
-      <ToastContainer />
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>
           {onClose => (
