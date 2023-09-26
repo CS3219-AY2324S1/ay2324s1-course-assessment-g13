@@ -15,8 +15,14 @@ import { Chip } from '@nextui-org/chip';
 import { Textarea } from '@nextui-org/react';
 import { Category, Complexity, Question } from '../types/question';
 import { useForm } from 'react-hook-form';
+<<<<<<< HEAD
 import { notifySuccess, notifyError } from '../components/Notifications';
 import { POST } from '../axios/axios';
+=======
+import { ToastContainer, toast } from 'react-toastify';
+import axiosInstance from '../requests';
+import 'react-toastify/dist/ReactToastify.css';
+>>>>>>> 44aa7da (Use axiosInstance and fix validation)
 
 export default function QuestionAddModal({ fetchQuestions }) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -30,6 +36,7 @@ export default function QuestionAddModal({ fetchQuestions }) {
   } = useForm();
 
   const onSubmit = handleSubmit(async (data: Question) => {
+<<<<<<< HEAD
     const modifiedData = {
       ...data,
       categories: (data.categories as string).split(',') as Category[],
@@ -44,6 +51,29 @@ export default function QuestionAddModal({ fetchQuestions }) {
     } catch (error) {
       notifyError(error.message.data);
     }
+=======
+      const modifiedData = {
+        ...data,
+        categories: (data.categories as string).split(',') as Category[],
+      };
+      try {
+        await axiosInstance.post('', modifiedData);
+        setUpdate(true);
+        notifyAdd();
+      } catch(error) {
+        const status = error.response.status;
+        if (status === 400) {
+          notifyError("Bad Request: Ensure data inputted is valid");
+        } else if (status === 409) {
+          notifyError("Conflict: This question already exists");
+        } else {
+          notifyError("An error occurred. Please try again later");
+        }
+      } finally {
+        onOpenChange();
+        reset();
+      }
+>>>>>>> 44aa7da (Use axiosInstance and fix validation)
   });
 
   return (
@@ -67,12 +97,23 @@ export default function QuestionAddModal({ fetchQuestions }) {
               <form>
                 <ModalBody>
                   <Input
+<<<<<<< HEAD
                     {...register('title', {
                       required: 'Title is required',
                       validate: {
                         noNumbers: value => !/\d/.test(value) || 'Title should not contain numbers',
                       },
                     })}
+=======
+                    {...register('title', 
+                      { required: 'Title is required',
+                        validate: { 
+                          noNumbers : (value) => !/\d/.test(value) 
+                          || 'Title should not contain numbers',
+                        },
+                      }
+                    )}
+>>>>>>> 44aa7da (Use axiosInstance and fix validation)
                     autoFocus
                     label="Title"
                     placeholder="Enter Question Title"
@@ -126,6 +167,7 @@ export default function QuestionAddModal({ fetchQuestions }) {
                     ))}
                   </Select>
                   <Textarea
+<<<<<<< HEAD
                     {...register('description', {
                       required: 'Description is required',
                       validate: {
@@ -134,6 +176,17 @@ export default function QuestionAddModal({ fetchQuestions }) {
                           'Description cannot be empty or contain only whitespace',
                       },
                     })}
+=======
+                    {...register('description', 
+                      { 
+                        required: 'Description is required',
+                        validate: {
+                          notEmpty: (value) => value.trim() !== '' 
+                          || 'Description cannot be empty or contain only whitespace',
+                        }, 
+                      }
+                    )}
+>>>>>>> 44aa7da (Use axiosInstance and fix validation)
                     label="Description"
                     isRequired
                     labelPlacement="outside"

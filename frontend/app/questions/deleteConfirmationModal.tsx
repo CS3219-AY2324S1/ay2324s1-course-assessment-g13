@@ -9,19 +9,36 @@ import {
   Tooltip,
 } from '@nextui-org/react';
 import { DeleteIcon } from './assets/DeleteIcon';
+<<<<<<< HEAD
 import { notifyWarning, notifyError } from '../components/Notifications';
 import { DELETE } from '../axios/axios';
+=======
+import { ToastContainer, toast } from 'react-toastify';
+import axiosInstance from '../requests';
+import 'react-toastify/dist/ReactToastify.css';
+>>>>>>> 44aa7da (Use axiosInstance and fix validation)
 
 const DeleteConfirmationModal = ({ title, id, fetchQuestions }) => {
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
 
   const handleDelete = async () => {
     try {
+<<<<<<< HEAD
       const response = await DELETE(`questions/${id}`);
       fetchQuestions();
       notifyWarning(response.data);
     } catch (error) {
       notifyError(error.message.data);
+=======
+      axiosInstance.delete(`/${id}`);
+      setUpdate(true);
+      notifyDelete();
+    } catch(error) {
+      const status = error.response.status;
+      if (status === 404) {
+        notifyError("Not Found: Specified question has already been deleted");
+      }
+>>>>>>> 44aa7da (Use axiosInstance and fix validation)
     } finally {
       onClose();
     }

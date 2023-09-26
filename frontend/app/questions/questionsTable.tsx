@@ -4,20 +4,43 @@ import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from 
 import { Pagination } from '@nextui-org/pagination';
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { Question } from '../types/question';
+<<<<<<< HEAD
 import StyleCell from './style-cell';
+=======
+import { ToastContainer, toast } from 'react-toastify';
+import StyleCell from './style-cell';
+import  axiosInstance  from '../requests';
+import 'react-toastify/dist/ReactToastify.css';
+>>>>>>> 44aa7da (Use axiosInstance and fix validation)
 
 interface QuestionProps {
   questions: Question[];
   fetchQuestions: () => void;
 }
 
-const QuestionsTable = ({questions, fetchQuestions} : QuestionProps) => {
+const QuestionsTable = ({ questions, fetchQuestions }: QuestionProps) => {
   const [page, setPage] = useState(1);
   const rowsPerPage = 10;
 
   useEffect(() => {
-      fetchQuestions();
-  }, []);
+<<<<<<< HEAD
+    fetchQuestions();
+  }, [fetchQuestions]);
+=======
+    const fetchData = async () => {
+      try {
+        const response = await axiosInstance.get('');
+        setQuestions(response.data == null ? [] : response.data);
+        setUpdate(false);
+      } catch (error) {
+        notifyError("An error occurred while retrieving questions");
+      } 
+    }
+    if (update) {
+      fetchData();
+    }
+  }, [update]);
+>>>>>>> 44aa7da (Use axiosInstance and fix validation)
 
   const noOfPages = Math.ceil(questions.length / rowsPerPage)
     ? Math.ceil(questions.length / rowsPerPage)
@@ -31,9 +54,8 @@ const QuestionsTable = ({questions, fetchQuestions} : QuestionProps) => {
       return {
         ...(question as Question),
         listId: i + 1 + start,
-      }
+      };
     });
-
   }, [page, questions]);
 
   const renderCell = useCallback(StyleCell, []);
