@@ -10,9 +10,7 @@ import { notifyError, notifySuccess } from "../../components/toast/notifications
 let resetInteveralId: NodeJS.Timeout;
 
 export default function useAuth() {
-    const user =  useSelector((state: RootState) => state.user);
-    const userId = user.userId;
-    const userRole = user.userRole;
+    const { userId, userRole } =  useSelector((state: RootState) => state.user);
     const dispatch = useDispatch();
     const router = useRouter();
     const oneMinute = 60000;
@@ -38,42 +36,45 @@ export default function useAuth() {
     }, [isAuthenticated])
 
     const handleLogin = handleSubmit(async data => {
-        const response = await POST('/auth/login', data);
-        if (response.status != 200) {
-            notifyError(response.data.error);
-            return;
+        try {
+            const response = await POST('/auth/login', data);
+            console.log(response);
+            dispatch(login(response.data.user));
+            notifySuccess(response.data.message);
+            router.push('/questions');
+            reset();
+        } catch (error) {
+            notifyError(error.data.error);
         }
-        dispatch(login(response.data.user));
-        notifySuccess(response.data.message);
-        router.push('/questions');
-        reset();
     })
 
     const handleLogout = async () => {
-        dispatch(logout());
-        router.push('/');
-        const response = await GET('/auth/logout')
-        if (response.status != 200) {
-            return;
+        try {
+            dispatch(logout());
+            router.push('/');
+            await GET('/auth/logout')
+        } catch (error) {
+            notifyError(error.data.error);
         }
     }
 
     const handleRefresh = async () => {
-        const response = await GET('/auth/refresh')
-        if (response.status != 200) {
-            return;
+        try {
+            await GET('/auth/refresh')
+        } catch (error) {
+            notifyError("Error Refreshing Token");
         }
     }
 
     const handleSignUp = handleSubmit(async (data) => {
-        const response = await POST('/auth/register', data)
-        if (response.status != 200) {
-            notifyError(response.data.error);
-            return;
+        try {
+            const response = await POST('/auth/register', data)
+            notifySuccess(response.data.message);
+            router.push('/login');
+            reset();
+        } catch (error) {
+            notifyError(error.data.error);
         }
-        notifySuccess(response.data.message);
-        router.push('/login');
-        reset();
     })
 
     const handleGithubLogin = async () => {
@@ -84,15 +85,15 @@ export default function useAuth() {
     }
 
     const handleGithubLoginCallback = async (code: string) => {
-        const response = await GET(`/auth/login/github?code=${code}`)
-        if (response?.status != 200) {
-            notifyError(response.data.error);
-            router.push("/login")
-            return;
+        try {
+            const response = await GET(`/auth/login/github?code=${code}`)
+            notifySuccess(response.data.message);
+            dispatch(login(response.data.user));
+            router.push('/questions');
+        } catch (error) {
+            notifyError(error.data.error);
+            router.push("/login");
         }
-        notifySuccess(response.data.message);
-        dispatch(login(response.data.user));
-        router.push('/questions')
     } 
 
     return {

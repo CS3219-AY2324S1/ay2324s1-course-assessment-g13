@@ -14,7 +14,7 @@ export const GET = async (url : string) => {
     const response = await axiosInstance.get(url);
     return response;
   } catch (error) {
-    return error.response;
+    throw error.response;
   }
 }
 
@@ -23,7 +23,7 @@ export const POST = async (url : string, data: any) => {
     const response = await axiosInstance.post(url, data);
     return response;
   } catch (error) {
-    return error.response;
+    throw error.response;
   }
 }
 
@@ -32,7 +32,7 @@ export const DELETE = async (url : string) => {
     const response = await axiosInstance.delete(url);
     return response;
   } catch (error) {
-    return error.response;
+    throw error.response;
   }
 }
 
