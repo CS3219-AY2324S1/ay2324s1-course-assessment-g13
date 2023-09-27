@@ -32,4 +32,3 @@ export const protectedPath = [
 export const config = {
     matcher: ["/", "/questions", "/profile/info", "/profile/account", "/login", "/signup"]
 };
-

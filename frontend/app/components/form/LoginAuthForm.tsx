@@ -6,7 +6,7 @@ import { Divider } from "@nextui-org/react";
 import { GithubIcon } from "../../../public/GithubIcon";
 import { useForm } from "react-hook-form";
 
-export default function LoginForm() {
+export default function LoginAuthForm() {
     const {
         register,
         handleSubmit,
