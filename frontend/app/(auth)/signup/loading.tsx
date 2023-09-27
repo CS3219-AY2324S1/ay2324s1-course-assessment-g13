@@ -1,4 +1,4 @@
-import LoadingForm from "../LoadingForm";
+import LoadingForm from "../../components/form/LoadingForm";
 
 
 export default function Loading() {
