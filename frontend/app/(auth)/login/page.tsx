@@ -1,5 +1,5 @@
 import { Card, CardHeader, CardBody } from "@nextui-org/card";
-import LoginForm from "./LoginForm";
+import LoginForm from "../../components/form/LoginForm";
 
 export default function LoginPage() {
     return (

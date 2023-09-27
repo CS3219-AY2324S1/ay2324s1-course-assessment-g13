@@ -11,6 +11,7 @@ export default function SignUpForm() {
         register,
         handleSubmit,
         reset,
+        getValues,
         formState: { errors }
     } = useForm();
     
@@ -46,6 +47,19 @@ export default function SignUpForm() {
                 errorMessage={errors.password?.message as string}
                 className="mb-5"
             />
+            <Input
+                {...register('confirmPassword', {
+                  required: 'Password is required',
+                  validate: value => value === getValues().password || 'The passwords do not match',
+                })}
+                label="Confirm Password"
+                isRequired
+                type="password"
+                variant="bordered"
+                placeholder="Comfirm your password"
+                labelPlacement="outside"
+                errorMessage={errors.confirmPassword?.message as string}
+              />
             <Button
                 onClick={() => {
                     handleSubmit(handleSignUp)();
