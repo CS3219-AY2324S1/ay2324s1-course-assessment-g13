@@ -9,19 +9,14 @@ import useAuth from '../(auth)/hooks/useAuth';
 
 export default function Questions() {
   const [questions, setQuestions] = useState([]);
-  const { userRole } = useAuth();
-  const isAdmin = userRole === "admin";
-
-  const fetchQuestions = () => {
-    setTimeout(()=>{}, 10000)
-    getData('questions').then(res => {
-      if (res.data) {
-        setQuestions(res.data);
-      } else {
-        notifyError(res.error);
-      }
-    });
-  }
+  const fetchQuestions = async () => {
+    try {
+      const response = await GET('questions');
+      setQuestions(response.data == null ? [] : response.data);
+    } catch (error) {
+      notifyError(error.message.data);
+    }
+  };
 
   return (
     <div className="questions mx-auto max-w-7xl px-6 h-4/5 my-10">

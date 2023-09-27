@@ -18,7 +18,7 @@ const QuestionsTable = ({isAdmin, questions, fetchQuestions} : QuestionProps) =>
 
   useEffect(() => {
     fetchQuestions();
-  }, []);
+  }, [fetchQuestions]);
 
   const noOfPages = Math.ceil(questions.length / rowsPerPage)
     ? Math.ceil(questions.length / rowsPerPage)
@@ -32,9 +32,8 @@ const QuestionsTable = ({isAdmin, questions, fetchQuestions} : QuestionProps) =>
       return {
         ...(question as Question),
         listId: i + 1 + start,
-      }
+      };
     });
-
   }, [page, questions]);
 
   const renderCell = useCallback(StyleCell, []);
