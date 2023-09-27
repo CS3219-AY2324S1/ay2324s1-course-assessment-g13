@@ -51,7 +51,7 @@ func CreateQuestion(c echo.Context) error {
 
 	validator := validator.New()
 	if err := validator.Struct(question); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Inputted data is invalid"})
+		return c.JSON(http.StatusBadRequest, "Inputted data is invalid")
 	}
 
 	err := config.Collection.FindOne(context.TODO(), bson.M{"title": bson.M{"$regex": primitive.Regex{Pattern: "^" + question.Title + "$", Options: "i"}}}).Err()

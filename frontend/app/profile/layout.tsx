@@ -1,9 +1,9 @@
 'use client';
 
 import { Avatar, Divider } from '@nextui-org/react';
-import useAuth from '../hooks/useAuth';
+import useAuth from '../hook/useAuth';
 import { useSelector } from 'react-redux';
-import { AppState } from '../libs/redux/store';
+import { AppState } from '../redux/store';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 
