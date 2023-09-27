@@ -38,7 +38,7 @@ const StyleCell: React.FC<StyleCellProps> = ({ isAdmin, item, columnKey, fetchQu
               title={item.title} 
               id={item.id} 
               fetchQuestions={fetchQuestions}
-            >}
+            />}
         </div>
       );
 

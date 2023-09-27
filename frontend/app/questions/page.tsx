@@ -2,13 +2,16 @@
 import QuestionsTable from './questionsTable';
 import QuestionAddModal from './modal/addQuestionModal';
 import { useState } from 'react';
-import { getData } from '../libs/axios/axios';
+import { GET } from '../libs/axios/axios';
 import { notifyError } from '../components/toast/notifications';
 import useAuth from '../(auth)/hooks/useAuth';
 
 
 export default function Questions() {
   const [questions, setQuestions] = useState([]);
+  const { userRole } = useAuth();
+  const isAdmin = userRole === "admin";
+  
   const fetchQuestions = async () => {
     try {
       const response = await GET('questions');
