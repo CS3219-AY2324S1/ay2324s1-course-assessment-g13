@@ -4,9 +4,17 @@ import { Input } from "@nextui-org/input"
 import  useAuth  from "../../hooks/useAuth"
 import { Divider } from "@nextui-org/divider";
 import { GithubIcon } from "../../../public/GithubIcon";
+import { useForm } from "react-hook-form";
 
 export default function SignUpForm() {
-    const { register, errors, handleSignUp, handleGithubLogin } = useAuth();
+    const {
+        register,
+        handleSubmit,
+        reset,
+        formState: { errors }
+    } = useForm();
+    
+    const { handleSignUp, handleGithubLogin } = useAuth();
 
     return (
         <>
@@ -39,7 +47,10 @@ export default function SignUpForm() {
                 className="mb-5"
             />
             <Button
-                onClick={handleSignUp}
+                onClick={() => {
+                    handleSubmit(handleSignUp)();
+                    reset();
+                }}
                 color="primary"
                 className="mb-5"
             >
@@ -47,7 +58,10 @@ export default function SignUpForm() {
             </Button>
             <Divider/>
             <Button
-                onClick={handleGithubLogin}
+                onClick={() => {
+                    reset();
+                    handleSubmit(handleGithubLogin)();
+                }}
                 color="default"
                 className="mt-5"
                 startContent={<GithubIcon />}

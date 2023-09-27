@@ -14,12 +14,6 @@ export default function useAuth() {
     const dispatch = useDispatch();
     const router = useRouter();
     const oneMinute = 60000;
-    const {
-        register,
-        handleSubmit,
-        reset,
-        formState: { errors }
-    } = useForm()
 
     const isAuthenticated = userId !== 0;
 
@@ -35,18 +29,16 @@ export default function useAuth() {
         };
     }, [isAuthenticated])
 
-    const handleLogin = handleSubmit(async data => {
+    const handleLogin = async data => {
         try {
             const response = await POST('/auth/login', data);
-            console.log(response);
             dispatch(login(response.data.user));
             notifySuccess(response.data.message);
             router.push('/questions');
-            reset();
         } catch (error) {
             notifyError(error.data.error);
         }
-    })
+    }
 
     const handleLogout = async () => {
         try {
@@ -66,16 +58,15 @@ export default function useAuth() {
         }
     }
 
-    const handleSignUp = handleSubmit(async (data) => {
+    const handleSignUp = async (data) => {
         try {
             const response = await POST('/auth/register', data)
             notifySuccess(response.data.message);
             router.push('/login');
-            reset();
         } catch (error) {
             notifyError(error.data.error);
         }
-    })
+    }
 
     const handleGithubLogin = async () => {
         const clientId = "e2d4b8fe671589d0d378" // Should move to .env
@@ -97,8 +88,6 @@ export default function useAuth() {
     } 
 
     return {
-        register, 
-        errors, 
         handleLogin, 
         handleLogout, 
         handleSignUp, 
