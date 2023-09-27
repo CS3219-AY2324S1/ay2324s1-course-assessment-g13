@@ -19,11 +19,14 @@ func Login(c echo.Context) error {
 	}
 
 	var user models.User
-	config.DB.Where("username = ?", requestBody.Username).First(&user)
+	err := config.DB.Where("username = ?", requestBody.Username).First(&user).Error
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(ERROR_OCCURRED))
+	}
 	if user.ID == 0 {
 		return c.JSON(http.StatusNotFound, message.CreateErrorMessage(INVALID_USER_NOT_FOUND))
 	}
-	err := bcrypt.CompareHashAndPassword([]byte(user.HashedPassword), []byte(requestBody.Password))
+	err = bcrypt.CompareHashAndPassword([]byte(user.HashedPassword), []byte(requestBody.Password))
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(FAILURE_HASHING_PASSWORD))
 	}

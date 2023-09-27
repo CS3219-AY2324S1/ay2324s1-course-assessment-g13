@@ -24,7 +24,11 @@ func CreateUser(c echo.Context) error {
 	}
 
 	var existingUser models.User
-	config.DB.Where("username = ?", requestBody.Username).First(&existingUser)
+	err := config.DB.Where("username = ?", requestBody.Username).First(&existingUser).Error
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(ERROR_OCCURRED))
+	}
+
 	if existingUser.ID != 0 {
 		return c.JSON(http.StatusConflict, message.CreateErrorMessage(INVALID_USER_EXIST))
 	}

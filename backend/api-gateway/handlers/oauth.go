@@ -48,7 +48,10 @@ func GithubLogin(c echo.Context) error {
 	githubUserID := githubData.GithubID
 
 	var existingUser models.User
-	config.DB.Where("o_auth_provider = ? AND o_auth_user_id = ?", provider, githubUserID).First(&existingUser)
+	err := config.DB.Where("o_auth_provider = ? AND o_auth_user_id = ?", provider, githubUserID).First(&existingUser).Error
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(ERROR_OCCURRED))
+	}
 
 	if existingUser.ID == 0 {
 		c.Set(GITHUB_DATA_CONTEXT_KEY, githubData)

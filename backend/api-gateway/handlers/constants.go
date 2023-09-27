@@ -1,11 +1,12 @@
 package handlers
 
 const (
+	ERROR_OCCURRED             = "An Error Occurred"
 	INVALID_JSON_REQUEST       = "Invalid JSON Request!"
 	INVALID_USER_INPUT         = "Invalid User Input!"
 	INVALID_USER_EXIST         = "Username Already Exists!"
 	INVALID_USER_NOT_FOUND     = "User Not Found!"
-	FAILURE_HASHING_PASSWORD   = "An Error Occurred while Hashing Password"
+	FAILURE_HASHING_PASSWORD   = "Double Check Your Credentials"
 	FAILURE_CREATE_USER        = "Failed to Create User!"
 	FAILURE_USER_ALREADY_LOGIN = "User Already Logged In"
 	FAILURE_USER_ROLE_HIGHEST  = "User Role is Already Highest"

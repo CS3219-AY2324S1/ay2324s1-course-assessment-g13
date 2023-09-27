@@ -16,7 +16,10 @@ func UpgradeUser(c echo.Context) error {
 
 	userId := tokenClaims.User.ID
 	var user *models.User
-	config.DB.Where("id = ?", userId).First(&user)
+	err := config.DB.Where("id = ?", userId).First(&user).Error
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(ERROR_OCCURRED))
+	}
 
 	currentRole := user.Role
 	if currentRole == ADMIN {
@@ -39,7 +42,10 @@ func DowngradeUser(c echo.Context) error {
 
 	userId := tokenClaims.User.ID
 	var user *models.User
-	config.DB.Where("id = ?", userId).First(&user)
+	err := config.DB.Where("id = ?", userId).First(&user).Error
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(ERROR_OCCURRED))
+	}
 
 	currentRole := user.Role
 	if currentRole == USER {
