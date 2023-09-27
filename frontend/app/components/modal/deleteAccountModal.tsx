@@ -7,7 +7,7 @@ import {
   ModalHeader,
   useDisclosure,
 } from '@nextui-org/react';
-import { DELETE } from '../../axios/axios';
+import { DELETE } from '../../libs/axios/axios';
 import useAuth from '../../hook/useAuth';
 import { notifyError, notifySuccess } from '../Notifications';
 import { useDispatch } from 'react-redux';

@@ -6,7 +6,7 @@ import ProfileLayout from '../layout';
 import useAuth from '../../hook/useAuth';
 import { Avatar, Button, Divider, Input } from '@nextui-org/react';
 import ImageUpload from '../../components/form/ImageUpload';
-import { PUT } from '../../axios/axios';
+import { PUT } from '../../libs/axios/axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppState } from '../../redux/store';
 import { notifyError, notifySuccess } from '../../components/Notifications';

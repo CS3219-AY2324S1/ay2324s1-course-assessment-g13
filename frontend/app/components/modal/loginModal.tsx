@@ -12,7 +12,7 @@ import {
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/navigation';
-import { POST } from '../../axios/axios';
+import { POST } from '../../libs/axios/axios';
 import { login } from '../../redux/slices/userSlice';
 import { notifyError, notifySuccess } from '../Notifications';
 
