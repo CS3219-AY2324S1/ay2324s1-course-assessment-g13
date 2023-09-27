@@ -1,15 +1,10 @@
-import { Card, CardHeader, CardBody } from "@nextui-org/card";
 import SignUpForm from "../../components/form/SignUpForm";
+import AuthCard from "../../components/card/AuthCard";
 
 export default function LoginPage() {
     return (
-        <Card className="max-w-md mx-auto mt-48">
-            <CardHeader className="flex justify-center">
-                <span>Sign Up</span>
-            </CardHeader>
-            <CardBody>
-                <SignUpForm />
-            </CardBody>
-        </Card>
+        <AuthCard authTitle={"Sign Up"}>
+            <SignUpForm />
+        </AuthCard>
     )
 }
