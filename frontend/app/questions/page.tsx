@@ -4,7 +4,7 @@ import QuestionAddModal from './modal/addQuestionModal';
 import { useState } from 'react';
 import { GET } from '../libs/axios/axios';
 import { notifyError } from '../components/toast/notifications';
-import useAuth from '../(auth)/hooks/useAuth';
+import useAuth from '../hooks/useAuth';
 
 
 export default function Questions() {

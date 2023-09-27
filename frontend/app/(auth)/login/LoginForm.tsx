@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@nextui-org/button";
 import { Input } from "@nextui-org/input"
-import  useAuth  from "../hooks/useAuth"
+import  useAuth  from "../../hooks/useAuth"
 import { Divider } from "@nextui-org/react";
 import { GithubIcon } from "../../../public/GithubIcon";
 

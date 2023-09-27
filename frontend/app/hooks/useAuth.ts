@@ -1,11 +1,11 @@
 import { useRouter } from "next/navigation";
 import { useEffect } from "react"
 import { useForm } from "react-hook-form"
-import { GET, POST } from "../../libs/axios/axios";
-import { login, logout } from "../../libs/redux/slices/userSlice";
+import { GET, POST } from "../libs/axios/axios";
+import { login, logout } from "../libs/redux/slices/userSlice";
 import { useSelector, useDispatch } from "react-redux";
-import { RootState } from '../../libs/redux/store';
-import { notifyError, notifySuccess } from "../../components/toast/notifications";
+import { RootState } from '../libs/redux/store';
+import { notifyError, notifySuccess } from "../components/toast/notifications";
 
 let resetInteveralId: NodeJS.Timeout;
 

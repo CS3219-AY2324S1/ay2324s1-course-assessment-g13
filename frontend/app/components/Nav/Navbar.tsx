@@ -4,8 +4,7 @@ import { Link } from '@nextui-org/link';
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem } from '@nextui-org/navbar';
 import React, { useEffect, useState } from 'react';
 import LoginButton from './LoginButton';
-import useAuth from '../../(auth)/hooks/useAuth';
-import LogoutButton from './LogoutButton';
+import useAuth from '../../hooks/useAuth';
 import SignUpButton from './SignUpButton';
 import { Avatar, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@nextui-org/react';
 

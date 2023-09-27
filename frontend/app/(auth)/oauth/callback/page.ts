@@ -1,6 +1,6 @@
 "use client";
 import { useSearchParams } from "next/navigation";
-import useAuth from "../../hooks/useAuth";
+import useAuth from "../../../hooks/useAuth";
 import { useEffect } from "react";
 
 export default function OAuthCallback() {

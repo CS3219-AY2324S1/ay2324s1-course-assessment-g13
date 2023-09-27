@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import useAuth from '../../(auth)/hooks/useAuth';
+import useAuth from '../../hooks/useAuth';
 import { usePathname, useRouter } from 'next/navigation';
 
 const isBrowser = () => typeof window !== "undefined";
