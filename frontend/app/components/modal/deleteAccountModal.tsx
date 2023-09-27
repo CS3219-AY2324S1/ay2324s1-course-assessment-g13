@@ -8,14 +8,14 @@ import {
   useDisclosure,
 } from '@nextui-org/react';
 import { DELETE } from '../../libs/axios/axios';
-import useAuth from '../../hook/useAuth';
-import { notifyError, notifySuccess } from '../Notifications';
+import useAuth from '../../hooks/useAuth';
+import { notifyError, notifySuccess } from '../toast/notifications';
 import { useDispatch } from 'react-redux';
-import { logout } from '../../redux/slices/userSlice';
+import { logout } from '../../libs/redux/slices/userSlice';
 import { useRouter } from 'next/navigation';
 
 const DeleteAccountModal = () => {
-  const { id } = useAuth();
+  const { userId:id } = useAuth();
   const dispatch = useDispatch();
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const router = useRouter();

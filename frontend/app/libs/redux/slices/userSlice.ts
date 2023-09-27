@@ -4,12 +4,14 @@ export interface UserState {
     username: string;
     userId: number;
     userRole: string;
+    photoUrl?: string;
 }
 
 const initialState: UserState = {
-    username: null,
+    username: '',
     userId: 0,
-    userRole: null
+    userRole: '',
+    photoUrl: ''
   };
 
 const userSlice = createSlice({
@@ -17,17 +19,23 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     login: (state, action) => {
-      state.username = action.payload.username
-      state.userId = action.payload.ID
-      state.userRole = action.payload.role
+      state.username = action.payload.username;
+      state.userId = action.payload.ID;
+      state.userRole = action.payload.role;
+      state.photoUrl = action.payload.photoUrl ?? '';
     },
     logout: (state) => {
-      state.username = null;
+      state.username = '';
       state.userId = 0;
-      state.userRole = null;
+      state.userRole = '';
+      state.photoUrl = '';
+    },
+    updateUser: (state, action) => {
+      state.username = action.payload.username;
+      state.photoUrl = action.payload.photoUrl;
     },
   },
 });
 
-export const { login, logout } = userSlice.actions;
+export const { login, logout, updateUser } = userSlice.actions;
 export default userSlice.reducer;

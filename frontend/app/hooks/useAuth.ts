@@ -15,7 +15,7 @@ interface UserCredential {
 }
 
 export default function useAuth() {
-    const { userId, userRole } =  useSelector((state: RootState) => state.user);
+    const { userId, userRole, username } =  useSelector((state: RootState) => state.user);
     const dispatch = useDispatch();
     const router = useRouter();
     const oneMinute = 60000;
@@ -99,7 +99,9 @@ export default function useAuth() {
         handleGithubLogin, 
         handleGithubLoginCallback, 
         isAuthenticated, 
-        userRole
+        userRole,
+        userId,
+        username
     }
 
 }
