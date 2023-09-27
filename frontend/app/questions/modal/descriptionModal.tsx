@@ -8,7 +8,7 @@ import {
   useDisclosure,
   Tooltip,
 } from '@nextui-org/react';
-import { EyeIcon } from '../assets/EyeIcon';
+import { EyeIcon } from '../../../public/EyeIcon';
 
 const QuestionDescriptionModal = ({ title, description }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();

@@ -8,7 +8,7 @@ import {
   useDisclosure,
   Tooltip,
 } from '@nextui-org/react';
-import { DeleteIcon } from '../assets/DeleteIcon';
+import { DeleteIcon } from '../../../public/DeleteIcon';
 import { notifyWarning, notifyError } from '../../components/toast/notifications';
 import { deleteEntry } from '../../libs/axios/axios';
 

@@ -3,7 +3,7 @@ import { Button } from "@nextui-org/button";
 import { Input } from "@nextui-org/input"
 import  useAuth  from "../hooks/useAuth"
 import { Divider } from "@nextui-org/divider";
-import { GithubIcon } from "../assets/GithubIcon";
+import { GithubIcon } from "../../../public/GithubIcon";
 
 export default function SignUpForm() {
     const { register, errors, handleSignUp, handleGithubLogin } = useAuth();
