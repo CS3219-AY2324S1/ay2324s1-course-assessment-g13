@@ -18,7 +18,7 @@ const QuestionsTable = ({isAdmin, questions, fetchQuestions} : QuestionProps) =>
 
   useEffect(() => {
     fetchQuestions();
-  }, [fetchQuestions]);
+  }, []);
 
   const noOfPages = Math.ceil(questions.length / rowsPerPage)
     ? Math.ceil(questions.length / rowsPerPage)

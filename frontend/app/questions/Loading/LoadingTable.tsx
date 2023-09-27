@@ -22,7 +22,7 @@ export default function LoadingTable() {
                 </Skeleton>
             </div>
             <div className="table w-full">
-                <Table>
+                <Table aria-label="Loading Questions Table">
                 <TableHeader columns={columns}>
                     {column => (
                     <TableColumn key={column.key} align="center">
