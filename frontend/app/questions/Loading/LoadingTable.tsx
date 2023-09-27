@@ -3,7 +3,13 @@ import { Table, TableBody, TableHeader, TableColumn, TableCell, TableRow } from 
 import { Skeleton } from "@nextui-org/skeleton";
 import { useMemo } from "react";
 
+interface LoadingRowDimentsion {
+    w: number;
+    h: number;
+}
+
 export default function LoadingTable() {
+
     const columns = useMemo(() => {
         return [
           { key: 'id', label: 'ID' },
@@ -13,6 +19,15 @@ export default function LoadingTable() {
           { key: 'actions', label: 'ACTIONS' },
         ];
       }, []);
+
+    const LoadingRowDimension : LoadingRowDimentsion[][][]= [
+        [[{w:5,h:5}], [{w:25,h:5}], [{w:28,h:7}, {w:20,h:7}], [{w:16,h:7}], [{w:5,h:5}, {w:5,h:5}]],
+        [[{w:5,h:5}], [{w:48,h:5}], [{w:20,h:7}], [{w:20,h:7}], [{w:5,h:5}, {w:5,h:5}]],
+        [[{w:5,h:5}], [{w:40,h:5}], [{w:16,h:7}, {w:24,h:7}], [{w:24,h:7}], [{w:5,h:5}, {w:5,h:5}]],
+        [[{w:5,h:5}], [{w:32,h:5}], [{w:28,h:7}, {w:24,h:7}], [{w:20,h:7}], [{w:5,h:5}, {w:5,h:5}]],
+        [[{w:5,h:5}], [{w:36,h:5}], [{w:20,h:7}, {w:24,h:7}], [{w:28,h:7}], [{w:5,h:5}, {w:5,h:5}]]
+    ]
+
     return (
         <div className="questions mx-auto max-w-7xl px-6 h-4/5 my-10">
             <div className="questions-header flex justify-between items-center mb-5">
@@ -31,168 +46,21 @@ export default function LoadingTable() {
                     )}
                 </TableHeader>
                     <TableBody>
-                        <TableRow>
-                            <TableCell>
-                                <Skeleton className="w-5 rounded-lg">
-                                    <div className="h-5 bg-default-300"></div>
-                                </Skeleton>
-                            </TableCell>
-                            <TableCell>
-                                <Skeleton className="w-28 rounded-lg">
-                                    <div className="h-5 bg-default-300"></div>
-                                </Skeleton>
-                            </TableCell>
-                            <TableCell className="flex flex-row gap-3">
-                                <Skeleton className="w-28 rounded-xl">
-                                    <div className="h-7 bg-default-300"></div>
-                                </Skeleton>
-                                <Skeleton className="w-20 rounded-xl">
-                                    <div className="h-7 bg-default-300"></div>
-                                </Skeleton>
-                            </TableCell>
-                            <TableCell>
-                                <Skeleton className="w-16 rounded-xl">
-                                    <div className="h-7 bg-default-300"></div>
-                                </Skeleton>
-                            </TableCell>
-                            <TableCell className="flex flex-row gap-3">
-                                <Skeleton className="w-5 rounded-lg">
-                                    <div className="h-5 bg-default-300"></div>
-                                </Skeleton>
-                                <Skeleton className="w-5 rounded-lg">
-                                    <div className="h-5 bg-default-300"></div>
-                                </Skeleton>
-                            </TableCell>
-                        </TableRow>
-                        <TableRow>
-                            <TableCell>
-                                <Skeleton className="w-5 rounded-lg">
-                                    <div className="h-5 bg-default-300"></div>
-                                </Skeleton>
-                            </TableCell>
-                            <TableCell>
-                                <Skeleton className="w-48 rounded-lg">
-                                    <div className="h-5 bg-default-300"></div>
-                                </Skeleton>
-                            </TableCell>
-                            <TableCell className="flex flex-row gap-3">
-                                <Skeleton className="w-20 rounded-xl">
-                                    <div className="h-7 bg-default-300"></div>
-                                </Skeleton>
-                            </TableCell>
-                            <TableCell>
-                                <Skeleton className="w-20 rounded-xl">
-                                    <div className="h-7 bg-default-300"></div>
-                                </Skeleton>
-                            </TableCell>
-                            <TableCell className="flex flex-row gap-3">
-                                <Skeleton className="w-5 rounded-lg">
-                                    <div className="h-5 bg-default-300"></div>
-                                </Skeleton>
-                                <Skeleton className="w-5 rounded-lg">
-                                    <div className="h-5 bg-default-300"></div>
-                                </Skeleton>
-                            </TableCell>
-                        </TableRow>
-                        <TableRow>
-                            <TableCell>
-                                <Skeleton className="w-5 rounded-lg">
-                                    <div className="h-5 bg-default-300"></div>
-                                </Skeleton>
-                            </TableCell>
-                            <TableCell>
-                                <Skeleton className="w-40 rounded-lg">
-                                    <div className="h-5 bg-default-300"></div>
-                                </Skeleton>
-                            </TableCell>
-                            <TableCell className="flex flex-row gap-3">
-                                <Skeleton className="w-16 rounded-xl">
-                                    <div className="h-7 bg-default-300"></div>
-                                </Skeleton>
-                                <Skeleton className="w-24 rounded-xl">
-                                    <div className="h-7 bg-default-300"></div>
-                                </Skeleton>
-                            </TableCell>
-                            <TableCell>
-                                <Skeleton className="w-24 rounded-xl">
-                                    <div className="h-7 bg-default-300"></div>
-                                </Skeleton>
-                            </TableCell>
-                            <TableCell className="flex flex-row gap-3">
-                                <Skeleton className="w-5 rounded-lg">
-                                    <div className="h-5 bg-default-300"></div>
-                                </Skeleton>
-                                <Skeleton className="w-5 rounded-lg">
-                                    <div className="h-5 bg-default-300"></div>
-                                </Skeleton>
-                            </TableCell>
-                        </TableRow>
-                        <TableRow>
-                            <TableCell>
-                                <Skeleton className="w-5 rounded-lg">
-                                    <div className="h-5 bg-default-300"></div>
-                                </Skeleton>
-                            </TableCell>
-                            <TableCell>
-                                <Skeleton className="w-32 rounded-lg">
-                                    <div className="h-5 bg-default-300"></div>
-                                </Skeleton>
-                            </TableCell>
-                            <TableCell className="flex flex-row gap-3">
-                                <Skeleton className="w-28 rounded-xl">
-                                    <div className="h-7 bg-default-300"></div>
-                                </Skeleton>
-                                <Skeleton className="w-24 rounded-xl">
-                                    <div className="h-7 bg-default-300"></div>
-                                </Skeleton>
-                            </TableCell>
-                            <TableCell>
-                                <Skeleton className="w-20 rounded-xl">
-                                    <div className="h-7 bg-default-300"></div>
-                                </Skeleton>
-                            </TableCell>
-                            <TableCell className="flex flex-row gap-3">
-                                <Skeleton className="w-5 rounded-lg">
-                                    <div className="h-5 bg-default-300"></div>
-                                </Skeleton>
-                                <Skeleton className="w-5 rounded-lg">
-                                    <div className="h-5 bg-default-300"></div>
-                                </Skeleton>
-                            </TableCell>
-                        </TableRow>
-                        <TableRow>
-                            <TableCell>
-                                <Skeleton className="w-5 rounded-lg">
-                                    <div className="h-5 bg-default-300"></div>
-                                </Skeleton>
-                            </TableCell>
-                            <TableCell>
-                                <Skeleton className="w-36 rounded-lg">
-                                    <div className="h-5 bg-default-300"></div>
-                                </Skeleton>
-                            </TableCell>
-                            <TableCell className="flex flex-row gap-3">
-                                <Skeleton className="w-20 rounded-xl">
-                                    <div className="h-7 bg-default-300"></div>
-                                </Skeleton>
-                                <Skeleton className="w-24 rounded-xl">
-                                    <div className="h-7 bg-default-300"></div>
-                                </Skeleton>
-                            </TableCell>
-                            <TableCell>
-                                <Skeleton className="w-28 rounded-xl">
-                                    <div className="h-7 bg-default-300"></div>
-                                </Skeleton>
-                            </TableCell>
-                            <TableCell className="flex flex-row gap-3">
-                                <Skeleton className="w-5 rounded-lg">
-                                    <div className="h-5 bg-default-300"></div>
-                                </Skeleton>
-                                <Skeleton className="w-5 rounded-lg">
-                                    <div className="h-5 bg-default-300"></div>
-                                </Skeleton>
-                            </TableCell>
-                        </TableRow>
+                        {LoadingRowDimension.map((row, rowIndex) => (
+                            <TableRow key={`row ${rowIndex}`}>
+                                {row.map((col, colIndex) => (
+                                    <TableCell key={`col ${colIndex}`} className={(colIndex === 2 || colIndex === 4) && "flex gap-3"}>
+                                        {col.map((cell, cellIndex) => (
+                                            <Skeleton key={cellIndex} className={`w-${cell.w} rounded-lg`}>
+                                                <div className={`h-${cell.h} bg-default-300`}></div>
+                                            </Skeleton>
+                                        ))}
+                                    </TableCell>
+                                ))
+                                }
+                            </TableRow>
+                        ))
+                        }
                     </TableBody>
                 </Table>
             </div>

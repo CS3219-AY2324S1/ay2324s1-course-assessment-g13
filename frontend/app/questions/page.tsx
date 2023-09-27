@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { GET } from '../libs/axios/axios';
 import { notifyError } from '../components/toast/notifications';
 import useAuth from '../hooks/useAuth';
+import LoadingTable from './Loading/LoadingTable';
 
 
 export default function Questions() {

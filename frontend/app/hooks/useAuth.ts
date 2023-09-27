@@ -9,6 +9,11 @@ import { notifyError, notifySuccess } from "../components/toast/notifications";
 
 let resetInteveralId: NodeJS.Timeout;
 
+interface UserCredential {
+    username: string,
+    password: string
+}
+
 export default function useAuth() {
     const { userId, userRole } =  useSelector((state: RootState) => state.user);
     const dispatch = useDispatch();
@@ -29,7 +34,7 @@ export default function useAuth() {
         };
     }, [isAuthenticated])
 
-    const handleLogin = async data => {
+    const handleLogin = async (data : UserCredential) => {
         try {
             const response = await POST('/auth/login', data);
             dispatch(login(response.data.user));
@@ -58,7 +63,7 @@ export default function useAuth() {
         }
     }
 
-    const handleSignUp = async (data) => {
+    const handleSignUp = async (data : UserCredential) => {
         try {
             const response = await POST('/auth/register', data)
             notifySuccess(response.data.message);
