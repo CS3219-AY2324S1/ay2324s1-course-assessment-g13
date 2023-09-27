@@ -4,8 +4,8 @@ import { Button, Divider, Input } from '@nextui-org/react';
 import RootLayout from '../../layout';
 import ProfileLayout from '../layout';
 import { Controller, useForm } from 'react-hook-form';
-import { PUT } from '../../axios/axios';
-import useAuth from '../../hook/useAuth';
+import { PUT } from '../../libs/axios/axios';
+import useAuth from '../../hooks/useAuth';
 import { notifyError, notifySuccess } from '../../components/Notifications';
 import DeleteAccountModal from '../../components/modal/deleteAccountModal';
 
@@ -16,7 +16,7 @@ interface ChangePassword {
 }
 
 const AccountPage = () => {
-  const { id } = useAuth();
+  const { userId:id } = useAuth();
   const initialValues: ChangePassword = {
     oldPassword: '',
     newPassword: '',

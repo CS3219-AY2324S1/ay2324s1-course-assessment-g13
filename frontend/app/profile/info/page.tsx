@@ -3,14 +3,14 @@
 import { Controller, useForm } from 'react-hook-form';
 import RootLayout from '../../layout';
 import ProfileLayout from '../layout';
-import useAuth from '../../hook/useAuth';
+import useAuth from '../../hooks/useAuth';
 import { Avatar, Button, Divider, Input } from '@nextui-org/react';
 import ImageUpload from '../../components/form/ImageUpload';
-import { PUT } from '../../axios/axios';
+import { PUT } from '../../libs/axios/axios';
 import { useDispatch, useSelector } from 'react-redux';
-import { AppState } from '../../redux/store';
+import { AppState } from '../../libs/redux/store';
 import { notifyError, notifySuccess } from '../../components/Notifications';
-import { updateUser } from '../../redux/slices/userSlice';
+import { updateUser } from '../../libs/redux/slices/userSlice';
 
 interface UserInfo {
   username: string;
@@ -19,7 +19,7 @@ interface UserInfo {
 
 const InfoPage = () => {
   const dispatch = useDispatch();
-  const { id, username } = useAuth();
+  const { userId:id, username } = useAuth();
   const photoUrl = useSelector((state: AppState) => state.user.photoUrl);
 
   const initialValues: UserInfo = {
