@@ -1,30 +1,9 @@
-'use client';
-
 import { Link } from '@nextui-org/link';
+import { Button } from '@nextui-org/button';
 
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem } from '@nextui-org/navbar';
-import React from 'react';
-import LoginModal from './modal/loginModal';
-import SignupModal from './modal/signupModal';
-import useAuth from '../hook/useAuth';
-import { Avatar, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@nextui-org/react';
-import { useDispatch, useSelector } from 'react-redux';
-import { logout } from '../redux/slices/userSlice';
-import { usePathname, useRouter } from 'next/navigation';
-import { AppState } from '../redux/store';
 
 const Nav = () => {
-  const photoUrl = useSelector((state: AppState) => state.user.photoUrl);
-  const { isLoggedIn } = useAuth();
-  const dispatch = useDispatch();
-  const router = useRouter();
-  const pathname = usePathname();
-
-  const handleLogout = () => {
-    dispatch(logout());
-    router.push('/');
-  };
-
   return (
     <Navbar
       isBordered
@@ -48,59 +27,30 @@ const Nav = () => {
       }}
     >
       <NavbarBrand>
-        <Link href={isLoggedIn ? '/questions' : '/'} className="font-bold text-inherit">
-          PeerPrep
-        </Link>
+        <p className="font-bold text-inherit">PeerPrep</p>
       </NavbarBrand>
-      {isLoggedIn && (
-        <>
-          <NavbarContent className="flex gap-4" justify="center">
-            <NavbarItem isActive={pathname === '/questions'}>
-              <Link
-                href="/questions"
-                color={pathname === '/questions' ? 'primary' : 'foreground'}
-                aria-current="page"
-              >
-                Questions
-              </Link>
-            </NavbarItem>
-            <NavbarItem>
-              <Link color={pathname === '/interviews' ? 'primary' : 'foreground'} href="#">
-                Interviews
-              </Link>
-            </NavbarItem>
-          </NavbarContent>
-          <NavbarContent justify="end">
-            <NavbarItem>
-              <Dropdown placement="bottom-end">
-                <DropdownTrigger>
-                  <Avatar showFallback src={photoUrl} isBordered as="button" color="primary" />
-                </DropdownTrigger>
-                <DropdownMenu aria-label="Profile Actions" variant="flat">
-                  <DropdownItem key="profile" color="primary">
-                    <Link href="/profile/info" className="text-white text-sm w-full">
-                      Profile
-                    </Link>
-                  </DropdownItem>
-                  <DropdownItem key="logout" color="danger" onClick={handleLogout}>
-                    Log Out
-                  </DropdownItem>
-                </DropdownMenu>
-              </Dropdown>
-            </NavbarItem>
-          </NavbarContent>
-        </>
-      )}
-      {!isLoggedIn && (
-        <NavbarContent justify="end">
-          <NavbarItem>
-            <LoginModal />
-          </NavbarItem>
-          <NavbarItem className="hidden lg:flex">
-            <SignupModal isNav={true} />
-          </NavbarItem>
-        </NavbarContent>
-      )}
+      <NavbarContent className="hidden sm:flex gap-4" justify="center">
+        <NavbarItem isActive>
+          <Link href="#" aria-current="page">
+            Questions
+          </Link>
+        </NavbarItem>
+        <NavbarItem>
+          <Link color="foreground" href="#">
+            Interviews
+          </Link>
+        </NavbarItem>
+      </NavbarContent>
+      <NavbarContent justify="end">
+        <NavbarItem className="hidden lg:flex">
+          <Link href="#">Login</Link>
+        </NavbarItem>
+        <NavbarItem>
+          <Button as={Link} color="primary" href="#" variant="flat">
+            Sign Up
+          </Button>
+        </NavbarItem>
+      </NavbarContent>
     </Navbar>
   );
 };

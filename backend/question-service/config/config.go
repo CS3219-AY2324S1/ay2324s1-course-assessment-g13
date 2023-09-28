@@ -3,7 +3,6 @@ package config
 import (
 	"context"
 	"log"
-	"os"
 	"question-service/models"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -17,19 +16,15 @@ var ctx = context.TODO()
 const minDocuments int64 = 5
 
 func ConnectDb() {
-	MONGO_URI := os.Getenv("MONGO_URI")
-
-	clientOptions := options.Client().ApplyURI(MONGO_URI)
+	clientOptions := options.Client().ApplyURI("mongodb://db:27017")
 	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
 		log.Fatal(err)
-		os.Exit(2)
 	}
 
 	err = client.Ping(ctx, nil)
 	if err != nil {
 		log.Fatal(err)
-		os.Exit(2)
 	}
 
 	Collection = client.Database("questions-service").Collection("questions")
@@ -61,7 +56,7 @@ func PopulateDb() {
 					Constraints:
 					• 1 <= s.length <= 105
 					• s[i] is a printable ascii character.`,
-			Categories: []models.Category{models.Strings, models.Algorithms},
+			Categories: []string{"Strings", "Algorithms"},
 			Complexity: "Easy",
 		},
 		{
@@ -92,7 +87,7 @@ func PopulateDb() {
 			• prerequisites[i].length == 2
 			• 0 <= ai, bi < numCourses
 			• All the pairs prerequisites[i] are unique.`,
-			Categories: []models.Category{models.DataStructures, models.Algorithms},
+			Categories: []string{"Data Structures", "Algorithms"},
 			Complexity: "Medium",
 		},
 		{
@@ -109,7 +104,7 @@ func PopulateDb() {
 			•  1 <= a.length, b.length <= 104
 			•  a and b consist only of '0' or '1' characters.
 			•  Each string does not contain leading zeros except for the zero itself.`,
-			Categories: []models.Category{models.BitManipulation, models.Algorithms},
+			Categories: []string{"Bit Manipulation", "Algorithms"},
 			Complexity: "Easy",
 		},
 		{
@@ -138,7 +133,7 @@ func PopulateDb() {
 			Constraints:
 			• 1 <= text1.length, text2.length <= 1000
 			• text1 and text2 consist of only lowercase English characters.`,
-			Categories: []models.Category{models.Strings, models.Algorithms},
+			Categories: []string{"Strings", "Algorithms"},
 			Complexity: "Medium",
 		},
 		{
@@ -174,7 +169,7 @@ func PopulateDb() {
 			Constraints:
 			• 1 <= nums.length <= 1000
 			• 0 <= nums[i] < 2^16`,
-			Categories: []models.Category{models.BrainTeaser},
+			Categories: []string{"Brainteaser"},
 			Complexity: "Hard",
 		},
 	}

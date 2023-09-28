@@ -6,7 +6,6 @@ type User struct {
 	gorm.Model
 	Username       string
 	HashedPassword string
-	PhotoUrl       string
 }
 
 type CreateUserRequest struct {
@@ -14,18 +13,7 @@ type CreateUserRequest struct {
 	Password string `json:"password" validate:"required"`
 }
 
-type UpdateUserInfo struct {
+type UpdateUserRequest struct {
 	Username string `json:"username"`
-	PhotoUrl string `json:"photoUrl"`
-}
-
-type UpdateUserPassword struct {
-	OldPassword string `json:"oldPassword" validate:"required"`
-	NewPassword string `json:"newPassword" validate:"required"`
-}
-
-type LoginResponse struct {
-	Id 	 uint   `json:"id"`
-	Username string `json:"username"`
-	PhotoUrl	string `json:"photoUrl"`
+	Password string `json:"password"`
 }

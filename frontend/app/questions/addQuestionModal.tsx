@@ -15,12 +15,21 @@ import { Chip } from '@nextui-org/chip';
 import { Textarea } from '@nextui-org/react';
 import { Category, Complexity, Question } from '../types/question';
 import { useForm } from 'react-hook-form';
-import { notifySuccess, notifyError } from '../components/Notifications';
-import { POST } from '../axios/axios';
+import { useDispatch, useSelector } from 'react-redux';
+import { addQuestion } from '../redux/slices/questionBankSlice';
+import { AppState } from '../redux/store';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-export default function QuestionAddModal({ fetchQuestions }) {
+export default function QuestionAddModal() {
+  const dispatch = useDispatch();
+  const { questionBank } = useSelector((state: AppState) => state.questionBank);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const categories = Object.values(Category);
+  const notifyAdd = () =>
+    toast.success('Question Added Successfully', {
+      theme: 'dark',
+    });
 
   const {
     register,
@@ -34,20 +43,15 @@ export default function QuestionAddModal({ fetchQuestions }) {
       ...data,
       categories: (data.categories as string).split(',') as Category[],
     };
-
-    try {
-      const response = await POST('questions', modifiedData);
-      fetchQuestions();
-      notifySuccess(response.data);
-      onOpenChange();
-      reset();
-    } catch (error) {
-      notifyError(error.message.data);
-    }
+    dispatch(addQuestion(modifiedData));
+    notifyAdd();
+    onOpenChange();
+    reset();
   });
 
   return (
     <>
+      <ToastContainer />
       <Button color="primary" variant="ghost" className="text-lg py-5" onPress={onOpen}>
         Add Question
       </Button>
@@ -69,8 +73,12 @@ export default function QuestionAddModal({ fetchQuestions }) {
                   <Input
                     {...register('title', {
                       required: 'Title is required',
-                      validate: {
-                        noNumbers: value => !/\d/.test(value) || 'Title should not contain numbers',
+                      validate: value => {
+                        const isDuplicate = questionBank.some(question => question.title === value);
+                        if (isDuplicate) {
+                          return 'Question already exists';
+                        }
+                        return true;
                       },
                     })}
                     autoFocus
@@ -126,17 +134,10 @@ export default function QuestionAddModal({ fetchQuestions }) {
                     ))}
                   </Select>
                   <Textarea
-                    {...register('description', {
-                      required: 'Description is required',
-                      validate: {
-                        notEmpty: value =>
-                          value.trim() !== '' ||
-                          'Description cannot be empty or contain only whitespace',
-                      },
-                    })}
+                    {...register('description', { required: 'Description is required' })}
                     label="Description"
-                    isRequired
                     labelPlacement="outside"
+                    isRequired
                     placeholder="Enter Question Description"
                     errorMessage={errors.description?.message as string}
                   />

@@ -22,12 +22,12 @@ const QuestionDescriptionModal = ({ title, description }) => {
           </span>
         </Button>
       </Tooltip>
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="2xl">
-        <ModalContent className='fit-content'>
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+        <ModalContent>
           {onClose => (
             <>
               <ModalHeader className="flex flex-col gap-1">{title}</ModalHeader>
-              <ModalBody className="whitespace-pre-line">{description}</ModalBody>
+              <ModalBody>{description}</ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="light" onPress={onClose}>
                   Close

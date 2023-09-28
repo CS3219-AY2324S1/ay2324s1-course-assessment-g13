@@ -9,8 +9,6 @@ node_modules
 # ide configs
 .idea
 
-*.log
-package-lock.json
 
 # build files
 .next

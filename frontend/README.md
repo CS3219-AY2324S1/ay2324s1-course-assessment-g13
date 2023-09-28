@@ -3,5 +3,3 @@
 # AssignmentTemplate
 
 [Refer](https://github.com/vercel/next.js/blob/canary/examples/with-docker/README.md)
-
-1. Create a `.env` file referencing from the `.env.sample` in the current directory

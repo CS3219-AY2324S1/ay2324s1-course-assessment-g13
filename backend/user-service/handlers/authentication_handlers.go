@@ -30,23 +30,14 @@ func Login(c echo.Context) error {
 
 	sess, _ := session.Get("session", c)
 	sess.Options = &sessions.Options{
-		Domain:  "localhost",
 		Path:     "/",
 		MaxAge:   86400 * 7,
 		HttpOnly: false,
 		Secure:   false, // have to change to true in production
 	}
 	sess.Values["userId"] = strconv.FormatUint(uint64(user.ID), 10)
-	if err := sess.Save(c.Request(), c.Response()); err != nil {
-		return c.JSON(http.StatusInternalServerError, "Internal server error")
-	}
+	sess.Save(c.Request(), c.Response())
 
-	res := &model.LoginResponse{
-		Id: user.ID,
-		Username: user.Username,
-		PhotoUrl: user.PhotoUrl,
-	}
-
-	return c.JSON(http.StatusOK, res)
+	return c.JSON(http.StatusOK, "Login successful")
 
 }

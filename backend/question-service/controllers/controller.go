@@ -16,13 +16,13 @@ import (
 func GetQuestion(c echo.Context) error {
 	questionID, err := primitive.ObjectIDFromHex(c.Param("id"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, "Invalid ID format")
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid ID format"})
 	}
 
 	question := models.Question{}
 	err = config.Collection.FindOne(context.TODO(), bson.M{"_id": questionID}).Decode(&question)
 	if err == mongo.ErrNoDocuments {
-		return c.JSON(http.StatusNotFound, "Specified question does not exist")
+		return c.JSON(http.StatusNotFound, map[string]string{"error": "Specified question does not exist"})
 	}
 
 	return c.JSON(http.StatusOK, question)
@@ -31,13 +31,13 @@ func GetQuestion(c echo.Context) error {
 func GetQuestions(c echo.Context) error {
 	cursor, err := config.Collection.Find(context.TODO(), bson.M{})
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, "Failed to retrieve questions")
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to retrieve questions"})
 	}
 	defer cursor.Close(context.TODO())
 
 	var questions []models.Question
 	if err := cursor.All(context.TODO(), &questions); err != nil {
-		return c.JSON(http.StatusInternalServerError, "Failed to decode questions")
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to decode questions"})
 	}
 
 	return c.JSON(http.StatusOK, questions)
@@ -46,41 +46,40 @@ func GetQuestions(c echo.Context) error {
 func CreateQuestion(c echo.Context) error {
 	var question models.Question
 	if err := c.Bind(&question); err != nil {
-		return c.JSON(http.StatusBadRequest, "Failed to bind request data")
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Failed to bind request data"})
 	}
 
 	validator := validator.New()
 	if err := validator.Struct(question); err != nil {
-		return c.JSON(http.StatusBadRequest, "Inputted data is invalid")
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
-	err := config.Collection.FindOne(context.TODO(), bson.M{"title": bson.M{"$regex": primitive.Regex{Pattern: "^" + question.Title + "$", Options: "i"}}}).Err()
+	err := config.Collection.FindOne(context.TODO(), bson.M{"title": question.Title}).Err()
 	if err == nil {
-		return c.JSON(http.StatusConflict, "Question with this title already exists")
+		return c.JSON(http.StatusConflict, map[string]string{"error": "Question with this title already exists"})
 	}
 
 	result, err := config.Collection.InsertOne(context.TODO(), question)
-	_ = result
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, "Failed to insert question")
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to insert question"})
 	}
 
-	return c.JSON(http.StatusCreated, "Question created successfully")
+	return c.JSON(http.StatusCreated, map[string]interface{}{"message": "Question created successfully", "insertedID": result.InsertedID})
 }
 
 func DeleteQuestion(c echo.Context) error {
 	objectID, err := primitive.ObjectIDFromHex(c.Param("id"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, "Invalid ID format")
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid ID format"})
 	}
 
 	result, err := config.Collection.DeleteOne(context.TODO(), bson.M{"_id": objectID})
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, "Failed to delete question")
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
 	if result.DeletedCount == 0 {
-		return c.JSON(http.StatusNotFound, "Specified question does not exist")
+		return c.JSON(http.StatusNotFound, map[string]string{"error": "Specified question does not exist"})
 	}
 
 	return c.JSON(http.StatusOK, map[string]string{"message": "Question deleted successfully"})
@@ -112,7 +111,7 @@ func EditQuestion(c echo.Context) error {
 	if request.Title != "" {
 		filter := bson.M{
 			"_id":   bson.M{"$ne": objectID},
-			"title": bson.M{"$regex": primitive.Regex{Pattern: request.Title, Options: "i"}},
+			"title": request.Title,
 		}
 		if err = collection.FindOne(context.TODO(), filter).Err(); err == nil {
 			return c.JSON(http.StatusConflict, map[string]string{"error": "Another question with this title already exists"})
