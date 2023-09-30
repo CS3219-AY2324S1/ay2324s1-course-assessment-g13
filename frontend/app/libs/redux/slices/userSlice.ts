@@ -32,7 +32,9 @@ const userSlice = createSlice({
     },
     updateUser: (state, action) => {
       state.username = action.payload.username;
-      state.photoUrl = action.payload.photoUrl;
+      state.userId = action.payload.ID;
+      state.userRole = action.payload.role;
+      state.photoUrl = action.payload.photoUrl ?? '';
     },
   },
 });
