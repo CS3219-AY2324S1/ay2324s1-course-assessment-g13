@@ -6,7 +6,7 @@ import ProfileLayout from '../layout';
 import { Controller, useForm } from 'react-hook-form';
 import { GET, PUT } from '../../libs/axios/axios';
 import useAuth from '../../hooks/useAuth';
-import { notifyError, notifySuccess } from '../../components/Notifications';
+import { notifyError, notifySuccess } from '../../components/toast/notifications';
 import DeleteAccountModal from '../../components/modal/deleteAccountModal';
 import { useDispatch } from 'react-redux';
 import { updateUser } from '../../libs/redux/slices/userSlice';

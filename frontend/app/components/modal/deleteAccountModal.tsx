@@ -9,7 +9,7 @@ import {
 } from '@nextui-org/react';
 import { DELETE } from '../../libs/axios/axios';
 import useAuth from '../../hooks/useAuth';
-import { notifyError, notifySuccess } from '../Notifications';
+import { notifyError, notifySuccess } from '../toast/notifications';
 import { useDispatch } from 'react-redux';
 import { logout } from '../../libs/redux/slices/userSlice';
 import { useRouter } from 'next/navigation';

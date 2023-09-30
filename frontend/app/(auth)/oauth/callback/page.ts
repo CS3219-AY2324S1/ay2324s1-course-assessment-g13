@@ -1,7 +1,7 @@
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { GET } from "../../../libs/axios/axios";
-import { notifyError, notifySuccess } from "../../../components/Notifications";
+import { notifyError, notifySuccess } from "../../../components/toast/notifications";
 import { login } from "../../../libs/redux/slices/userSlice";
 import { useDispatch } from "react-redux";
 
