@@ -10,6 +10,8 @@ node_modules
 .idea
 
 tmp
+*.log
+package-lock.json
 
 # build files
 .next
