@@ -1,8 +1,8 @@
-import LoadingForm from "../../components/form/LoadingForm";
+import LoadingAuthCard from "../../components/card/LoadingAuthCard";
 
 
 export default function Loading() {
     return (
-        <LoadingForm title={"Sign Up"}/>
+        <LoadingAuthCard/>
       );
 }
