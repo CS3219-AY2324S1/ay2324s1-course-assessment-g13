@@ -56,6 +56,7 @@ func GithubLogin(c echo.Context) error {
 	if statusCode != http.StatusOK {
 		return c.JSON(statusCode, message.CreateErrorMessage(responseMessage))
 	}
+
 	githubData, statusCode, responseMessage := getGithubData(githubAccessToken)
 	if statusCode != http.StatusOK {
 		return c.JSON(statusCode, message.CreateErrorMessage(responseMessage))
@@ -65,15 +66,15 @@ func GithubLogin(c echo.Context) error {
 	githubUserID := githubData.GithubID
 
 	var existingUser models.User
-	err := config.DB.Where("o_auth_provider = ? AND o_auth_user_id = ?", provider, githubUserID).First(&existingUser).Error
+	err := config.DB.Where("provider = ? AND user_id = ?", provider, githubUserID).First(&existingUser).Error
 	if err != nil {
+		if existingUser.ID == 0 {
+			c.Set(GITHUB_DATA_CONTEXT_KEY, githubData)
+			return oauthCreateUser(c)
+		}
 		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(ERROR_OCCURRED))
 	}
 
-	if existingUser.ID == 0 {
-		c.Set(GITHUB_DATA_CONTEXT_KEY, githubData)
-		return oauthCreateUser(c)
-	}
 	c.Set(USER_CONTEXT_KEY, existingUser)
 	c.Set(SUCCESS_MESSAGE_CONTEXT_KEY, GITHUB_USER_DATA_SUCCESS)
 	c.Set(EXPIRATION_TIME_CONTEXT_KEY, expiry.ExpireIn5Minutes())
@@ -145,14 +146,13 @@ func getGithubData(accessToken string) (githubData *models.GithubDataResponseBod
 }
 
 func oauthCreateUser(c echo.Context) error {
-	githubData := c.Get("GithubData").(*models.GithubDataResponseBody)
+	githubData := c.Get(GITHUB_DATA_CONTEXT_KEY).(*models.GithubDataResponseBody)
 	user := new(models.User)
-	user.OAuthProvider = GITHUB
-	user.OAuthUserID = githubData.GithubID
-	user.OAuthUsername = githubData.GithubName
-	user.OAuthEmail = githubData.GithubEmail
-	user.OAuthProfilePictureURL = githubData.GithubProfilePictureURL
-	user.OAuthProfileURL = githubData.GithubProfileURL
+	user.Provider = GITHUB
+	user.UserId = githubData.GithubID
+	user.Username = githubData.GithubName
+	user.Email = githubData.GithubEmail
+	user.Picture = githubData.GithubProfilePictureURL
 	if err := config.DB.Create(user).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(FAILURE_CREATE_USER))
 	}

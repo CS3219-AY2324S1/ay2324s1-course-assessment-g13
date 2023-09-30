@@ -4,18 +4,10 @@ import "gorm.io/gorm"
 
 type User struct {
 	gorm.Model
-	Username               string `json:"username,omitempty"`
-	Role                   string `json:"role" gorm:"default:'user'"`
-	HashedPassword         string `json:"-"`
-	OAuthProvider          string `json:"oauthProvider,omitempty"`
-	OAuthUserID            int    `json:"-"`
-	OAuthUsername          string `json:"oauthUsername,omitempty"`
-	OAuthEmail             string `json:"-"`
-	OAuthProfilePictureURL string `json:"-"`
-	OAuthProfileURL        string `json:"-"`
-}
-
-type UserCredential struct {
-	Username string `json:"username" validate:"required"`
-	Password string `json:"password" validate:"required"`
+	UserId   int    `json:"id"`
+	Provider string `json:"provider"`
+	Username string `json:"username"`
+	Email    string `json:"email,omitempty"`
+	Picture  string `json:"picture"`
+	Role     string `json:"role" gorm:"default:'user'"`
 }

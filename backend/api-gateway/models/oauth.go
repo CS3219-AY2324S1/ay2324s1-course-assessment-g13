@@ -17,5 +17,4 @@ type GithubDataResponseBody struct {
 	GithubName              string `json:"name"`
 	GithubEmail             string `json:"email"`
 	GithubProfilePictureURL string `json:"avatar_url"`
-	GithubProfileURL        string `json:"html_url"`
 }
