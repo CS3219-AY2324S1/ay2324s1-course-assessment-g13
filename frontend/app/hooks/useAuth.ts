@@ -1,17 +1,11 @@
 import { useRouter } from "next/navigation";
 import { useEffect } from "react"
-import { GET, POST } from "../libs/axios/axios";
-import { login, logout } from "../libs/redux/slices/userSlice";
+import { GET } from "../libs/axios/axios";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from '../libs/redux/store';
-import { notifyError, notifySuccess } from "../components/toast/notifications";
+import { notifyError } from "../components/toast/notifications";
 
 let resetInteveralId: NodeJS.Timeout;
-
-interface UserCredential {
-    username: string,
-    password: string
-}
 
 export default function useAuth() {
     const { userId, userRole, username } =  useSelector((state: RootState) => state.user);
@@ -33,27 +27,6 @@ export default function useAuth() {
         };
     }, [isAuthenticated])
 
-    const handleLogin = async (data : UserCredential) => {
-        try {
-            const response = await POST('/auth/login', data);
-            dispatch(login(response.data.user));
-            notifySuccess(response.data.message);
-            router.push('/questions');
-        } catch (error) {
-            notifyError(error.data.error);
-        }
-    }
-
-    const handleLogout = async () => {
-        try {
-            dispatch(logout());
-            router.push('/');
-            await GET('/auth/logout')
-        } catch (error) {
-            notifyError(error.data.error);
-        }
-    }
-
     const handleRefresh = async () => {
         try {
             await GET('/auth/refresh')
@@ -62,41 +35,7 @@ export default function useAuth() {
         }
     }
 
-    const handleSignUp = async (data : UserCredential) => {
-        try {
-            const response = await POST('/auth/register', data)
-            notifySuccess(response.data.message);
-            router.push('/login');
-        } catch (error) {
-            notifyError(error.data.error);
-        }
-    }
-
-    const handleGithubLogin = async () => {
-        const clientId = process.env.NEXT_PUBLIC_GITHUB_OAUTH_CLIENT_ID
-        const redirectUrl = "http://localhost:3000/oauth/callback"
-        const github_authorize_url = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUrl}`
-        router.push(github_authorize_url);
-    }
-
-    const handleGithubLoginCallback = async (code: string) => {
-        try {
-            const response = await GET(`/auth/login/github?code=${code}`)
-            notifySuccess(response.data.message);
-            dispatch(login(response.data.user));
-            router.push('/questions');
-        } catch (error) {
-            notifyError(error.data.error);
-            router.push("/login");
-        }
-    } 
-
     return {
-        handleLogin, 
-        handleLogout, 
-        handleSignUp, 
-        handleGithubLogin, 
-        handleGithubLoginCallback, 
         isAuthenticated, 
         userRole,
         userId,

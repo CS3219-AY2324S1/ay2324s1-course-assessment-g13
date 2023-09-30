@@ -18,7 +18,7 @@ export default function OAuthCallback() {
             dispatch(login(response.data.user));
             router.push('/questions');
         } catch (error) {
-            notifyError(error.data.error);
+            notifyError(error.message.data.error);
             router.push("/login");
         }
     }

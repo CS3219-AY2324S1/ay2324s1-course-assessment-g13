@@ -7,10 +7,26 @@ import LoginButton from './LoginButton';
 import useAuth from '../../hooks/useAuth';
 import SignUpButton from './SignUpButton';
 import { Avatar, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@nextui-org/react';
+import { useDispatch } from 'react-redux';
+import { useRouter } from 'next/navigation';
+import { logout } from '../../libs/redux/slices/userSlice';
+import { GET } from '../../libs/axios/axios';
 
 const Nav = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const {handleLogout, isAuthenticated} = useAuth();
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { isAuthenticated } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+        dispatch(logout());
+        router.push('/');
+        await GET('/auth/logout');
+    } catch (error) {
+        console.error(error)
+    }
+  }
 
   useEffect(() => {
     setIsLoggedIn(isAuthenticated);
