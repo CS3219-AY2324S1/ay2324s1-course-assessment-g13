@@ -8,7 +8,7 @@ export function middleware(request: NextRequest) {
 
     const pathIsProtected = protectedPath.indexOf(pathname) !== -1;
 
-    if (accessTokenExist && !pathIsProtected) {
+    if ((accessTokenExist || refreshTokenExist) && !pathIsProtected) {
         return NextResponse.redirect(url+'/questions');
     }
 
