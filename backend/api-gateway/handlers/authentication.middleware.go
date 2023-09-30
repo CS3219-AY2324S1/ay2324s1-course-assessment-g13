@@ -15,6 +15,8 @@ var bypassLoginList = map[string]bool{
 	path.REGISTER:     true,
 	path.LOGIN:        true,
 	path.GITHUB_LOGIN: true,
+	"/":               true,
+	"/github":         true,
 }
 
 func RequireAuthenticationMiddleWare(next echo.HandlerFunc) echo.HandlerFunc {

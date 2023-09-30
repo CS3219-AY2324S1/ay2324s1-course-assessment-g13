@@ -44,9 +44,9 @@ func GithubLoginHandler(c echo.Context) error {
 	redirectURL := fmt.Sprintf(
 		"https://github.com/login/oauth/authorize?client_id=%s&redirect_uri=%s",
 		githubClientID,
-		"http://localhost:1234/github-callback",
+		"http://localhost:1234/auth/login/github",
 	)
-	return c.Redirect(301, redirectURL)
+	return c.Redirect(http.StatusMovedPermanently, redirectURL)
 }
 
 func GithubLogin(c echo.Context) error {
