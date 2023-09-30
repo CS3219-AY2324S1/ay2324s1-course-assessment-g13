@@ -1,4 +1,5 @@
 import axios, { AxiosError } from 'axios';
+import { refreshToken } from './helper';
 
 const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
@@ -8,6 +9,23 @@ const axiosInstance = axios.create({
   },
   withCredentials: true
 });
+
+axiosInstance.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  async (error: AxiosError) => {
+    if (error.response && error.response.status === 401) {
+      try {
+        await refreshToken();
+        return axiosInstance(error.config);
+      } catch (refreshError) {
+        throw refreshError
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 export const GET = async (url: string) => {
   try {
