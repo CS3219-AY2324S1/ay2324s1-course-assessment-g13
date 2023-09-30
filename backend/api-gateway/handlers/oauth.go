@@ -75,7 +75,7 @@ func GithubLogin(c echo.Context) error {
 	}
 
 	c.Set(USER_CONTEXT_KEY, existingUser)
-	c.Set(SUCCESS_MESSAGE_CONTEXT_KEY, GITHUB_USER_DATA_SUCCESS)
+	c.Set(SUCCESS_MESSAGE_CONTEXT_KEY, SUCCESS_LOGIN)
 
 	return GenerateTokenAndSetCookie(c)
 }
