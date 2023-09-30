@@ -154,5 +154,9 @@ func oauthCreateUser(c echo.Context) error {
 	if err := config.DB.Create(user).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(FAILURE_CREATE_USER))
 	}
-	return c.JSON(http.StatusOK, message.CreateSuccessUserMessage(SUCCESS_USER_CREATED, *user))
+
+	c.Set(USER_CONTEXT_KEY, *user)
+	c.Set(SUCCESS_MESSAGE_CONTEXT_KEY, SUCCESS_USER_CREATED)
+
+	return GenerateTokenAndSetCookie(c)
 }
