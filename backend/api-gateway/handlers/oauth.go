@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 
 	"github.com/labstack/echo/v4"
 )
@@ -31,6 +32,22 @@ const (
 	HTTP_HEADER_AUTHORIZATION = "Authorization"
 	HTTP_APPLICATION_JSON     = "application/json"
 )
+
+func RootHandler(c echo.Context) error {
+	_, err := fmt.Fprintf(c.Response().Writer, `<a href="/github">LOGIN</a>`)
+	return err
+}
+
+func GithubLoginHandler(c echo.Context) error {
+	githubClientID := os.Getenv("GITHUB_CLIENT_ID")
+
+	redirectURL := fmt.Sprintf(
+		"https://github.com/login/oauth/authorize?client_id=%s&redirect_uri=%s",
+		githubClientID,
+		"http://localhost:1234/github-callback",
+	)
+	return c.Redirect(301, redirectURL)
+}
 
 func GithubLogin(c echo.Context) error {
 	code := c.Request().URL.Query().Get(GITHUB_CALLBACK_REQUEST_QUERY_CODE)
