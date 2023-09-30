@@ -3,7 +3,6 @@ package handlers
 import (
 	"api-gateway/config"
 	"api-gateway/models"
-	"api-gateway/utils/expiry"
 	"api-gateway/utils/message"
 	"net/http"
 
@@ -12,7 +11,6 @@ import (
 
 func UpgradeUser(c echo.Context) error {
 	tokenClaims := c.Get(TOKEN_CLAIMS_CONTEXT_KEY).(*models.Claims)
-	expirationTime := expiry.Add5MoreSeconds(tokenClaims.ExpiresAt.Time)
 
 	userId := tokenClaims.User.ID
 	var user *models.User
@@ -31,14 +29,12 @@ func UpgradeUser(c echo.Context) error {
 
 	c.Set(USER_CONTEXT_KEY, *user)
 	c.Set(SUCCESS_MESSAGE_CONTEXT_KEY, SUCCESS_ROLE_UPGRADED)
-	c.Set(EXPIRATION_TIME_CONTEXT_KEY, expirationTime)
 
 	return GenerateTokenAndSetCookie(c)
 }
 
 func DowngradeUser(c echo.Context) error {
 	tokenClaims := c.Get(TOKEN_CLAIMS_CONTEXT_KEY).(*models.Claims)
-	expirationTime := expiry.Add5MoreSeconds(tokenClaims.ExpiresAt.Time)
 
 	userId := tokenClaims.User.ID
 	var user *models.User
@@ -57,7 +53,6 @@ func DowngradeUser(c echo.Context) error {
 
 	c.Set(USER_CONTEXT_KEY, *user)
 	c.Set(SUCCESS_MESSAGE_CONTEXT_KEY, SUCCESS_ROLE_DOWNGRADED)
-	c.Set(EXPIRATION_TIME_CONTEXT_KEY, expirationTime)
 
 	return GenerateTokenAndSetCookie(c)
 }

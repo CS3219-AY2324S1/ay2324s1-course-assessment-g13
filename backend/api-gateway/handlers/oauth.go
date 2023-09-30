@@ -4,7 +4,6 @@ import (
 	"api-gateway/config"
 	"api-gateway/models"
 	"api-gateway/utils/env"
-	"api-gateway/utils/expiry"
 	"api-gateway/utils/message"
 	"bytes"
 	"encoding/json"
@@ -77,7 +76,6 @@ func GithubLogin(c echo.Context) error {
 
 	c.Set(USER_CONTEXT_KEY, existingUser)
 	c.Set(SUCCESS_MESSAGE_CONTEXT_KEY, GITHUB_USER_DATA_SUCCESS)
-	c.Set(EXPIRATION_TIME_CONTEXT_KEY, expiry.ExpireIn5Minutes())
 
 	return GenerateTokenAndSetCookie(c)
 }

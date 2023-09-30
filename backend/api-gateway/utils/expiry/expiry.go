@@ -12,6 +12,6 @@ func ExpireIn5Minutes() time.Time {
 	return time.Now().Add(5 * time.Minute)
 }
 
-func Add5MoreSeconds(t time.Time) time.Time {
-	return t.Add(5 * time.Second)
+func ExpireIn24Hours() time.Time {
+	return time.Now().Add(24 * time.Hour)
 }

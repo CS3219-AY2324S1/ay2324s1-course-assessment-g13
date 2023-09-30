@@ -12,9 +12,8 @@ import (
 )
 
 var bypassLoginList = map[string]bool{
-	path.REGISTER:     true,
-	path.LOGIN:        true,
 	path.GITHUB_LOGIN: true,
+	path.REFRESH:      true,
 	"/":               true,
 	"/github":         true,
 }
@@ -27,18 +26,18 @@ func RequireAuthenticationMiddleWare(next echo.HandlerFunc) echo.HandlerFunc {
 			return next(c)
 		}
 
-		tokenString, statusCode, responseMessage := cookie.Service.GetCookieValue(c.Cookie(JWT_COOKIE_NAME))
+		tokenString, statusCode, responseMessage := cookie.Service.GetCookieValue(c.Cookie(ACCESS_TOKEN_COOKIE_NAME))
 		if statusCode != http.StatusOK {
 			return c.JSON(statusCode, message.CreateErrorMessage(responseMessage))
 		}
 
-		tokenClaims, statusCode, responseMessage := token.Service.Validate(tokenString)
+		tokenClaims, statusCode, responseMessage := token.AccessTokenService.Validate(tokenString)
 		if statusCode != http.StatusOK {
 			return c.JSON(statusCode, message.CreateErrorMessage(responseMessage))
 		}
 
 		c.Set(TOKEN_CLAIMS_CONTEXT_KEY, tokenClaims)
-		c.Request().Header.Set(REQUEST_HEADER_USER_ROLE_KEY, tokenClaims.User.Role)
+		c.Request().Header.Set(USER_ROLE_KEY_REQUEST_HEADER, tokenClaims.User.Role)
 		return next(c)
 	}
 }
@@ -49,7 +48,7 @@ func PreventLoginMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		if !isInList {
 			return next(c)
 		}
-		_, statusCode, _ := cookie.Service.GetCookieValue(c.Cookie(JWT_COOKIE_NAME))
+		_, statusCode, _ := cookie.Service.GetCookieValue(c.Cookie(ACCESS_TOKEN_COOKIE_NAME))
 		if statusCode == http.StatusOK {
 			return c.JSON(http.StatusForbidden, message.CreateErrorMessage(FAILURE_USER_ALREADY_LOGIN))
 		}

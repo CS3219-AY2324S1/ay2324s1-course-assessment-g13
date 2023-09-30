@@ -28,7 +28,13 @@ func DeleteUser(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(ERROR_OCCURRED))
 	}
 
-	cookie_, statusCode, responseMessage := cookie.Service.SetCookieExpires(c.Cookie(JWT_COOKIE_NAME))
+	cookie_, statusCode, responseMessage := cookie.Service.SetCookieExpires(c.Cookie(ACCESS_TOKEN_COOKIE_NAME))
+	if statusCode != http.StatusOK {
+		return c.JSON(statusCode, message.CreateErrorMessage(responseMessage))
+	}
+	c.SetCookie(cookie_)
+
+	cookie_, statusCode, responseMessage = cookie.Service.SetCookieExpires(c.Cookie(REFRESH_TOKEN_COOKIE_NAME))
 	if statusCode != http.StatusOK {
 		return c.JSON(statusCode, message.CreateErrorMessage(responseMessage))
 	}

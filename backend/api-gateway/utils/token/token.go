@@ -10,7 +10,10 @@ import (
 )
 
 const (
-	JWT_SECRET_KEY_ENV_KEY = "JWT_SECRET_KEY"
+	ACCESS_TOKEN          = "ACCESS TOKEN"
+	REFRESH_TOKEN         = "REFRESH TOKEN"
+	ACCESS_TOKEN_ENV_KEY  = "ACCESS_TOKEN_SECRET_KEY"
+	REFRESH_TOKEN_ENV_KEY = "REFRESH_TOKEN_SECRET_KEY"
 
 	INVALID_TOKEN_SIGNATURE    = "Invalid Signature!"
 	FAILURE_TOKEN_UNSIGN       = "Unable to Sign Token!"
@@ -29,7 +32,8 @@ type tokenService struct {
 	secretKey []byte
 }
 
-var Service = CreateTokenService()
+var AccessTokenService = CreateTokenService(ACCESS_TOKEN)
+var RefreshTokenService = CreateTokenService(REFRESH_TOKEN)
 
 func (service *tokenService) Generate(user *models.User, expirationTime time.Time) (string, int, string) {
 	tokenClaims := &models.Claims{
@@ -64,8 +68,13 @@ func (service *tokenService) Validate(tokenString string) (*models.Claims, int, 
 	return tokenClaims, http.StatusOK, SUCCESS_TOKEN_VALIDATED
 }
 
-func CreateTokenService() TokenService {
-	secret := os.Getenv(JWT_SECRET_KEY_ENV_KEY)
+func CreateTokenService(tokenType string) TokenService {
+	var secret string
+	if tokenType == ACCESS_TOKEN {
+		secret = os.Getenv(ACCESS_TOKEN_ENV_KEY)
+	} else {
+		secret = os.Getenv(REFRESH_TOKEN_ENV_KEY)
+	}
 	return &tokenService{
 		secretKey: []byte(secret),
 	}
