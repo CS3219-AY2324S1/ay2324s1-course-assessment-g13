@@ -38,8 +38,8 @@ func main() {
 	API_GATEWAY.GET("/", handlers.RootHandler)
 	API_GATEWAY.GET("/github", handlers.GithubLoginHandler)
 
-	API_GATEWAY.PUT(path.AUTH_USER_UPGRADE, handlers.UpgradeUser)
-	API_GATEWAY.PUT(path.AUTH_USER_DOWNGRADE, handlers.DowngradeUser)
+	API_GATEWAY.GET(path.AUTH_USER_UPGRADE, handlers.UpgradeUser)
+	API_GATEWAY.GET(path.AUTH_USER_DOWNGRADE, handlers.DowngradeUser)
 
 	API_GATEWAY.Any(path.ALL_USER_SERVICE, handlers.HandleUserService)
 
