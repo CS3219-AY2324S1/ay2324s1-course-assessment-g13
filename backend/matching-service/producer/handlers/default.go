@@ -154,6 +154,8 @@ func MatchHandler(c echo.Context) error {
 
 	shouldBreak := false // Flag to aid breaking out of for-select loop
 
+	var matchResponseBody models.MatchResponse
+
 	// Loops infinitely until context timer is hit, or result is returned from consumer, whichever occurs first
 	for {
 		select {
@@ -164,12 +166,25 @@ func MatchHandler(c echo.Context) error {
 			break
 		case res := <-resChan:
 			utils.PrintCancelledUsers()
-			return c.JSON(http.StatusOK, res)
+			matchResponseBody = models.MatchResponse{
+				MatchUser:    res,
+				MatchStatus:  1,
+				RedirectURL:  "https://google.com",
+				ErrorMessage: "",
+			}
+			return c.JSON(http.StatusOK, matchResponseBody)
 		}
 		if shouldBreak {
 			break
 		}
 	}
 
-	return c.JSON(http.StatusOK, "Match not found within 3 seconds.")
+	matchResponseBody = models.MatchResponse{
+		MatchUser:    "",
+		MatchStatus:  0,
+		RedirectURL:  "https://google.com",
+		ErrorMessage: "Match not found within 3 seconds.",
+	}
+
+	return c.JSON(http.StatusOK, matchResponseBody)
 }

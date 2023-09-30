@@ -6,7 +6,7 @@ services:
     build:
       dockerfile: Dockerfile.dev
     ports:
-      - "5008:8080"
+      - "5009:8080"
     volumes:
       - .:/usr/src/app
     env_file:

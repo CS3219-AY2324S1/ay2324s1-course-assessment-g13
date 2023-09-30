@@ -1,4 +1,5 @@
 import SignupModal from './components/modal/signupModal';
+import LoginModal from "./components/modal/loginModal";
 
 export const metadata = {
   title: 'PeerPrep',
@@ -13,7 +14,8 @@ export default function Home() {
         tracking on PeerPrep.
       </p>
 
-      <SignupModal />
+      {/*<SignupModal />*/}
+        <LoginModal/>
     </div>
   );
 }

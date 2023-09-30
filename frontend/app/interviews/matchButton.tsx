@@ -1,16 +1,34 @@
-import { Button } from "@nextui-org/react";
-import { notifyError, notifyWarning } from "../components/notifications";
+import {Button, user} from "@nextui-org/react";
+import {notifyError, notifySuccess, notifyWarning} from "../components/notifications";
 import { useEffect, useState } from "react";
+import {useSelector} from "react-redux";
+import {selectPreferenceState} from "../redux/slices/matchPreferenceSlice";
+import {POST} from "../axios/axios";
+import {selectUsername} from "../redux/slices/userSlice";
+
+// Used since assignment 3 is not merged into this branch yet. Allows me to illustrate matching via user id
+const makeTemporaryUser = (length) => {
+  let result = '';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const charactersLength = characters.length;
+  let counter = 0;
+  while (counter < length) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    counter += 1;
+  }
+  return result;
+}
 
 export default function MatchButton({inQueue, setInQueue}) {
   const [seconds, setSeconds] = useState(0);
   const timeLimit = 30;
-
+  const preferenceState = useSelector(selectPreferenceState)
+  // const userState = useSelector(selectUsername);
+  const userState = makeTemporaryUser(10);
+  console.log(`User: ${userState} | User preference: ${preferenceState}`)
   useEffect(() => {
     if (seconds == timeLimit) {
-      setInQueue(false);
-      setSeconds(0);
-      notifyError("Timeout! No suitable partner was found")
+      matchNotfound();
     }
 
     let timer = null;
@@ -25,8 +43,41 @@ export default function MatchButton({inQueue, setInQueue}) {
   }, [inQueue, seconds]);
 
   const startQueue = () => {
-    setInQueue(true); 
+    setInQueue(true);
+    console.log("Queue started");
+    getMatch().then(r => {
+      if (r.status == 200) {
+        const payload = r.data;
+        // If there is a match, notify success and redirect
+        if (payload["match_user"] != "") {
+          console.log(payload["match_user"])
+          notifySuccess(`Matched with ${payload["match_user"]}`);
+          setInQueue(false);
+          setSeconds(0);
+          // TODO perform redirection here based on payload redirect url
+        } else {
+          matchNotfound()
+        }
+      } else {
+        // If failed to call matching service, cancel queue
+        cancelQueue();
+        return
+      }
+    });
   }
+
+  const matchNotfound = () => {
+    setInQueue(false);
+    setSeconds(0);
+    notifyError("Timeout! No suitable partner was found")
+  };
+
+  const getMatch = async () => {
+    return await POST("http://localhost:5007/match", {
+      "username":`${userState}`,
+      "match_criteria":`${preferenceState.toLowerCase()}`
+    });
+  };
 
   const cancelQueue = () => {
     setInQueue(false);

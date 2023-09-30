@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from "axios";
 
 const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
@@ -27,7 +27,7 @@ export const POST = async (url : string, data: any) => {
     const response = await axiosInstance.post(url, data);
     return response;
   } catch (error) {
-    return ErrorResponse;
+    return error.response.data;
   }
 }
 
@@ -47,6 +47,7 @@ export const getData = async (url : string) => {
       data: response.data == null ? [] : response.data
     };
   } catch (error) {
+    console.log(error)
     return {
       error: error.response ? error.response.data.error : error.message 
     };

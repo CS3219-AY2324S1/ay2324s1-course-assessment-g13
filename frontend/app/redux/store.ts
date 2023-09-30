@@ -11,6 +11,7 @@ import {
 } from 'redux-persist';
 import questionBankReducer from './slices/questionBankSlice';
 import userReducer from './slices/userSlice';
+import preferenceReducer from './slices/matchPreferenceSlice';
 import createWebStorage from 'redux-persist/lib/storage/createWebStorage';
 
 const createNoopStorage = () => {
@@ -38,6 +39,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
   questionBank: questionBankReducer,
   user: userReducer,
+  preference: preferenceReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

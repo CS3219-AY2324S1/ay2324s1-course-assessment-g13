@@ -30,7 +30,7 @@ const SignupModal: React.FC<SignUpProps> = ({ isNav = false }) => {
   const onSubmit = handleSubmit(async data => {
     // eslint-disable-next-line no-console
     POST('/users', data);
-    // console.log(data); //add in your api call to add user at backend
+    // console.log(data); //add in your axios call to add user at backend
     reset();
     onClose();
   });

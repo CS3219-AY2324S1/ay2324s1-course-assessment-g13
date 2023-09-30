@@ -16,11 +16,15 @@ import { Category, Complexity } from '../types/question';
 import { useForm } from 'react-hook-form';
 import { notifySuccess} from '../components/notifications';
 import { Preference } from '../types/preference';
+import {useDispatch} from "react-redux";
+import {setPreference} from "../redux/slices/matchPreferenceSlice";
 
 export default function SetPreferencesModal() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const categories = Object.values(Category);
+  // const categories = Object.values(Category);
   const complexities = Object.values(Complexity);
+
+  const dispatch = useDispatch();
 
   const {
     register,
@@ -30,11 +34,11 @@ export default function SetPreferencesModal() {
   } = useForm();
 
   const onSubmit = handleSubmit((data : Preference) => {
-    const modifiedData = {
-      categories: (data.categories as string).split(',') as Category[],
-      complexities: (data.complexities as string).split(',') as Complexity[],
-    };
-    // TODO: Use the modifiedData for matching and keeping track of their currently set preferences
+    // const modifiedData = {
+    //   // categories: (data.categories as string).split(',') as Category[],
+    //   complexities: (data.complexities as string).split(',') as Complexity[],
+    // };
+    dispatch(setPreference(data.complexities as Complexity));
     notifySuccess("Preferences Set!");
     onOpenChange();
     reset();
@@ -64,7 +68,7 @@ export default function SetPreferencesModal() {
                     {...register('complexities')}
                     label="Complexity"
                     placeholder="Select Preferred Complexities"
-                    selectionMode="multiple"
+                    // selectionMode="multiple"
                     variant="bordered"
                     labelPlacement="outside"
                     errorMessage={errors.complexity?.message as string}
@@ -86,34 +90,34 @@ export default function SetPreferencesModal() {
                       </SelectItem>
                     ))}
                   </Select>
-                  <Select
-                    {...register('categories')}
-                    items={categories}
-                    label="Category"
-                    variant="bordered"
-                    labelPlacement="outside"
-                    isMultiline
-                    selectionMode="multiple"
-                    placeholder="Select Preferred Categories"
-                    errorMessage={errors.categories?.message as string}
-                    renderValue={items => {
-                      return (
-                        <div className="flex flex-wrap gap-2">
-                          {items.map(item => (
-                            <Chip key={item.key} variant="bordered">
-                              {item.key}
-                            </Chip>
-                          ))}
-                        </div>
-                      );
-                    }}
-                  >
-                    {categories.map(category => (
-                      <SelectItem key={category} value={category}>
-                        {category.toUpperCase()}
-                      </SelectItem>
-                    ))}
-                  </Select>
+                  {/*<Select*/}
+                  {/*  {...register('categories')}*/}
+                  {/*  items={categories}*/}
+                  {/*  label="Category"*/}
+                  {/*  variant="bordered"*/}
+                  {/*  labelPlacement="outside"*/}
+                  {/*  isMultiline*/}
+                  {/*  selectionMode="multiple"*/}
+                  {/*  placeholder="Select Preferred Categories"*/}
+                  {/*  errorMessage={errors.categories?.message as string}*/}
+                  {/*  renderValue={items => {*/}
+                  {/*    return (*/}
+                  {/*      <div className="flex flex-wrap gap-2">*/}
+                  {/*        {items.map(item => (*/}
+                  {/*          <Chip key={item.key} variant="bordered">*/}
+                  {/*            {item.key}*/}
+                  {/*          </Chip>*/}
+                  {/*        ))}*/}
+                  {/*      </div>*/}
+                  {/*    );*/}
+                  {/*  }}*/}
+                  {/*>*/}
+                  {/*  {categories.map(category => (*/}
+                  {/*    <SelectItem key={category} value={category}>*/}
+                  {/*      {category.toUpperCase()}*/}
+                  {/*    </SelectItem>*/}
+                  {/*  ))}*/}
+                  {/*</Select>*/}
                 </ModalBody>
               </form>
               <ModalFooter>

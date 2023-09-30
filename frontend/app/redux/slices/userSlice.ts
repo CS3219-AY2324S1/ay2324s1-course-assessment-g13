@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import {AppState} from "../store";
 
 interface UserState {
     username: string;
@@ -17,10 +18,11 @@ const userSlice = createSlice({
       state.username = action.payload;
     },
     logout: (state) => {
-      state.usernmae = null;
+      state.username = null;
     },
   },
 });
 
 export const { login, logout } = userSlice.actions;
+export const selectUsername = (state : AppState) => state.user.username;
 export default userSlice.reducer;
