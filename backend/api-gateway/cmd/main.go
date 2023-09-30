@@ -26,7 +26,7 @@ func main() {
 		AllowCredentials: true,
 	})
 
-	API_GATEWAY.Use(corsMiddleware, handlers.PreventLoginMiddleware, handlers.RequireAuthenticationMiddleWare)
+	API_GATEWAY.Use(corsMiddleware, handlers.RequireAuthenticationMiddleWare)
 
 	API_GATEWAY.GET(path.GITHUB_LOGIN, handlers.GithubLogin)
 	API_GATEWAY.GET(path.LOGOUT, handlers.Logout)

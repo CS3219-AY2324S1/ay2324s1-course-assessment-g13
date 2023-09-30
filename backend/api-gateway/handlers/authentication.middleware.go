@@ -41,17 +41,3 @@ func RequireAuthenticationMiddleWare(next echo.HandlerFunc) echo.HandlerFunc {
 		return next(c)
 	}
 }
-
-func PreventLoginMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		_, isInList := bypassLoginList[c.Request().RequestURI]
-		if !isInList {
-			return next(c)
-		}
-		_, statusCode, _ := cookie.Service.GetCookieValue(c.Cookie(ACCESS_TOKEN_COOKIE_NAME))
-		if statusCode == http.StatusOK {
-			return c.JSON(http.StatusForbidden, message.CreateErrorMessage(FAILURE_USER_ALREADY_LOGIN))
-		}
-		return next(c)
-	}
-}
