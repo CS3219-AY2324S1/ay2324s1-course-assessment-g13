@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export function middleware(request: NextRequest) {
-    const jwtExist = request.cookies.get('jwt');
+    const jwtExist = request.cookies.get('access-token');
     const url = request.nextUrl.origin;
     const pathname = request.nextUrl.pathname;
 

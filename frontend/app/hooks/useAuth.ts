@@ -74,7 +74,7 @@ export default function useAuth() {
     }
 
     const handleGithubLogin = async () => {
-        const clientId = "e2d4b8fe671589d0d378" // Should move to .env
+        const clientId = process.env.NEXT_PUBLIC_GITHUB_OAUTH_CLIENT_ID
         const redirectUrl = "http://localhost:3000/oauth/callback"
         const github_authorize_url = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUrl}`
         router.push(github_authorize_url);
