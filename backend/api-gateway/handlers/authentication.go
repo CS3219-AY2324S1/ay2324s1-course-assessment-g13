@@ -29,7 +29,7 @@ func Refresh(c echo.Context) error {
 		return c.JSON(statusCode, message.CreateErrorMessage(responseMessage))
 	}
 
-	tokenClaims, statusCode, responseMessage := token.AccessTokenService.Validate(tokenString)
+	tokenClaims, statusCode, responseMessage := token.RefreshTokenService.Validate(tokenString)
 	if statusCode != http.StatusOK {
 		return c.JSON(statusCode, message.CreateErrorMessage(responseMessage))
 	}

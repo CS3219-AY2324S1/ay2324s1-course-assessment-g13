@@ -8,8 +8,8 @@ func ExpireNow() time.Time {
 	return time.Now()
 }
 
-func ExpireIn5Minutes() time.Time {
-	return time.Now().Add(5 * time.Minute)
+func ExpireIn1Minute() time.Time {
+	return time.Now().Add(time.Minute)
 }
 
 func ExpireIn24Hours() time.Time {

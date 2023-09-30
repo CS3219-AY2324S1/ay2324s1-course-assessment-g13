@@ -14,7 +14,7 @@ import (
 func GenerateTokenAndSetCookie(c echo.Context) error {
 	user := c.Get(USER_CONTEXT_KEY).(models.User)
 	successMessage := c.Get(SUCCESS_MESSAGE_CONTEXT_KEY).(string)
-	accessTokenExpiry := expiry.ExpireIn5Minutes()
+	accessTokenExpiry := expiry.ExpireIn1Minute()
 	refreshTokenExpiry := expiry.ExpireIn24Hours()
 
 	accessTokenString, statusCode, responseMessage := token.AccessTokenService.Generate(&user, accessTokenExpiry)
