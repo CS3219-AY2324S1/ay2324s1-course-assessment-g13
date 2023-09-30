@@ -13,7 +13,7 @@ export default function OAuthCallback() {
 
     const handleGithubLoginCallback = async (code: string) => {
         try {
-            const response = await GET(`/auth/login/github?code=${code}`)
+            const response = await GET(`/auth/login/github?code=${code}`);
             notifySuccess(response.data.message);
             dispatch(login(response.data.user));
             router.push('/questions');

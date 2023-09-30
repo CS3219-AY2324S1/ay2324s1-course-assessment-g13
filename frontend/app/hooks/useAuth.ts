@@ -1,7 +1,6 @@
-import { useRouter } from "next/navigation";
 import { useEffect } from "react"
 import { GET } from "../libs/axios/axios";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from '../libs/redux/store';
 import { notifyError } from "../components/toast/notifications";
 
@@ -9,8 +8,6 @@ let resetInteveralId: NodeJS.Timeout;
 
 export default function useAuth() {
     const { userId, userRole, username } =  useSelector((state: RootState) => state.user);
-    const dispatch = useDispatch();
-    const router = useRouter();
     const oneMinute = 60000;
 
     const isAuthenticated = userId !== 0;
