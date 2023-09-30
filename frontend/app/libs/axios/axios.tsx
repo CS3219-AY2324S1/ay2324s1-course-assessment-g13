@@ -16,12 +16,8 @@ axiosInstance.interceptors.response.use(
   },
   async (error: AxiosError) => {
     if (error.response && error.response.status === 401) {
-      try {
         await refreshToken();
         return axiosInstance(error.config);
-      } catch (refreshError) {
-        throw refreshError
-      }
     }
     return Promise.reject(error);
   }
