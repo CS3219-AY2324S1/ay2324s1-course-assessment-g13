@@ -9,7 +9,7 @@ import ImageUpload from '../../components/form/ImageUpload';
 import { PUT } from '../../libs/axios/axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppState } from '../../libs/redux/store';
-import { notifyError, notifySuccess } from '../../components/Notifications';
+import { notifyError, notifySuccess } from '../../components/toast/notifications';
 import { updateUser } from '../../libs/redux/slices/userSlice';
 
 interface UserInfo {

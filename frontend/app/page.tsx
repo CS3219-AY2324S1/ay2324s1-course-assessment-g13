@@ -1,5 +1,6 @@
 "use client";
-import SignUpButton from './components/Nav/SignUpButton';
+import { Button } from '@nextui-org/button';
+import { Link } from '@nextui-org/link';
 
 export const metadata = {
   title: 'PeerPrep',
@@ -15,7 +16,14 @@ export default function Home() {
         tracking on PeerPrep.
       </p>
 
-      <SignUpButton width="w-2/5" />
+      <Button  
+            color="primary"
+            as={Link}
+            href="/signup"
+            className={"w-2/5"}
+        >
+            Sign Up
+        </Button>
     </div>
   );
 }

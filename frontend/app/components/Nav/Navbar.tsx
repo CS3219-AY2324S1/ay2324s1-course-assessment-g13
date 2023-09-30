@@ -1,12 +1,11 @@
 'use client';
 import { Link } from '@nextui-org/link';
-
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem } from '@nextui-org/navbar';
 import React, { useEffect, useState } from 'react';
-import LoginButton from './LoginButton';
 import useAuth from '../../hooks/useAuth';
-import SignUpButton from './SignUpButton';
-import { Avatar, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@nextui-org/react';
+import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@nextui-org/dropdown'
+import { Avatar } from '@nextui-org/avatar';
+import { Button } from '@nextui-org/button';
 import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import { logout } from '../../libs/redux/slices/userSlice';
@@ -81,8 +80,21 @@ const Nav = () => {
         :
         <NavbarContent justify="end">
           <NavbarItem className="hidden lg:flex gap-3">
-            <LoginButton />
-            <SignUpButton />
+            <Button  
+                variant="bordered" 
+                color="default"
+                as={Link}
+                href="/login"
+            >
+                Login
+            </Button>
+            <Button  
+                color="primary"
+                as={Link}
+                href="/signup"
+            >
+                Sign Up
+            </Button>
           </NavbarItem>
         </NavbarContent>
       }
