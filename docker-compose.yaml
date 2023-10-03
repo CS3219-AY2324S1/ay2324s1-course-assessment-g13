@@ -31,6 +31,8 @@ services:
       - "5005:8080" # Maps container port 8080 to local 5005
     volumes:
       -  ./backend/collaboration-service:/usr/src/app
+    networks:
+      - peerpreps-backend
 
   user-service:
     container_name: user-service
@@ -46,6 +48,8 @@ services:
     depends_on:
       db:
         condition: service_started
+    networks:
+      - peerpreps-backend
 
   matching-service:
     container_name: matching-service
@@ -56,6 +60,8 @@ services:
       - "5007:8080" # Maps container port 8080 to local 5007
     volumes:
       - ./backend/matching-service:/usr/src/app
+    networks:
+      - peerpreps-backend
 
   question-service:
       container_name: question-service
@@ -73,6 +79,8 @@ services:
       depends_on:
         mongodb:
           condition: service_started
+      networks:
+        - peerpreps-backend
 
   mongodb:
     image: mongo:7.0.1
@@ -86,6 +94,8 @@ services:
       - "27017:27017"
     volumes:
       - db-data:/data/db
+    networks:
+      - peerpreps-backend
 
   db:
     image: postgres:16rc1-alpine3.18
@@ -101,7 +111,14 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
     volumes:
       - data:/var/lib/postgresql/data
+    networks:
+      - peerpreps-backend
 
 volumes:
   data: {}
   db-data: {}
+
+networks:
+  peerpreps-backend:
+    external:
+      true
