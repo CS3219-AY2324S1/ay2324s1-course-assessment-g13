@@ -25,7 +25,7 @@ type UpdateUserPassword struct {
 }
 
 type LoginResponse struct {
-	Id 	 uint   `json:"id"`
+	Id       uint   `json:"id"`
 	Username string `json:"username"`
-	PhotoUrl	string `json:"photoUrl"`
+	PhotoUrl string `json:"photoUrl"`
 }

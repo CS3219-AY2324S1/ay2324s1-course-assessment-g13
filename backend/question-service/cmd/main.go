@@ -14,15 +14,15 @@ func main() {
 	e := echo.New()
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"http://localhost:3000"},
+		AllowOrigins: []string{"http://localhost:1234"},
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
 	}))
 
 	questionGroup := e.Group("/questions")
 	questionGroup.GET("", controllers.GetQuestions)
 	questionGroup.GET("/:id", controllers.GetQuestion)
-	questionGroup.POST("", controllers.CreateQuestion)
-	questionGroup.DELETE("/:id", controllers.DeleteQuestion)
+	questionGroup.POST("", controllers.CreateQuestion, controllers.AuthorizeAdminMiddleWare)
+	questionGroup.DELETE("/:id", controllers.DeleteQuestion, controllers.AuthorizeAdminMiddleWare)
 
 	e.Start(":8080")
 }

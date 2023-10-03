@@ -30,7 +30,7 @@ func Login(c echo.Context) error {
 
 	sess, _ := session.Get("session", c)
 	sess.Options = &sessions.Options{
-		Domain:  "localhost",
+		Domain:   "localhost",
 		Path:     "/",
 		MaxAge:   86400 * 7,
 		HttpOnly: false,
@@ -42,7 +42,7 @@ func Login(c echo.Context) error {
 	}
 
 	res := &model.LoginResponse{
-		Id: user.ID,
+		Id:       user.ID,
 		Username: user.Username,
 		PhotoUrl: user.PhotoUrl,
 	}

@@ -12,6 +12,8 @@ services:
       - .env
     depends_on:
       - db
+    networks:
+      - peerpreps-backend
 
   db:
     image: mongo:7.0.1
@@ -22,5 +24,11 @@ services:
       - db-data:/data/db
     environment:
       - MONGO_URI=${MONGO_URI}
+    networks:
+      - peerpreps-backend
 volumes:
   db-data:
+
+networks:
+  peerpreps-backend:
+    external: true

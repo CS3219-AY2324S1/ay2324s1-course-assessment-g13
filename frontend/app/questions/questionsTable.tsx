@@ -7,16 +7,17 @@ import { Question } from '../types/question';
 import StyleCell from './style-cell';
 
 interface QuestionProps {
+  isAdmin: boolean,
   questions: Question[];
   fetchQuestions: () => void;
 }
 
-const QuestionsTable = ({questions, fetchQuestions} : QuestionProps) => {
+const QuestionsTable = ({isAdmin, questions, fetchQuestions} : QuestionProps) => {
   const [page, setPage] = useState(1);
   const rowsPerPage = 10;
 
   useEffect(() => {
-      fetchQuestions();
+    fetchQuestions();
   }, []);
 
   const noOfPages = Math.ceil(questions.length / rowsPerPage)
@@ -31,9 +32,8 @@ const QuestionsTable = ({questions, fetchQuestions} : QuestionProps) => {
       return {
         ...(question as Question),
         listId: i + 1 + start,
-      }
+      };
     });
-
   }, [page, questions]);
 
   const renderCell = useCallback(StyleCell, []);
@@ -75,7 +75,7 @@ const QuestionsTable = ({questions, fetchQuestions} : QuestionProps) => {
       <TableBody items={items} emptyContent={'No rows to display.'}>
         {item => (
           <TableRow key={item.id}>
-            {columnKey => <TableCell>{renderCell({ item, columnKey, fetchQuestions })}</TableCell>}
+            {columnKey => <TableCell>{renderCell({isAdmin, item, columnKey, fetchQuestions })}</TableCell>}
           </TableRow>
         )}
       </TableBody>
