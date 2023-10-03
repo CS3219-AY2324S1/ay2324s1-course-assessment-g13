@@ -3,14 +3,15 @@ version: '3'
 services:
   user-service:
     container_name: user-service
-    build:
-      dockerfile: Dockerfile.dev
+    build: .
     env_file:
       - .env
     ports:
-      - "5006:8080"
+      - "3001:3000"
     volumes:
       - .:/usr/src/app
+    networks:
+      - peerpreps-backend
   db:
     image: postgres:16rc1-alpine3.18
     container_name: postgres
@@ -22,6 +23,22 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
     volumes:
       - data:/var/lib/postgresql/data
+    networks:
+      - peerpreps-backend
 
+  pg-admin:
+    image: dpage/pgadmin4:6
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@email.com
+      - PGADMIN_DEFAULT_PASSWORD=password
+      - PGADMIN_LISTEN_PORT=5050
+
+    ports:
+      - "5050:5050"
 volumes:
   data:
+
+networks:
+  peerpreps-backend:
+    external:
+      true
