@@ -4,11 +4,11 @@
 Follow the steps below to set up the entire project using **Docker Compose**.
 
 1. Turn on [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-2. Copy the `.env.sample` file and fill in the environment variables with the required secrets
-3. 
-4. Change directory to the `scripts` folder and run `chmod +rwx <script>` for both scripts
-5. Ensure that all the repositories have their environment setup as well by following the respective `README.md`'s
-6. Once that is ensured, simply run `docker compose up --build`
+2. Copy the `.env.sample` file into a `.env` and fill in the environment variables with the required secrets
+3. Change directory to the `scripts` folder and run `chmod +rwx <script>` for both scripts
+4. Ensure that all the repositories have their environment setup as well by following the respective `README.md`'s
+5. Once that is ensured, simply run `docker compose up --build`
+6. Go to `http://localhost:3000` and interact with Peerprep!
 
 ## For development
 
@@ -24,5 +24,4 @@ the minimum amount of files to containerise the service.
 
 ## FAQ / Troubleshooting
 1. Running `docker compose up --build` returns a "database service unhealthy" error and terminates.
-    > Simply rerun the command and this issue should go away. 
-2. 
+    > Simply rerun the command and this issue should go away.
