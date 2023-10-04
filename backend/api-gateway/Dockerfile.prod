@@ -15,7 +15,7 @@ RUN go mod download
 COPY . .
 
 # Build the Go app
-RUN go build -o /matching-service .
+RUN go build -o /api-gateway .
 
 # Run unit tests on container
 FROM builder AS builder-test
@@ -27,10 +27,10 @@ FROM scratch
 
 WORKDIR /
 
-COPY --from=builder /matching-service /matching-service
+COPY --from=builder /api-gateway /api-gateway
 
-# Expose port 8080 to the outside world
-EXPOSE 8080
+# Expose port 1234 to the outside world
+EXPOSE 1234
 
 # Command to run the executable
-ENTRYPOINT ["./matching-service"]
+ENTRYPOINT ["./api-gateway"]

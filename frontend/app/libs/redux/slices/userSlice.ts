@@ -20,9 +20,9 @@ const userSlice = createSlice({
   reducers: {
     login: (state, action) => {
       state.username = action.payload.username;
-      state.userId = action.payload.ID;
+      state.userId = action.payload.id;
       state.userRole = action.payload.role;
-      state.photoUrl = action.payload.photoUrl ?? '';
+      state.photoUrl = action.payload.picture ?? '';
     },
     logout: (state) => {
       state.username = '';
@@ -32,9 +32,9 @@ const userSlice = createSlice({
     },
     updateUser: (state, action) => {
       state.username = action.payload.username;
-      state.userId = action.payload.ID;
+      state.userId = action.payload.id;
       state.userRole = action.payload.role;
-      state.photoUrl = action.payload.photoUrl ?? '';
+      state.photoUrl = action.payload.picture ?? '';
     },
   },
 });

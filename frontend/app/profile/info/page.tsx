@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppState } from '../../libs/redux/store';
 import { notifyError, notifySuccess } from '../../components/toast/notifications';
 import { updateUser } from '../../libs/redux/slices/userSlice';
+import {userInfo} from "os";
 
 interface UserInfo {
   username: string;
@@ -21,11 +22,12 @@ const InfoPage = () => {
   const dispatch = useDispatch();
   const { userId:id, username } = useAuth();
   const photoUrl = useSelector((state: AppState) => state.user.photoUrl);
-
+  console.log(`uid: ${id}, username: ${username}`);
   const initialValues: UserInfo = {
     username,
     photoUrl,
   };
+
   const {
     control,
     handleSubmit,

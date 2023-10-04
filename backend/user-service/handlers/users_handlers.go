@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 
 	"user-service/config"
@@ -65,7 +66,7 @@ func CreateUser(c echo.Context) error {
 	}
 
 	res := &model.LoginResponse{
-		Id: user.ID,
+		Id:       user.ID,
 		Username: user.Username,
 		PhotoUrl: user.PhotoUrl,
 	}
@@ -75,6 +76,7 @@ func CreateUser(c echo.Context) error {
 func UpdateUserInfo(c echo.Context) error {
 	id := c.Param("id")
 	var user model.User
+	fmt.Println(id)
 	if err := config.DB.Where("id = ?", id).First(&user).Error; err != nil {
 		return c.JSON(http.StatusBadRequest, "User not found")
 	}

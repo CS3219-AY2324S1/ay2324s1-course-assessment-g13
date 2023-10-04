@@ -12,6 +12,9 @@ services:
       - .:/usr/src/app
     networks:
       - peerpreps-backend
+    depends_on:
+      - db
+
   db:
     image: postgres:16rc1-alpine3.18
     container_name: postgres-api-gateway
