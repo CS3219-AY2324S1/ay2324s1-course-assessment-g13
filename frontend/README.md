@@ -14,4 +14,3 @@ NEXT_PUBLIC_BACKEND_URL=http://localhost:5000
 ```
 
 Then, simply run `docker compose up` in the root directory.
-

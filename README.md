@@ -24,4 +24,5 @@ the minimum amount of files to containerise the service.
 
 ## FAQ / Troubleshooting
 1. Running `docker compose up --build` returns a "database service unhealthy" error and terminates.
-    > Simply rerun the command and this issue should go away.
+    > Simply rerun the command and this issue should go away. The reason for this is because the script
+   > is designed to terminate on error, and database existing is considered an error.
