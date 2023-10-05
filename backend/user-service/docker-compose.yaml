@@ -14,7 +14,11 @@ services:
       - .:/usr/src/app
     networks:
       - peerpreps-backend
-  db:
+    depends_on:
+      db-us:
+        condition: service_healthy
+
+  db-us:
     image: postgres:16rc1-alpine3.18
     container_name: postgres
     ports:
@@ -23,6 +27,12 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
+      - PGUSER=postgres
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready", "-d", "users", "-p", "5432" ]
+      interval: 5s
+      timeout: 60s
+      retries: 5
     volumes:
       - data:/var/lib/postgresql/data
     networks:

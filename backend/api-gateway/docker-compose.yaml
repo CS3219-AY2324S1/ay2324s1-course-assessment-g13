@@ -1,10 +1,11 @@
 version: '3'
 
 services:
-<<<<<<<< HEAD:backend/api-gateway/docker-compose.yaml
   api-gateway:
     container_name: api-gateway
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
     env_file:
       - .env
     ports:
@@ -14,37 +15,26 @@ services:
     networks:
       - peerpreps-backend
     depends_on:
-      - db
+      db-agw:
+        condition: service_healthy
 
-  db:
+  db-agw:
     image: postgres:16rc1-alpine3.18
     container_name: postgres-api-gateway
     ports:
       - "5433:5432"
-========
-  user-service:
-    container_name: user-service
-    build:
-      dockerfile: Dockerfile.dev
-    env_file:
-      - .env
-    ports:
-      - "5006:8080"
-    volumes:
-      - .:/usr/src/app
-  db:
-    image: postgres:16rc1-alpine3.18
-    container_name: postgres
-    ports:
-      - "5432:5432"
->>>>>>>> a1776366533ade409a6881700b0a6e6fd6b47d38:backend/user-service/docker-compose.yaml
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
+      - PGUSER=postgres
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready", "-d", "apigateway", "-p", "5433" ]
+      interval: 5s
+      timeout: 60s
+      retries: 5
     volumes:
       - data:/var/lib/postgresql/data
-<<<<<<<< HEAD:backend/api-gateway/docker-compose.yaml
     networks:
       - peerpreps-backend
 
@@ -54,8 +44,3 @@ volumes:
 networks:
   peerpreps-backend:
     external: true
-========
-
-volumes:
-  data:
->>>>>>>> a1776366533ade409a6881700b0a6e6fd6b47d38:backend/user-service/docker-compose.yaml
