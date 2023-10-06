@@ -22,7 +22,7 @@ const InfoPage = () => {
   const dispatch = useDispatch();
   const { userId:id, username } = useAuth();
   const photoUrl = useSelector((state: AppState) => state.user.photoUrl);
-  console.log(`uid: ${id}, username: ${username}`);
+
   const initialValues: UserInfo = {
     username,
     photoUrl,

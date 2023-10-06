@@ -22,7 +22,7 @@ const userSlice = createSlice({
       state.username = action.payload.username;
       state.userId = action.payload.id;
       state.userRole = action.payload.role;
-      state.photoUrl = action.payload.picture ?? '';
+      state.photoUrl = action.payload.picture ?? state.photoUrl;
     },
     logout: (state) => {
       state.username = '';
@@ -34,7 +34,7 @@ const userSlice = createSlice({
       state.username = action.payload.username;
       state.userId = action.payload.id;
       state.userRole = action.payload.role;
-      state.photoUrl = action.payload.picture ?? '';
+      state.photoUrl = action.payload.picture ?? state.photoUrl;
     },
   },
 });

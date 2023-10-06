@@ -64,9 +64,6 @@ func GithubLogin(c echo.Context) error {
 	provider := GITHUB
 	githubUserID := githubData.GithubID
 
-	debugLandmark := fmt.Sprintf("ID: %s | Name: %s | Email: %s", githubData.GithubID, githubData.GithubName, githubData.GithubEmail)
-	fmt.Println(debugLandmark)
-
 	var existingUser models.User
 	err := config.DB.Where("provider = ? AND user_id = ?", provider, githubUserID).First(&existingUser).Error
 	if err != nil {
@@ -138,13 +135,10 @@ func getGithubData(accessToken string) (githubData *models.GithubDataResponseBod
 	if responseErr != nil {
 		return nil, http.StatusBadRequest, GITHUB_RESPONSE_FAILED
 	}
-	
+
 	responseBody, _ := io.ReadAll(response.Body)
 	var githubDataResponseBody *models.GithubDataResponseBody
 	json.Unmarshal(responseBody, &githubDataResponseBody)
-
-	debugLandmark := fmt.Sprintf("ID: %s | Name: %s | Email: %s | Avatar: %s", githubDataResponseBody.GithubID, githubDataResponseBody.GithubName, githubDataResponseBody.GithubEmail, githubDataResponseBody.GithubProfilePictureURL)
-	fmt.Println(debugLandmark)
 
 	return githubDataResponseBody, http.StatusOK, GITHUB_USER_DATA_SUCCESS
 }

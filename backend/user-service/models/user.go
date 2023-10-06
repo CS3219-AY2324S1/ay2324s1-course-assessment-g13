@@ -4,13 +4,16 @@ import "gorm.io/gorm"
 
 type User struct {
 	gorm.Model
+	UserID         uint
 	Username       string
 	HashedPassword string
 	PhotoUrl       string
 }
 
 type CreateUserRequest struct {
+	UserID   uint   `json:"user_id" validate:"required"`
 	Username string `json:"username" validate:"required"`
+	PhotoURL string `json:"photo_url" validate:"required"`
 	Password string `json:"password" validate:"required"`
 }
 
