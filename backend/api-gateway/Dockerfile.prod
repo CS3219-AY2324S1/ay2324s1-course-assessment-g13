@@ -23,7 +23,7 @@ FROM builder AS builder-test
 RUN go test -v ./...
 
 # We just want the binary, rest need not be copied over
-FROM scratch
+FROM golang:1.20-alpine
 
 WORKDIR /
 

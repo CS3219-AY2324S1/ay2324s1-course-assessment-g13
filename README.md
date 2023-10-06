@@ -6,9 +6,10 @@ Follow the steps below to set up the entire project using **Docker Compose**.
 1. Turn on [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 2. Copy the `.env.sample` file into a `.env` and fill in the environment variables with the required secrets
 3. Change directory to the `scripts` folder and run `chmod +rwx <script>` for both scripts
-4. Ensure that all the repositories have their environment setup as well by following the respective `README.md`'s
-5. Once that is ensured, simply run `docker compose up --build`
-6. Go to `http://localhost:3000` and interact with Peerprep!
+4. Run the following command `docker network create peerpreps-backend`
+5. Ensure that all the repositories have their environment setup as well by following the respective `README.md`'s
+6. Once that is ensured, simply run `docker compose up --build`
+7. Go to `http://localhost:3000` and interact with Peerprep!
 
 ## For development
 
@@ -16,7 +17,7 @@ For development, we are using `Dockerfile.dev` for all backend microservices to
 allow for hot-reload using air. Since we do not employ multi-stage builds for 
 development environments, the image size is usually much larger than it should be.
 
-## For production [WIP]
+## For production 
 
 For production, we are using `Dockerfile.prod` for all services. These files employ
 a multistage build process which ensures the final image is lean and only contains
@@ -26,3 +27,5 @@ the minimum amount of files to containerise the service.
 1. Running `docker compose up --build` returns a "database service unhealthy" error and terminates.
     > Simply rerun the command and this issue should go away. The reason for this is because the script
    > is designed to terminate on error, and database existing is considered an error.
+2. Error of `network peerpreps-backend declared as external, but could not be found`
+   > Run `docker network create peerpreps-backend` in the repository root
