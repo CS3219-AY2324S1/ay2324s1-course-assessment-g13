@@ -1,16 +1,17 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c5622901739e7c5dd533143b0c8e959d652212380cedb1ea36.svg)](https://classroom.github.com/a/6BOvYMwN)
-# Group 13 
+# Question Service
 
-## Development
+## Setting up environment
 
-To configure the development environment, create a `.env` file like this:
+1. Create a `.env` file referencing from the `.env.sample` in the current directory
 
-```bash
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
-POSTGRES_DB=user-db
-MONGO_URI=mongodb://question-db:27017
-NEXT_PUBLIC_BACKEND_URL=http://localhost:5000
+2. Here's an example of the `.env` file:
+
+```
+NEXT_PUBLIC_BACKEND_URL=http://localhost:1234
+NEXT_PUBLIC_GITHUB_OAUTH_CLIENT_ID=<details_omitted>
+
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=<details_omitted>
+NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=<details_omitted>
 ```
 
-Then, simply run `docker compose up` in the root directory.
+For `NEXT_PUBLIC_GITHUB_OAUTH_CLIENT_ID`, `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` and `NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET`, please refer to the assignment submission folder.
