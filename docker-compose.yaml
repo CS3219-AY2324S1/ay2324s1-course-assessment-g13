@@ -2,17 +2,17 @@ version: "3"
 
 services:
   frontend:
-    # depends_on:
-    #   api-gateway:
-    #     condition: service_started
-    #   matching-service:
-    #     condition: service_started
-    #   collaboration-service:
-    #     condition: service_started
-    #   user-service:
-    #     condition: service_started
-    #   question-service:
-    #     condition: service_started
+    depends_on:
+      api-gateway:
+        condition: service_started
+      matching-service:
+        condition: service_started
+      collaboration-service:
+        condition: service_started
+      user-service:
+        condition: service_started
+      question-service:
+        condition: service_started
     env_file:
       - ./frontend/.env
     build:
