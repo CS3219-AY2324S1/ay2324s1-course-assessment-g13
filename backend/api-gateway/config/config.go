@@ -16,7 +16,7 @@ var DB *gorm.DB
 func ConnectDb() {
 	dsn := fmt.Sprintf(
 		"host=db-agw user=%s password=%s dbname=%s port=5432 sslmode=disable",
-		os.Getenv("POSTGRES_USER"),
+		os.Getenv("PGUSER"),
 		os.Getenv("POSTGRES_PASSWORD"),
 		os.Getenv("POSTGRES_DB"),
 	)

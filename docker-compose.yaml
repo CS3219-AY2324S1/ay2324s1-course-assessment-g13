@@ -2,17 +2,17 @@ version: "3"
 
 services:
   frontend:
-    depends_on:
-      api-gateway:
-        condition: service_started
-      matching-service:
-        condition: service_started
-      collaboration-service:
-        condition: service_started
-      user-service:
-        condition: service_started
-      question-service:
-        condition: service_started
+    # depends_on:
+    #   api-gateway:
+    #     condition: service_started
+    #   matching-service:
+    #     condition: service_started
+    #   collaboration-service:
+    #     condition: service_started
+    #   user-service:
+    #     condition: service_started
+    #   question-service:
+    #     condition: service_started
     env_file:
       - ./frontend/.env
     build:
@@ -91,8 +91,6 @@ services:
         dockerfile: Dockerfile.prod
       env_file:
         - ./backend/question-service/.env
-      environment:
-        - MONGO_URI=${MONGO_URI}
       ports:
         - "5008:8080" # Maps container port 8080 to local 5008
       volumes:
@@ -109,8 +107,6 @@ services:
     env_file:
       - ./backend/question-service/.env
     restart: always
-    environment:
-      - MONGO_URI=${MONGO_URI}
     ports:
       - "27017:27017"
     volumes:
@@ -131,11 +127,6 @@ services:
       retries: 5
     ports:
       - "5432:5432"
-    environment:
-      - POSTGRES_USER=${POSTGRES_USER_USER_SERVICE}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD_USER_SERVICE}
-      - POSTGRES_DB=${POSTGRES_DB_USER_SERVICE}
-      - PGUSER=postgres
     volumes:
       - ./scripts/init_user_db.sh:/docker-entrypoint-initdb.d/init_user_db.sh
       - data:/var/lib/postgresql/data
@@ -155,11 +146,6 @@ services:
       retries: 5
     ports:
       - "5433:5432"
-    environment:
-      - POSTGRES_USER=${POSTGRES_USER_APIGW}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD_APIGW}
-      - POSTGRES_DB=${POSTGRES_DB_APIGW}
-      - PGUSER=postgres
     volumes:
       - ./scripts/init_apigw_db.sh:/docker-entrypoint-initdb.d/init_apigw_db.sh
       - agw-data:/var/lib/postgresql/data
@@ -173,5 +159,4 @@ volumes:
 
 networks:
   peerpreps-backend:
-    external:
-      true
+    driver: bridge
