@@ -1,0 +1,162 @@
+version: "3"
+
+services:
+  frontend:
+    depends_on:
+      api-gateway:
+        condition: service_started
+      matching-service:
+        condition: service_started
+      collaboration-service:
+        condition: service_started
+      user-service:
+        condition: service_started
+      question-service:
+        condition: service_started
+    env_file:
+      - ./frontend/.env
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: frontend
+    volumes:
+      - ./frontend:/usr/src/app
+      - /usr/src/app/node_modules
+      - /usr/src/app/.next
+    ports:
+      - "3000:3000" # Maps container port 3000 to local 3000
+
+  api-gateway:
+    container_name: api-gateway
+    build:
+      context: ./backend/api-gateway
+      dockerfile: Dockerfile.dev
+    env_file:
+      - ./backend/api-gateway/.env
+    ports:
+      - "1234:1234"  # Maps container port 1234 to local 1234
+    volumes:
+      - ./backend/api-gateway:/usr/src/app
+    networks:
+      - peerpreps-backend
+    depends_on:
+      db-agw:
+        condition: service_healthy
+
+  collaboration-service:
+    container_name: collaboration-service
+    build:
+      context: ./backend/collaboration-service
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5005:8080" # Maps container port 8080 to local 5005
+    volumes:
+      -  ./backend/collaboration-service:/usr/src/app
+    networks:
+      - peerpreps-backend
+
+  user-service:
+    container_name: user-service
+    build:
+      context: ./backend/user-service
+      dockerfile: Dockerfile.dev
+    env_file:
+      - ./backend/user-service/.env
+    ports:
+      - "5006:8080" # Maps container port 8080 to local 5006
+    volumes:
+      - ./backend/user-service:/usr/src/app
+    depends_on:
+      db-us:
+        condition: service_healthy
+    networks:
+      - peerpreps-backend
+
+  matching-service:
+    container_name: matching-service
+    build:
+      context: ./backend/matching-service
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5007:8080" # Maps container port 8080 to local 5007
+    volumes:
+      - ./backend/matching-service:/usr/src/app
+    networks:
+      - peerpreps-backend
+
+  question-service:
+      container_name: question-service
+      build:
+        context: ./backend/question-service
+        dockerfile: Dockerfile.dev
+      env_file:
+        - ./backend/question-service/.env
+      ports:
+        - "5008:8080" # Maps container port 8080 to local 5008
+      volumes:
+        - ./backend/question-service:/usr/src/app
+      depends_on:
+        mongodb:
+          condition: service_started
+      networks:
+        - peerpreps-backend
+
+  mongodb:
+    image: mongo:7.0.1
+    container_name: mongodb-question-service
+    env_file:
+      - ./backend/question-service/.env
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - db-data:/data/db
+    networks:
+      - peerpreps-backend
+
+  db-us:
+    image: postgres:16rc1-alpine3.18
+    container_name: postgres-user-service
+    restart: always
+    env_file:
+      - ./backend/user-service/.env
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready", "-d", "users", "-p", "5432" ]
+      interval: 5s
+      timeout: 60s
+      retries: 5
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./scripts/init_user_db.sh:/docker-entrypoint-initdb.d/init_user_db.sh
+      - data:/var/lib/postgresql/data
+    networks:
+      - peerpreps-backend
+
+  db-agw:
+    image: postgres:16rc1-alpine3.18
+    container_name: postgres-api-gateway
+    restart: always
+    env_file:
+      - ./backend/api-gateway/.env
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready", "-d", "apigateway", "-p", "5433" ]
+      interval: 5s
+      timeout: 60s
+      retries: 5
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./scripts/init_apigw_db.sh:/docker-entrypoint-initdb.d/init_apigw_db.sh
+      - agw-data:/var/lib/postgresql/data
+    networks:
+      - peerpreps-backend
+
+volumes:
+  data: {}
+  db-data: {}
+  agw-data: {}
+
+networks:
+  peerpreps-backend:
+    driver: bridge

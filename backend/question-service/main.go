@@ -2,40 +2,27 @@ package main
 
 import (
 	"github.com/labstack/echo/v4"
-	"net/http"
-	"os"
+	"question-service/config"
+	"question-service/controllers"
 
 	"github.com/labstack/echo/v4/middleware"
 )
 
 func main() {
-
+	config.ConnectDb()
+	config.PopulateDb()
 	e := echo.New()
 
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"http://localhost:1234"},
+		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+	}))
 
-	e.GET("/", func(c echo.Context) error {
-		return c.HTML(http.StatusOK, "Hello, Docker! <3")
-	})
+	questionGroup := e.Group("/questions")
+	questionGroup.GET("", controllers.GetQuestions)
+	questionGroup.GET("/:id", controllers.GetQuestion)
+	questionGroup.POST("", controllers.CreateQuestion, controllers.AuthorizeAdminMiddleWare)
+	questionGroup.DELETE("/:id", controllers.DeleteQuestion, controllers.AuthorizeAdminMiddleWare)
 
-	e.GET("/health", func(c echo.Context) error {
-		return c.JSON(http.StatusOK, struct{ Status string }{Status: "OK"})
-	})
-
-	httpPort := os.Getenv("PORT")
-	if httpPort == "" {
-		httpPort = "8080"
-	}
-
-	e.Logger.Fatal(e.Start(":" + httpPort))
-}
-
-// Simple implementation of an integer minimum
-// Adapted from: https://gobyexample.com/testing-and-benchmarking
-func IntMin(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
+	e.Start(":8080")
 }

@@ -1,6 +1,6 @@
 module api-gateway
 
-go 1.21.0
+go 1.20
 
 require gorm.io/gorm v1.25.4
 

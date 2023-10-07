@@ -18,10 +18,10 @@ import { useForm } from 'react-hook-form';
 import { notifySuccess, notifyError } from '../../components/toast/notifications';
 import { POST } from '../../libs/axios/axios';
 
-
 export default function QuestionAddModal({fetchQuestions}) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const categories = Object.values(Category);
+
 
   const {
     register,
@@ -35,7 +35,6 @@ export default function QuestionAddModal({fetchQuestions}) {
       ...data,
       categories: (data.categories as string).split(',') as Category[],
     };
-
     try {
       const response = await POST('questions', modifiedData);
       fetchQuestions();
@@ -68,7 +67,7 @@ export default function QuestionAddModal({fetchQuestions}) {
               <form>
                 <ModalBody>
                   <Input
-                    {...register('title', 
+                    {...register('title',
                       { required: 'Title is required',
                         validate: { 
                           noNumbers : (value) => !/\d/.test(value) 
@@ -129,7 +128,7 @@ export default function QuestionAddModal({fetchQuestions}) {
                     ))}
                   </Select>
                   <Textarea
-                    {...register('description', 
+                    {...register('description',
                       { 
                         required: 'Description is required',
                         validate: {

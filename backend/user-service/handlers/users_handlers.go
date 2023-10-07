@@ -16,7 +16,7 @@ func GetUser(c echo.Context) error {
 	id := c.Param("id")
 
 	var user model.User
-	config.DB.Where("id = ?", id).First(&user)
+	config.DB.Where("user_id = ?", id).First(&user)
 	if user.ID == 0 {
 		return c.JSON(http.StatusBadRequest, "User not found")
 	}
@@ -59,13 +59,16 @@ func CreateUser(c echo.Context) error {
 	}
 	user.HashedPassword = string(hashedPassword)
 
+	user.UserID = req.UserID
+	user.PhotoUrl = req.PhotoURL
+
 	// Create a new user record in the database
 	if err := config.DB.Create(user).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, "Failed to create user")
 	}
 
 	res := &model.LoginResponse{
-		Id: user.ID,
+		Id:       user.ID,
 		Username: user.Username,
 		PhotoUrl: user.PhotoUrl,
 	}
@@ -75,7 +78,8 @@ func CreateUser(c echo.Context) error {
 func UpdateUserInfo(c echo.Context) error {
 	id := c.Param("id")
 	var user model.User
-	if err := config.DB.Where("id = ?", id).First(&user).Error; err != nil {
+	
+	if err := config.DB.Where("user_id = ?", id).First(&user).Error; err != nil {
 		return c.JSON(http.StatusBadRequest, "User not found")
 	}
 
@@ -105,7 +109,7 @@ func UpdateUserPassword(c echo.Context) error {
 	id := c.Param("id")
 
 	var user model.User
-	if err := config.DB.Where("id = ?", id).First(&user).Error; err != nil {
+	if err := config.DB.Where("user_id = ?", id).First(&user).Error; err != nil {
 		return c.JSON(http.StatusBadRequest, "User not found")
 	}
 
@@ -140,7 +144,7 @@ func DeleteUser(c echo.Context) error {
 	id := c.Param("id")
 
 	var user model.User
-	if err := config.DB.Where("id = ?", id).First(&user).Error; err != nil {
+	if err := config.DB.Where("user_id = ?", id).First(&user).Error; err != nil {
 		return c.JSON(http.StatusBadRequest, "User not found")
 	}
 
