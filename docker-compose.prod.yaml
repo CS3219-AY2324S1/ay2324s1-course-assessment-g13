@@ -5,7 +5,9 @@ services:
     depends_on:
       api-gateway:
         condition: service_started
-      matching-service:
+      matching-producer:
+        condition: service_started
+      matching-consumer:
         condition: service_started
       collaboration-service:
         condition: service_started
@@ -76,7 +78,7 @@ services:
     container_name: matching-producer
     build:
       context: ./backend/matching-service/producer
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile.prod
     ports:
       - "5007:8080"
     environment:
@@ -95,7 +97,7 @@ services:
     container_name: matching-consumer
     build:
       context: ./backend/matching-service/consumer
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile.prod
     ports:
       - "5008:8080"
     environment:
@@ -202,4 +204,6 @@ volumes:
 
 networks:
   peerpreps-backend:
+    driver: bridge
+  rabbitmq-network:
     driver: bridge
