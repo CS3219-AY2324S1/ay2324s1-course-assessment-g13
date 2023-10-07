@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import MatchButton from "./matchButton";
 import SetPreferencesModal from "./preferenceModal";
-import { notifySuccess } from "../components/notifications";
+import { notifySuccess } from "../components/toast/notifications";
 
 export default function Interviews() {
   const [inQueue, setInQueue] = useState(false);

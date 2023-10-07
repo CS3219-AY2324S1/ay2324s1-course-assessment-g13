@@ -50,7 +50,7 @@ const Nav = () => {
             </Link>
           </NavbarItem>
           <NavbarItem>
-            <Link color="foreground" href="#">
+            <Link color="foreground" href="/interviews">
               Interviews
             </Link>
           </NavbarItem>

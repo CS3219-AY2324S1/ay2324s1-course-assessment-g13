@@ -14,10 +14,10 @@ import { Select, SelectItem } from '@nextui-org/select';
 import { Chip } from '@nextui-org/chip';
 import { Category, Complexity } from '../types/question';
 import { useForm } from 'react-hook-form';
-import { notifySuccess} from '../components/notifications';
+import { notifySuccess} from '../components/toast/notifications';
 import { Preference } from '../types/preference';
 import {useDispatch} from "react-redux";
-import {setPreference} from "../redux/slices/matchPreferenceSlice";
+import {setPreference} from "../libs/redux/slices/matchPreferenceSlice";
 
 export default function SetPreferencesModal() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();

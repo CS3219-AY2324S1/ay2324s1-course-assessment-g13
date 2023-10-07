@@ -1,30 +1,16 @@
 import {Button, user} from "@nextui-org/react";
-import {notifyError, notifySuccess, notifyWarning} from "../components/notifications";
+import {notifyError, notifySuccess, notifyWarning} from "../components/toast/notifications";
 import { useEffect, useState } from "react";
 import {useSelector} from "react-redux";
-import {selectPreferenceState} from "../redux/slices/matchPreferenceSlice";
-import {POST} from "../axios/axios";
-import {selectUsername} from "../redux/slices/userSlice";
-
-// Used since assignment 3 is not merged into this branch yet. Allows me to illustrate matching via user id
-const makeTemporaryUser = (length) => {
-  let result = '';
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  const charactersLength = characters.length;
-  let counter = 0;
-  while (counter < length) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    counter += 1;
-  }
-  return result;
-}
+import {selectPreferenceState} from "../libs/redux/slices/matchPreferenceSlice";
+import {POST} from "../libs/axios/axios";
+import {selectUsername} from "../libs/redux/slices/userSlice";
 
 export default function MatchButton({inQueue, setInQueue}) {
   const [seconds, setSeconds] = useState(0);
   const timeLimit = 30;
   const preferenceState = useSelector(selectPreferenceState)
-  // const userState = useSelector(selectUsername);
-  const userState = makeTemporaryUser(10);
+  const userState = useSelector(selectUsername);
   console.log(`User: ${userState} | User preference: ${preferenceState}`)
   useEffect(() => {
     if (seconds == timeLimit) {
@@ -73,7 +59,7 @@ export default function MatchButton({inQueue, setInQueue}) {
   };
 
   const getMatch = async () => {
-    return await POST("http://localhost:5007/match", {
+    return await POST("match", {
       "username":`${userState}`,
       "match_criteria":`${preferenceState.toLowerCase()}`
     });

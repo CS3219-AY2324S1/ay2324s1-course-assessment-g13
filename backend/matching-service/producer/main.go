@@ -15,7 +15,12 @@ func main() {
 	defer rmq.Reset()
 
 	e := echo.New()
-	e.Use(middleware.CORS())
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"http://localhost:1234"},
+		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+		AllowMethods: []string{http.MethodGet, http.MethodPost},
+	}))
+
 	e.POST("/match", handlers.MatchHandler)
 	e.GET("/ping", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, "I am the matching producer microservice")

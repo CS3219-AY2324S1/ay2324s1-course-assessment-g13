@@ -11,4 +11,5 @@ const (
 	AUTH_USER_DOWNGRADE  = "/auth/user/downgrade"
 	ALL_USER_SERVICE     = "/users*"
 	ALL_QUESTION_SERVICE = "/questions*"
+	ALL_MATCHING_SERVICE = "/match*"
 )

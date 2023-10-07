@@ -45,5 +45,7 @@ func main() {
 
 	API_GATEWAY.Any(path.ALL_QUESTION_SERVICE, handlers.HandleQuestionService)
 
+	API_GATEWAY.Any(path.ALL_MATCHING_SERVICE, handlers.HandleMatchingService)
+
 	API_GATEWAY.Start(API_GATEWAY_PORT)
 }

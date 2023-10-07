@@ -74,68 +74,60 @@ services:
     networks:
       - peerpreps-backend
 
-#  matching-service:
-#    container_name: matching-service
-#    build:
-#      context: ./backend/matching-service
-#      dockerfile: Dockerfile.dev
-#    ports:
-#      - "5007:8080" # Maps container port 8080 to local 5007
-#    volumes:
-#      - ./backend/matching-service:/usr/src/app
-#    networks:
-#      - peerpreps-backend
-   matching-producer:
-     container_name: matching-producer
-     build:
-       context: ./backend/matching-service/producer
-       dockerfile: Dockerfile.dev
-     ports:
-       - "5007:8080"
-     environment:
-       AMQP_SERVER_URL: amqp://guest:guest@rabbitmq:5672/
-     networks:
-       - rabbitmq-network
-     volumes:
-       - ./backend/matching-service/producer:/usr/src/app
-     depends_on:
-       rabbitmq:
-         condition: service_healthy
-     restart: on-failure
-
-   matching-consumer:
-     container_name: matching-consumer
-     build:
-       context: ./backend/matching-service/consumer
-       dockerfile: Dockerfile.dev
-     ports:
-       - "5008:8080"
-     environment:
-       AMQP_SERVER_URL: amqp://guest:guest@rabbitmq:5672/
-     networks:
-       - rabbitmq-network
-     volumes:
-       - ./backend/matching-service/consumer:/usr/src/app
-     depends_on:
-       matching-producer:
-         condition: service_started
-       rabbitmq:
+  matching-producer:
+    container_name: matching-producer
+    build:
+      context: ./backend/matching-service/producer
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5007:8080"
+    environment:
+      AMQP_SERVER_URL: amqp://guest:guest@rabbitmq:5672/
+    networks:
+      - peerpreps-backend
+      - rabbitmq-network
+    volumes:
+      - ./backend/matching-service/producer:/usr/src/app
+    depends_on:
+      rabbitmq:
         condition: service_healthy
-     restart: on-failure
+    restart: on-failure
 
-   rabbitmq:
-     image: "rabbitmq:3-management-alpine"
-     container_name: rabbitmq
-     networks:
-       - rabbitmq-network
-     ports:
-       - "5672:5672"
-       - "15672:15672"
-     healthcheck:
-       test: rabbitmq-diagnostics -q ping
-       interval: 5s
-       timeout: 10s
-       retries: 5
+  matching-consumer:
+    container_name: matching-consumer
+    build:
+      context: ./backend/matching-service/consumer
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5008:8080"
+    environment:
+      AMQP_SERVER_URL: amqp://guest:guest@rabbitmq:5672/
+    networks:
+      - peerpreps-backend
+      - rabbitmq-network
+    volumes:
+      - ./backend/matching-service/consumer:/usr/src/app
+    depends_on:
+      matching-producer:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    restart: on-failure
+
+  rabbitmq:
+    image: "rabbitmq:3-management-alpine"
+    container_name: rabbitmq
+    networks:
+      - peerpreps-backend
+      - rabbitmq-network
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 5s
+      timeout: 10s
+      retries: 5
 
   question-service:
       container_name: question-service
@@ -145,7 +137,7 @@ services:
       env_file:
         - ./backend/question-service/.env
       ports:
-        - "5008:8080" # Maps container port 8080 to local 5008
+        - "5009:8080" # Maps container port 8080 to local 5009
       volumes:
         - ./backend/question-service:/usr/src/app
       depends_on:

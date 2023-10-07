@@ -15,8 +15,8 @@ import { Chip } from '@nextui-org/chip';
 import { Textarea } from '@nextui-org/react';
 import { Category, Complexity, Question } from '../types/question';
 import { useForm } from 'react-hook-form';
-import { notifySuccess, notifyError } from '../components/notifications';
-import { createEntry } from '../axios/axios';
+import { notifySuccess, notifyError } from '../components/toast/notifications';
+import { POST } from '../libs/axios/axios';
 
 
 export default function QuestionAddModal({fetchQuestions}) {
@@ -35,15 +35,16 @@ export default function QuestionAddModal({fetchQuestions}) {
         ...data,
         categories: (data.categories as string).split(',') as Category[],
       };
-      createEntry('questions', modifiedData)
+      POST('questions', modifiedData)
       .then(res => {
-        if (res.message) {
+          const resData = res.data;
+        if (resData.message) {
           fetchQuestions();
-          notifySuccess(res.message);
+          notifySuccess(resData.message);
           onOpenChange();
           reset();
         } else {
-          notifyError(res.error);
+          notifyError(resData.error);
         }
       });
   });
