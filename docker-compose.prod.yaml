@@ -82,6 +82,7 @@ services:
     environment:
       AMQP_SERVER_URL: amqp://guest:guest@rabbitmq:5672/
     networks:
+      - peerpreps-backend
       - rabbitmq-network
     volumes:
       - ./backend/matching-service/producer:/usr/src/app
@@ -100,6 +101,7 @@ services:
     environment:
       AMQP_SERVER_URL: amqp://guest:guest@rabbitmq:5672/
     networks:
+      - peerpreps-backend
       - rabbitmq-network
     volumes:
       - ./backend/matching-service/consumer:/usr/src/app
@@ -114,6 +116,7 @@ services:
     image: "rabbitmq:3-management-alpine"
     container_name: rabbitmq
     networks:
+      - peerpreps-backend
       - rabbitmq-network
     ports:
       - "5672:5672"
