@@ -17,7 +17,7 @@ services:
       - ./frontend/.env
     build:
       context: ./frontend
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile.prod
     container_name: frontend
     volumes:
       - ./frontend:/usr/src/app
@@ -30,7 +30,7 @@ services:
     container_name: api-gateway
     build:
       context: ./backend/api-gateway
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile.prod
     env_file:
       - ./backend/api-gateway/.env
     ports:
@@ -47,7 +47,7 @@ services:
     container_name: collaboration-service
     build:
       context: ./backend/collaboration-service
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile.prod
     ports:
       - "5005:8080" # Maps container port 8080 to local 5005
     volumes:
@@ -59,7 +59,7 @@ services:
     container_name: user-service
     build:
       context: ./backend/user-service
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile.prod
     env_file:
       - ./backend/user-service/.env
     ports:
@@ -76,7 +76,7 @@ services:
     container_name: matching-service
     build:
       context: ./backend/matching-service
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile.prod
     ports:
       - "5007:8080" # Maps container port 8080 to local 5007
     volumes:
@@ -88,7 +88,7 @@ services:
       container_name: question-service
       build:
         context: ./backend/question-service
-        dockerfile: Dockerfile.dev
+        dockerfile: Dockerfile.prod
       env_file:
         - ./backend/question-service/.env
       ports:
