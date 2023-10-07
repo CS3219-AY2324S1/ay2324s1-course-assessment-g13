@@ -1,5 +1,5 @@
 import '../styles/globals.css';
-import Nav from './components/Nav';
+import Nav from './components/Nav/Navbar';
 import { Providers } from './providers';
 
 export default function RootLayout({ children }) {

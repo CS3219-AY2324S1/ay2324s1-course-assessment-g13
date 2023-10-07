@@ -1,11 +1,11 @@
 package main
 
 import (
-	"net/http"
+	"github.com/labstack/echo/v4"
 	"question-service/config"
 	"question-service/controllers"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 func main() {
@@ -13,15 +13,16 @@ func main() {
 	config.PopulateDb()
 	e := echo.New()
 
-	e.GET("/ping", func(c echo.Context) error {
-		return c.JSON(http.StatusOK, "I am the questions microservice")
-	})
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"http://localhost:1234"},
+		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+	}))
 
 	questionGroup := e.Group("/questions")
 	questionGroup.GET("", controllers.GetQuestions)
 	questionGroup.GET("/:id", controllers.GetQuestion)
-	questionGroup.POST("", controllers.CreateQuestion)
-	questionGroup.DELETE("/:id", controllers.DeleteQuestion)
+	questionGroup.POST("", controllers.CreateQuestion, controllers.AuthorizeAdminMiddleWare)
+	questionGroup.DELETE("/:id", controllers.DeleteQuestion, controllers.AuthorizeAdminMiddleWare)
 
 	e.Start(":8080")
 }

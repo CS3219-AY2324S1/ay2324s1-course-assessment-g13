@@ -18,7 +18,6 @@ const minDocuments int64 = 5
 
 func ConnectDb() {
 	MONGO_URI := os.Getenv("MONGO_URI")
-
 	clientOptions := options.Client().ApplyURI(MONGO_URI)
 	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {

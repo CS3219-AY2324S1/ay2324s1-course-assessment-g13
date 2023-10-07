@@ -1,0 +1,23 @@
+FROM node:18-alpine
+
+# Create the working directory inside the container
+RUN mkdir -p /usr/src/app
+
+# Set the current working directory inside the container
+WORKDIR /usr/src/app
+
+# Copy dependency files into container
+COPY package.json .
+COPY yarn.lock .
+
+# Install dependencies
+RUN yarn install
+
+# Copy src files
+COPY . .
+
+# Expose port 3000 to host machine
+EXPOSE 3000
+
+# Run dev mode
+CMD yarn dev
