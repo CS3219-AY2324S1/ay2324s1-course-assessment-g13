@@ -30,13 +30,12 @@ export default function MatchButton({inQueue, setInQueue}) {
 
   const startQueue = () => {
     setInQueue(true);
-    console.log("Queue started");
+    console.log(`Queue starting: ${inQueue}`)
     getMatch().then(r => {
       if (r.status == 200) {
         const payload = r.data;
         // If there is a match, notify success and redirect
         if (payload["match_user"] != "") {
-          console.log(payload["match_user"])
           notifySuccess(`Matched with ${payload["match_user"]}`);
           setInQueue(false);
           setSeconds(0);

@@ -76,7 +76,7 @@ func SpinMQConsumer(criteria utils.MatchCriteria) {
 				matchMakingBuffer = append(matchMakingBuffer, res)
 			}
 
-			// Match found
+			// Match found. Safe to do since single threaded within this goroutine
 			if len(matchMakingBuffer) == 2 {
 				fmt.Println("Found a match!")
 				for index, user := range matchMakingBuffer {

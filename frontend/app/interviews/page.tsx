@@ -3,10 +3,13 @@ import { useEffect, useState } from "react";
 import MatchButton from "./matchButton";
 import SetPreferencesModal from "./preferenceModal";
 import { notifySuccess } from "../components/toast/notifications";
+import {useSelector} from "react-redux";
+import {selectPreferenceState} from "../libs/redux/slices/matchPreferenceSlice";
 
 export default function Interviews() {
   const [inQueue, setInQueue] = useState(false);
   const [isMatch, setIsMatch] = useState(false);
+  const userPreference = useSelector(selectPreferenceState);
 
   // TODO: When match found set this to true
   useEffect(() => {
@@ -16,12 +19,13 @@ export default function Interviews() {
       notifySuccess("Match Found, Redirecting to Collaboration Room...");
     }
   }, [isMatch]);
-  
+
   return (
     <>
       <div className="mx-auto px-6 max-w-7xl flex flex-col justify-center text-center my-12">
         <div className="flex justify-between items-center mb-5">
           <span className="text-3xl">Interviews</span>
+          <span className="text-2xl">Current Preference: {userPreference}</span>
           <SetPreferencesModal />
         </div>
         {!inQueue && (

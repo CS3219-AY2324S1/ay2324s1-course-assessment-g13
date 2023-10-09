@@ -23,7 +23,11 @@ func MatchHandler(c echo.Context) error {
 		log.Println(msg)
 		return err
 	}
+
+	// Removes the user from our cancel buffer if they have previously tried to match and got cancelled
 	utils.ResetUser(requestBody.Username)
+
+	// TODO Reset to 30 seconds once confirmed
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	// Retrieves the appropriate channel to publish the user into
@@ -145,6 +149,7 @@ func MatchHandler(c echo.Context) error {
 					}
 					continue
 				} else {
+					// If matched user is valid, return matched user
 					resChan <- packetResponse.ResponseBody.MatchUser
 					return
 				}
@@ -159,13 +164,15 @@ func MatchHandler(c echo.Context) error {
 	// Loops infinitely until context timer is hit, or result is returned from consumer, whichever occurs first
 	for {
 		select {
+		// 30 seconds timer hit
 		case <-ctxTimer.Done():
+			// Remove user from queue
 			utils.CancelUser(requestBody.Username)
-			<-syncChan
+			<-syncChan // Reads from sync channel to allow goroutine listening to result to break out of loop
 			shouldBreak = true
 			break
 		case res := <-resChan:
-			utils.PrintCancelledUsers()
+			utils.PrintCancelledUsers() // TODO remove once live
 			matchResponseBody = models.MatchResponse{
 				MatchUser:    res,
 				MatchStatus:  1,
