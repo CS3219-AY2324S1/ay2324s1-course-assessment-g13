@@ -59,7 +59,7 @@ export default function MatchButton({inQueue, setInQueue}) {
   };
 
   const getMatch = async () => {
-    return await POST("match", {
+    return await POST("/match", {
       "username":`${userState}`,
       "match_criteria":`${preferenceState.toLowerCase()}`
     });

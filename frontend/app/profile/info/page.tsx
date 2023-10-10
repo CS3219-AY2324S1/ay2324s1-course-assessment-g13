@@ -11,7 +11,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppState } from '../../libs/redux/store';
 import { notifyError, notifySuccess } from '../../components/toast/notifications';
 import { updateUser } from '../../libs/redux/slices/userSlice';
-import {userInfo} from "os";
 
 interface UserInfo {
   username: string;
