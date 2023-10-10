@@ -6,6 +6,9 @@ WORKDIR /usr/src/app
 
 RUN go install github.com/cosmtrek/air@latest
 
+# Install air binary
+RUN curl -sSfL https://raw.githubusercontent.com/cosmtrek/air/master/install.sh | sh -s
+
 COPY . .
 
 RUN go mod tidy
@@ -13,4 +16,5 @@ RUN go mod tidy
 # Expose port 8080 to the outside world
 EXPOSE 8080
 
-CMD air
+# Command to run the executable
+CMD ["air", "-c", ".air.toml"]
