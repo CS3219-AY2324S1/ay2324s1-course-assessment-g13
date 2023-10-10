@@ -4,6 +4,7 @@ import { GET, POST } from "../../../libs/axios/axios";
 import { notifyError, notifySuccess } from "../../../components/toast/notifications";
 import { login } from "../../../libs/redux/slices/userSlice";
 import { useDispatch } from "react-redux";
+import { v4 } from "uuid";
 
 export default function OAuthCallback() {
     const param = useSearchParams();
@@ -15,6 +16,7 @@ export default function OAuthCallback() {
         try {
             const response = await GET(`/auth/login/github?code=${code}`);
             const rUser = response.data.user;
+            rUser.username = rUser.username !== "" ? rUser.username : v4();
             // Perform upsert of user login details in user service
             await POST(`users`, {
                 "user_id": rUser.id,
