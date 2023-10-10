@@ -31,8 +31,6 @@ func main() {
 	e.PUT("/users/info/:id", handlers.UpdateUserInfo)
 	e.PUT("/users/password/:id", handlers.UpdateUserPassword)
 	e.DELETE("/users/delete/:id", handlers.DeleteUser)
-
-	e.POST("/users/login", handlers.Login)
-
+	
 	e.Logger.Fatal(e.Start(":8080"))
 }
