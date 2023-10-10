@@ -11,8 +11,10 @@ export default function MatchButton({inQueue, setInQueue}) {
   const timeLimit = 30;
   const preferenceState = useSelector(selectPreferenceState)
   const userState = useSelector(selectUsername);
+
   console.log(`User: ${userState} | User preference: ${preferenceState}`)
   useEffect(() => {
+
     if (seconds == timeLimit) {
       matchNotfound();
     }
@@ -30,7 +32,6 @@ export default function MatchButton({inQueue, setInQueue}) {
 
   const startQueue = () => {
     setInQueue(true);
-    console.log(`Queue starting: ${inQueue}`)
     getMatch().then(r => {
       if (r.status == 200) {
         const payload = r.data;
