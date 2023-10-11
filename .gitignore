@@ -9,6 +9,7 @@ node_modules
 # ide configs
 .idea
 
+tmp
 *.log
 package-lock.json
 

@@ -9,6 +9,7 @@ import {
   persistReducer,
   persistStore,
 } from 'redux-persist';
+import preferenceReducer from './slices/matchPreferenceSlice';
 import questionBankReducer, { QuestionBankState } from './slices/questionBankSlice';
 import createWebStorage from 'redux-persist/lib/storage/createWebStorage';
 import userReducer, { UserState } from './slices/userSlice'
@@ -37,12 +38,13 @@ const storage = typeof window !== 'undefined' ? createWebStorage('local') : crea
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['questionBank', 'user'],
+  whitelist: ['questionBank', 'user', 'preference'],
 };
 
 const rootReducer = combineReducers({
   questionBank: questionBankReducer,
   user: userReducer,
+  preference: preferenceReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

@@ -6,7 +6,8 @@ import useAuth from '../../hooks/useAuth';
 import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@nextui-org/dropdown'
 import { Avatar } from '@nextui-org/avatar';
 import { Button } from '@nextui-org/button';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppState } from '../../libs/redux/store';
 import { useRouter } from 'next/navigation';
 import { logout } from '../../libs/redux/slices/userSlice';
 import { GET } from '../../libs/axios/axios';
@@ -16,6 +17,7 @@ const Nav = () => {
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { isAuthenticated } = useAuth();
+  const photoUrl = useSelector((state: AppState) => state.user.photoUrl);
 
   const handleLogout = async () => {
     try {
@@ -50,7 +52,7 @@ const Nav = () => {
             </Link>
           </NavbarItem>
           <NavbarItem>
-            <Link color="foreground" href="#">
+            <Link color="foreground" href="/interviews">
               Interviews
             </Link>
           </NavbarItem>
@@ -62,7 +64,7 @@ const Nav = () => {
           <NavbarItem>
             <Dropdown placement="bottom-end">
               <DropdownTrigger>
-                <Avatar showFallback isBordered as="button" color="primary" />
+                <Avatar src={photoUrl} showFallback isBordered as="button" color="primary" />
               </DropdownTrigger>
               <DropdownMenu aria-label="Profile Actions" variant="flat">
                 <DropdownItem key="profile" color="primary">
