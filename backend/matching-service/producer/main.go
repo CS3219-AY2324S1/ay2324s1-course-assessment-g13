@@ -21,7 +21,9 @@ func main() {
 		AllowMethods: []string{http.MethodGet, http.MethodPost},
 	}))
 
-	e.POST("/match", handlers.MatchHandler)
+	e.POST("/match/find", handlers.MatchHandler)
+	e.POST("/match/cancel", handlers.UserCancelHandler)
+
 	e.GET("/ping", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, "I am the matching producer microservice")
 	})

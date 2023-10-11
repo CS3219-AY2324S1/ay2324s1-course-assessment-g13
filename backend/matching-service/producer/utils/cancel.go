@@ -5,7 +5,6 @@ import "fmt"
 var cancelledUsers []string
 
 func IsUserCancelled(user string) bool {
-	fmt.Println("Checking if user is cancelled: " + user)
 	for _, cancelledUser := range cancelledUsers {
 		if cancelledUser == user {
 			return true
@@ -30,7 +29,8 @@ func ResetUser(userToCancel string) {
 }
 
 func CancelUser(user string) {
-	cancelledUsers = append(cancelledUsers, user)
+	ResetUser(user)                               // Resets user first
+	cancelledUsers = append(cancelledUsers, user) // Then cancel to prevent duplicates
 }
 
 func PrintCancelledUsers() {
