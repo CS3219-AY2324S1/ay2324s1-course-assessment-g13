@@ -126,7 +126,6 @@ func MatchHandler(c echo.Context) error {
 					return
 				}
 				matchedUser := packetResponse.ResponseBody.MatchUser
-				log.Printf("[Debug] Matched User: %s", matchedUser)
 				// Check if matched user is already out of queue
 				if utils.IsUserCancelled(matchedUser) {
 					// Publishes the user request into the selected MQ

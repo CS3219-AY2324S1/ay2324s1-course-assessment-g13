@@ -20,7 +20,6 @@ func UserCancelHandler(c echo.Context) error {
 		return err
 	}
 	// Indicate user has cancelled
-	log.Printf("[Debug] Cancelling %s\n", requestBody.Username)
 	utils.CancelUser(requestBody.Username)
 
 	cancelResponseBody := models.CancelResponse{CancelStatus: true}

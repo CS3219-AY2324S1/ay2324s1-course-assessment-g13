@@ -47,10 +47,8 @@ export default function MatchButton({inQueue, setInQueue, setSeconds, matchNotfo
   }
 
   const cancelQueue = () => {
-    console.log("Cancel queue button clicked")
     // Sends API request to matching service to indicate user has cancelled
     cancelMatch().then(res => {
-        console.log(`Response received for cancelling | ${res.data["cancel_status"]}`);
         setIsCancelled(true);
         setInQueue(false);
         setSeconds(0);
