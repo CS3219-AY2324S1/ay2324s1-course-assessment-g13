@@ -1,37 +1,18 @@
-import {Button, user} from "@nextui-org/react";
-import {notifyError, notifySuccess, notifyWarning} from "../components/toast/notifications";
-import { useEffect, useState } from "react";
+import {Button} from "@nextui-org/react";
+import {notifySuccess, notifyWarning} from "../components/toast/notifications";
 import {useSelector} from "react-redux";
 import {selectPreferenceState} from "../libs/redux/slices/matchPreferenceSlice";
 import {POST} from "../libs/axios/axios";
 import {selectUsername} from "../libs/redux/slices/userSlice";
 
-export default function MatchButton({inQueue, setInQueue}) {
-  const [seconds, setSeconds] = useState(0);
-  const timeLimit = 30;
+export default function MatchButton({inQueue, setInQueue, setSeconds, matchNotfound, setIsCancelled, setShouldNotifyCancelled}) {
   const preferenceState = useSelector(selectPreferenceState)
   const userState = useSelector(selectUsername);
 
-  console.log(`User: ${userState} | User preference: ${preferenceState}`)
-  useEffect(() => {
-
-    if (seconds == timeLimit) {
-      matchNotfound();
-    }
-
-    let timer = null;
-    if (inQueue) {
-      timer = setInterval(() => {
-        setSeconds((seconds) => seconds + 1);
-      }, 1000);
-    }
-    return () => {
-      clearInterval(timer);
-    };
-  }, [inQueue, seconds]);
-
   const startQueue = () => {
     setInQueue(true);
+    setIsCancelled(false);
+    setShouldNotifyCancelled(false);
     getMatch().then(r => {
       if (r.status == 200) {
         const payload = r.data;
@@ -52,12 +33,6 @@ export default function MatchButton({inQueue, setInQueue}) {
     });
   }
 
-  const matchNotfound = () => {
-    setInQueue(false);
-    setSeconds(0);
-    notifyError("Timeout! No suitable partner was found")
-  };
-
   const getMatch = async () => {
     return await POST("/match", {
       "username":`${userState}`,
@@ -66,6 +41,7 @@ export default function MatchButton({inQueue, setInQueue}) {
   };
 
   const cancelQueue = () => {
+    setIsCancelled(true);
     setInQueue(false);
     setSeconds(0);
     notifyWarning("Queue cancelled!");

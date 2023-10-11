@@ -2,14 +2,46 @@
 import { useEffect, useState } from "react";
 import MatchButton from "./matchButton";
 import SetPreferencesModal from "./preferenceModal";
-import { notifySuccess } from "../components/toast/notifications";
+import {notifyError, notifySuccess} from "../components/toast/notifications";
 import {useSelector} from "react-redux";
 import {selectPreferenceState} from "../libs/redux/slices/matchPreferenceSlice";
 
 export default function Interviews() {
   const [inQueue, setInQueue] = useState(false);
   const [isMatch, setIsMatch] = useState(false);
+  const [isCancelled, setIsCancelled] = useState(false);
+  const [shouldNotifyCancelled, setShouldNotifyCancelled] = useState(false);
+  const [seconds, setSeconds] = useState(0);
   const userPreference = useSelector(selectPreferenceState);
+  const timeLimit = 30;
+
+  const matchNotfound = () => {
+    setSeconds(0);
+    setInQueue(false);
+    setShouldNotifyCancelled(true);
+  };
+
+  useEffect(() => {
+    if (!isCancelled && shouldNotifyCancelled) {
+      notifyError("Timeout! No suitable partner was found");
+    }
+  }, [isCancelled, shouldNotifyCancelled]);
+
+  useEffect(() => {
+    if (seconds == timeLimit) {
+      matchNotfound();
+    }
+    let timer = null;
+    if (inQueue) {
+      timer = setInterval(() => {
+        setSeconds((seconds) => seconds + 1);
+      }, 1000);
+    }
+    return () => {
+      clearInterval(timer);
+    };
+  }, [inQueue, seconds]);
+
 
   // TODO: When match found set this to true
   useEffect(() => {
@@ -39,12 +71,15 @@ export default function Interviews() {
         {inQueue && (
           <div>
             <p className="text-3xl font-extrabold my-6">Looking for a partner...</p>
+            <p className="text-2xl font-semibold my-6 text-teal-400">Time Elapsed: {seconds} seconds</p>
             <p className="text-2xl font-semibold my-6">
               You can end the search by clicking the cancel button!
             </p>
           </div>
         )}
-        <MatchButton inQueue={inQueue} setInQueue={setInQueue}/>
+        <MatchButton inQueue={inQueue} setInQueue={setInQueue} setSeconds={setSeconds}
+                     matchNotfound={matchNotfound} setIsCancelled={setIsCancelled}
+                    setShouldNotifyCancelled={setShouldNotifyCancelled} />
       </div>
     </>
   );

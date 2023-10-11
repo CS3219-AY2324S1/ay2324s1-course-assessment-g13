@@ -27,8 +27,7 @@ func MatchHandler(c echo.Context) error {
 	// Removes the user from our cancel buffer if they have previously tried to match and got cancelled
 	utils.ResetUser(requestBody.Username)
 
-	// TODO Reset to 30 seconds once confirmed
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	// Retrieves the appropriate channel to publish the user into
 	var channel *amqp.Channel
@@ -105,9 +104,8 @@ func MatchHandler(c echo.Context) error {
 		return err
 	}
 
-	// TODO set to 3 seconds for testing, reset to 30 for actual implementation
 	// Counts 30 seconds
-	ctxTimer, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	ctxTimer, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
 	syncChan := make(chan int)   // Used to break consumer goroutine once timeout hits
