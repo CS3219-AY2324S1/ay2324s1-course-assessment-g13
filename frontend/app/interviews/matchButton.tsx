@@ -34,18 +34,27 @@ export default function MatchButton({inQueue, setInQueue, setSeconds, matchNotfo
   }
 
   const getMatch = async () => {
-    return await POST("/match", {
+    return await POST("/match/find", {
       "username":`${userState}`,
       "match_criteria":`${preferenceState.toLowerCase()}`
     });
   };
 
-  const cancelQueue = () => {
-    setIsCancelled(true);
-    setInQueue(false);
-    setSeconds(0);
-    notifyWarning("Queue cancelled!");
+  const cancelMatch = async () => {
+    return await POST("/match/cancel", {
+      "username": `${userState}`
+    });
   }
+
+  const cancelQueue = () => {
+    // Sends API request to matching service to indicate user has cancelled
+    cancelMatch().then(res => {
+        setIsCancelled(true);
+        setInQueue(false);
+        setSeconds(0);
+        notifyWarning("Queue cancelled!");
+    });
+  };
 
   return  (
     <div className="mt-6 mx-auto w-2/5 flex justify-between">

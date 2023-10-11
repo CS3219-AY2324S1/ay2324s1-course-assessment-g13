@@ -146,6 +146,9 @@ func MatchHandler(c echo.Context) error {
 						return
 					}
 					continue
+				} else if utils.IsUserCancelled(requestBody.Username) {
+					// If user is already cancelled, cancel the timer
+					cancel()
 				} else {
 					// If matched user is valid, return matched user
 					resChan <- packetResponse.ResponseBody.MatchUser
@@ -188,7 +191,7 @@ func MatchHandler(c echo.Context) error {
 		MatchUser:    "",
 		MatchStatus:  0,
 		RedirectURL:  "https://google.com",
-		ErrorMessage: "Match not found within 3 seconds.",
+		ErrorMessage: "Match not found within 30 seconds.",
 	}
 
 	return c.JSON(http.StatusOK, matchResponseBody)

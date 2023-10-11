@@ -11,3 +11,11 @@ type MatchResponse struct {
 	RedirectURL  string `json:"redirect_url"`
 	ErrorMessage string `json:"error_message"`
 }
+
+type CancelRequest struct {
+	Username string `json:"username"`
+}
+
+type CancelResponse struct {
+	CancelStatus bool `json:"cancel_status"` // True means cancel success, false means failure
+}

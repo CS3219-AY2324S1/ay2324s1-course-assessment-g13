@@ -76,6 +76,14 @@ func SpinMQConsumer(criteria utils.MatchCriteria) {
 				matchMakingBuffer = append(matchMakingBuffer, res)
 			}
 
+			// Just for assignment 5 PDF buffer illustration
+			log.Printf(" > Received message: %s with buffer size %d\n", res, len(matchMakingBuffer))
+			log.Printf("----- Current Queue (%d) -----\n", len(matchMakingBuffer))
+			for _, v := range matchMakingBuffer {
+				log.Printf("%s\n", v.RequestBody.Username)
+			}
+			log.Printf("----- End of Queue -----\n")
+
 			// Match found. Safe to do since single threaded within this goroutine
 			if len(matchMakingBuffer) == 2 {
 				fmt.Println("Found a match!")
@@ -125,8 +133,6 @@ func SpinMQConsumer(criteria utils.MatchCriteria) {
 				}
 				matchMakingBuffer = nil
 			}
-
-			log.Printf(" > Received message: %s with buffer size %d\n", res, len(matchMakingBuffer))
 		}
 	}()
 }
