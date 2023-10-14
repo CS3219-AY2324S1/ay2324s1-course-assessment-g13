@@ -16,6 +16,12 @@ func Logout(c echo.Context) error {
 	}
 	c.SetCookie(cookie_)
 
+	cookie_, statusCode, responseMessage = cookie.Service.SetCookieExpires(c.Cookie(REFRESH_TOKEN_COOKIE_NAME))
+	if statusCode != http.StatusOK {
+		return c.JSON(statusCode, message.CreateErrorMessage(responseMessage))
+	}
+	c.SetCookie(cookie_)
+
 	return c.JSON(http.StatusOK, message.CreateSuccessMessage(SUCCESS_LOGOUT))
 }
 
