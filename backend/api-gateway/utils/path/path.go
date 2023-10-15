@@ -12,4 +12,5 @@ const (
 	ALL_USER_SERVICE     = "/users*"
 	ALL_QUESTION_SERVICE = "/questions*"
 	ALL_MATCHING_SERVICE = "/match*"
+	ALL_COLLAB_SERVICE   = "/ws*"
 )

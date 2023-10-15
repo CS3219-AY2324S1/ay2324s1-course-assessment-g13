@@ -16,6 +16,6 @@ type MessageQueueResponsePacket struct {
 type MatchResponse struct {
 	MatchUser    string `json:"match_user"`
 	MatchStatus  int    `json:"match_status"`
-	RedirectURL  string `json:"redirect_url"`
+	RoomId  string `json:"room_id"`
 	ErrorMessage string `json:"error_message"`
 }

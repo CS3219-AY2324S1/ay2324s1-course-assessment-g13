@@ -8,7 +8,7 @@ type MatchRequest struct {
 type MatchResponse struct {
 	MatchUser    string `json:"match_user"`
 	MatchStatus  int    `json:"match_status"` // 0 is failure, 1 is success
-	RedirectURL  string `json:"redirect_url"`
+	RoomId  string `json:"room_id"`
 	ErrorMessage string `json:"error_message"`
 }
 

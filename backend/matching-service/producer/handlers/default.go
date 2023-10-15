@@ -109,7 +109,7 @@ func MatchHandler(c echo.Context) error {
 	defer cancel()
 
 	syncChan := make(chan int)   // Used to break consumer goroutine once timeout hits
-	resChan := make(chan string) // Used to pass result from consumer goroutine to main thread
+	resChan := make(chan models.MatchResponse) // Used to pass result from consumer goroutine to main thread
 
 	// Spins off consumer goroutine to listen to results channel
 	go func(syncChan chan int) {
@@ -151,7 +151,7 @@ func MatchHandler(c echo.Context) error {
 					cancel()
 				} else {
 					// If matched user is valid, return matched user
-					resChan <- packetResponse.ResponseBody.MatchUser
+					resChan <- packetResponse.ResponseBody
 					return
 				}
 			}
@@ -175,9 +175,9 @@ func MatchHandler(c echo.Context) error {
 		case res := <-resChan:
 			utils.PrintCancelledUsers() // TODO remove once live
 			matchResponseBody = models.MatchResponse{
-				MatchUser:    res,
+				MatchUser:    res.MatchUser,
 				MatchStatus:  1,
-				RedirectURL:  "https://google.com",
+				RoomId:  res.RoomId,
 				ErrorMessage: "",
 			}
 			return c.JSON(http.StatusOK, matchResponseBody)
@@ -190,7 +190,7 @@ func MatchHandler(c echo.Context) error {
 	matchResponseBody = models.MatchResponse{
 		MatchUser:    "",
 		MatchStatus:  0,
-		RedirectURL:  "https://google.com",
+		RoomId:  "",
 		ErrorMessage: "Match not found within 30 seconds.",
 	}
 

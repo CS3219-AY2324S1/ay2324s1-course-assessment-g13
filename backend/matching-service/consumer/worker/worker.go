@@ -7,6 +7,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"os"
+	// "io"
+	"bytes"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"log"
 	"time"
@@ -87,12 +91,36 @@ func SpinMQConsumer(criteria utils.MatchCriteria) {
 			// Match found. Safe to do since single threaded within this goroutine
 			if len(matchMakingBuffer) == 2 {
 				fmt.Println("Found a match!")
+				// TODO: create room here
+				reqBody, err := json.Marshal(map[string]string{
+					"user1": matchMakingBuffer[0].RequestBody.Username,
+					"user2": matchMakingBuffer[1].RequestBody.Username,
+				})
+				if err != nil {
+					log.Fatal(err)
+				}
+				resp, err := http.Post(os.Getenv("COLLAB_URL") + "/room", "application/json", bytes.NewBuffer(reqBody))
+				if err != nil {
+					log.Fatal(err)
+					return
+				}
+				defer resp.Body.Close()
+				body := map[string]interface{}{}
+				json.NewDecoder(resp.Body).Decode(&body)
+				log.Println(body["Id"])
+
+				// body, err := io.ReadAll(resp.Body)
+				// if err != nil {
+				// 	log.Fatal(err)
+				// }
+				// log.Println(string(body))
+				
 				for index, user := range matchMakingBuffer {
 					pubMsg := models.MessageQueueResponsePacket{
 						ResponseBody: models.MatchResponse{
 							MatchUser:    matchMakingBuffer[(index+1)%2].RequestBody.Username,
 							MatchStatus:  1,
-							RedirectURL:  "https://google.com", // Redirect link to collaboration site
+							RoomId:  body["Id"].(string),
 							ErrorMessage: "",
 						},
 					}
