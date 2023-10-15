@@ -22,6 +22,7 @@ export default function MatchButton({inQueue, setInQueue, setSeconds, matchNotfo
           setInQueue(false);
           setSeconds(0);
           // TODO perform redirection here based on payload redirect url
+          console.log(payload["room_id"])
         } else {
           matchNotfound()
         }
