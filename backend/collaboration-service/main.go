@@ -19,5 +19,6 @@ func main() {
 		return c.String(http.StatusOK, "I am the collaboration microservice!")
 	})
 	e.POST("/room", wsHandler.CreateRoom)
+	e.GET("/ws/:roomId", wsHandler.JoinRoom)
 	e.Logger.Fatal(e.Start(":8080"))
 }

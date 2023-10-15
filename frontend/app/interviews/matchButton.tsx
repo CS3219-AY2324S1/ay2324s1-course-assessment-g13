@@ -23,6 +23,8 @@ export default function MatchButton({inQueue, setInQueue, setSeconds, matchNotfo
           setSeconds(0);
           // TODO perform redirection here based on payload redirect url
           console.log(payload["room_id"])
+          const ws = new WebSocket(`ws://localhost:5005/ws/${payload["room_id"]}`)
+          // TODO: router push to collaboration page
         } else {
           matchNotfound()
         }

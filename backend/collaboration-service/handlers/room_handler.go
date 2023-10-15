@@ -62,6 +62,9 @@ func (h *Handler) CreateRoom(c echo.Context) error {
 var upgrader = websocket.Upgrader{
     ReadBufferSize: 1024,
     WriteBufferSize: 1024,
+    CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
 }
 
 func (h *Handler) JoinRoom(c echo.Context) error {
@@ -70,6 +73,8 @@ func (h *Handler) JoinRoom(c echo.Context) error {
         log.Printf("error upgrade: %s\n", err.Error())
         return c.JSON(http.StatusBadRequest, "Error joining room")
     }
+
+    log.Println("Attempting to join room")
 
     roomId := c.Param("roomId")
     user := &User{
