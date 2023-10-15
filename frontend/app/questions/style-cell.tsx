@@ -8,7 +8,7 @@ interface StyleCellProps {
   isAdmin: boolean,
   item: Question & { listId: number };
   columnKey: Key;
-  fetchQuestions: () => void;
+  fetchQuestions?: () => void;
 }
 
 const StyleCell: React.FC<StyleCellProps> = ({ isAdmin, item, columnKey, fetchQuestions }) => {

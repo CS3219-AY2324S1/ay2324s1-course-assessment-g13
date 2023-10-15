@@ -9,9 +9,12 @@ import {
   Tooltip,
 } from '@nextui-org/react';
 import { EyeIcon } from '../../../public/EyeIcon';
+import DOMPurify from 'dompurify'
 
 const QuestionDescriptionModal = ({ title, description }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
+  const sanitizedHTML = { __html: DOMPurify.sanitize(description) };
 
   return (
     <>
@@ -22,12 +25,12 @@ const QuestionDescriptionModal = ({ title, description }) => {
           </span>
         </Button>
       </Tooltip>
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="2xl">
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="3xl" scrollBehavior='inside' className='h-4/5'>
         <ModalContent className='fit-content'>
           {onClose => (
             <>
               <ModalHeader className="flex flex-col gap-1">{title}</ModalHeader>
-              <ModalBody className="whitespace-pre-line">{description}</ModalBody>
+              <ModalBody className="whitespace-pre-line"><div dangerouslySetInnerHTML={sanitizedHTML} /></ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="light" onPress={onClose}>
                   Close

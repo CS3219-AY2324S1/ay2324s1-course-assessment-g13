@@ -1864,6 +1864,13 @@
   dependencies:
     "@types/color-convert" "*"
 
+"@types/dompurify@^3.0.3":
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/@types/dompurify/-/dompurify-3.0.3.tgz#d34ba1cf4f8b8f2cbfe5d3118dc3b7d81858fa42"
+  integrity sha512-odiGr/9/qMqjcBOe5UhcNLOFHSYmKFOyr+bJ/Xu3Qp4k1pNPAlNLUVNNLcLfjQI7+W7ObX58EdD3H+3p3voOvA==
+  dependencies:
+    "@types/trusted-types" "*"
+
 "@types/flat@^5.0.2":
   version "5.0.2"
   resolved "https://registry.npmjs.org/@types/flat/-/flat-5.0.2.tgz"
@@ -1999,6 +2006,11 @@
   version "2.0.1"
   resolved "https://registry.npmjs.org/@types/stack-utils/-/stack-utils-2.0.1.tgz"
   integrity sha512-Hl219/BT5fLAaz6NDkSuhzasy49dwQS/DSdu4MdggFB8zcXv7vflBI3xp7FEmkmdDkBUI2bPUNeMttp2knYdxw==
+
+"@types/trusted-types@*":
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/@types/trusted-types/-/trusted-types-2.0.4.tgz#2b38784cd16957d3782e8e2b31c03bc1d13b4d65"
+  integrity sha512-IDaobHimLQhjwsQ/NMwRVfa/yL7L/wriQPMhw1ZJall0KX6E1oxk29XMDeilW5qTIg5aoiqf5Udy8U/51aNoQQ==
 
 "@types/use-sync-external-store@^0.0.3":
   version "0.0.3"
@@ -2585,6 +2597,11 @@ doctrine@^3.0.0:
   integrity sha512-yS+Q5i3hBf7GBkd4KG8a7eBNNWNGLTaEwwYWUijIYM7zrlYDM0BFXHjjPWlWZ1Rg7UaddZeIDmi9jF3HmqiQ2w==
   dependencies:
     esutils "^2.0.2"
+
+dompurify@^3.0.6:
+  version "3.0.6"
+  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-3.0.6.tgz#925ebd576d54a9531b5d76f0a5bef32548351dae"
+  integrity sha512-ilkD8YEnnGh1zJ240uJsW7AzE+2qpbOUYjacomn3AvJ6J4JhKGSZ2nh4wUIXPZrEPppaCLx5jFe8T89Rk8tQ7w==
 
 electron-to-chromium@^1.4.477:
   version "1.4.512"
