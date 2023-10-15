@@ -5,10 +5,8 @@ go 1.20
 require github.com/labstack/echo/v4 v4.11.1
 
 require (
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/gorilla/context v1.1.1 // indirect
 	github.com/gorilla/securecookie v1.1.1 // indirect
-	github.com/joho/godotenv v1.5.1 // indirect
 )
 
 require (
@@ -23,7 +21,6 @@ require (
 	github.com/jackc/pgx/v5 v5.3.1 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
-	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/echo-contrib v0.15.0
 	github.com/labstack/gommon v0.4.0 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
