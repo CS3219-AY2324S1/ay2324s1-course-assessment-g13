@@ -14,15 +14,24 @@ import (
 )
 
 func GetQuestion(c echo.Context) error {
-	questionID, err := primitive.ObjectIDFromHex(c.Param("id"))
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, "Invalid ID format")
+	complexity := c.Param("complexity")
+	filter := bson.M{"complexity": complexity}
+	pipeline := []bson.M{
+		{"$match": filter},
+		{"$sample": bson.M{"size": 1}},
 	}
+	cursor, err := config.Collection.Aggregate(context.TODO(), pipeline)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, "Failed to retrieve questions")
+	}
+	defer cursor.Close(context.TODO())
 
 	question := models.Question{}
-	err = config.Collection.FindOne(context.TODO(), bson.M{"_id": questionID}).Decode(&question)
-	if err == mongo.ErrNoDocuments {
-		return c.JSON(http.StatusNotFound, "Specified question does not exist")
+	if cursor.Next(context.TODO()) {
+		err := cursor.Decode(&question)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, "Failed to decode questions")
+		}
 	}
 
 	return c.JSON(http.StatusOK, question)
