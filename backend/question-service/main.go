@@ -21,7 +21,8 @@ func main() {
 
 	questionGroup := e.Group("/questions")
 	questionGroup.GET("", controllers.GetQuestions)
-	questionGroup.GET("/:complexity", controllers.GetQuestion)
+	questionGroup.GET("/complexity/:complexity", controllers.GetRandomQuestionId)
+	questionGroup.GET("/:id", controllers.GetQuestion)
 	questionGroup.POST("", controllers.CreateQuestion, controllers.AuthorizeAdminMiddleWare)
 	questionGroup.DELETE("/:id", controllers.DeleteQuestion, controllers.AuthorizeAdminMiddleWare)
 

@@ -14,6 +14,21 @@ import (
 )
 
 func GetQuestion(c echo.Context) error {
+	questionID, err := primitive.ObjectIDFromHex(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "Invalid ID format")
+	}
+
+	question := models.Question{}
+	err = config.Collection.FindOne(context.TODO(), bson.M{"_id": questionID}).Decode(&question)
+	if err == mongo.ErrNoDocuments {
+		return c.JSON(http.StatusNotFound, "Specified question does not exist")
+	}
+
+	return c.JSON(http.StatusOK, question)
+}
+
+func GetRandomQuestionId(c echo.Context) error {
 	complexity := c.Param("complexity")
 	filter := bson.M{"complexity": complexity}
 	pipeline := []bson.M{
@@ -34,7 +49,7 @@ func GetQuestion(c echo.Context) error {
 		}
 	}
 
-	return c.JSON(http.StatusOK, question)
+	return c.JSON(http.StatusOK, question.Id)
 }
 
 func GetQuestions(c echo.Context) error {
@@ -92,45 +107,5 @@ func DeleteQuestion(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, "Specified question does not exist")
 	}
 
-	return c.JSON(http.StatusOK, map[string]string{"message": "Question deleted successfully"})
-}
-
-func EditQuestion(c echo.Context) error {
-	objectID, err := primitive.ObjectIDFromHex(c.Param("id"))
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid ID format"})
-	}
-
-	collection := config.Collection
-	existingQuestion := models.Question{}
-	err = collection.FindOne(context.TODO(), bson.M{"_id": objectID}).Decode(&existingQuestion)
-	if err == mongo.ErrNoDocuments {
-		return c.JSON(http.StatusNotFound, map[string]string{"error": "Specified question does not exist"})
-	}
-
-	var request models.EditRequest
-	if err := c.Bind(&request); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Failed to bind request data"})
-	}
-
-	validator := validator.New()
-	if err := validator.Struct(request); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
-	}
-
-	if request.Title != "" {
-		filter := bson.M{
-			"_id":   bson.M{"$ne": objectID},
-			"title": bson.M{"$regex": primitive.Regex{Pattern: request.Title, Options: "i"}},
-		}
-		if err = collection.FindOne(context.TODO(), filter).Err(); err == nil {
-			return c.JSON(http.StatusConflict, map[string]string{"error": "Another question with this title already exists"})
-		}
-	}
-
-	if _, err = collection.UpdateByID(context.Background(), objectID, bson.M{"$set": request}); err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
-	}
-
-	return c.JSON(http.StatusOK, map[string]string{"message": "Question successfully updated"})
+	return c.JSON(http.StatusOK, "Question deleted successfully")
 }

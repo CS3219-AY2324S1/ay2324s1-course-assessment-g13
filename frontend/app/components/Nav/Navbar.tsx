@@ -35,8 +35,12 @@ const Nav = () => {
     setIsLoggedIn(isAuthenticated);
   }, [isAuthenticated])
 
-  const checkPath = (url) => {
+  const checkPath = (url : string) => {
     return pathname === url;
+  }
+
+  const displayQuitMsg = () => {
+    
   }
 
   return (
@@ -65,6 +69,16 @@ const Nav = () => {
         </NavbarContent>
       </>
       }
+      {checkPath("/collab") && (
+        <Button
+          color="danger" 
+          variant="solid" 
+          className="text-lg" 
+          onPress={displayQuitMsg}
+        >
+          End Collaboration
+        </Button>
+      )}
       {isLoggedIn ? 
         <NavbarContent justify="end">
           <NavbarItem>
