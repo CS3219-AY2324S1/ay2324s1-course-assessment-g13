@@ -5,9 +5,25 @@ import { Category, Complexity, ComplexityToColor, Question } from '../types/ques
 import { GET } from "../libs/axios/axios";
 import { notifyError } from '../components/toast/notifications';
 import Editor from '@monaco-editor/react';
+import { useSelector } from 'react-redux';
+import { selectCollabState, setIsLeaving } from '../libs/redux/slices/collabSlice';
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter
+} from '@nextui-org/modal';
 import { Button } from '@nextui-org/react';
+import { useDispatch } from 'react-redux';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function Collab() {
+  const collabState = useSelector(selectCollabState);
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const roomId = searchParams.get('room_id');
   const [question, setQuestion] = useState<Question>({
     id: "",
     title: "",
@@ -40,6 +56,11 @@ export default function Collab() {
     }
   };
 
+  const exitRoom = () => {
+    dispatch(setIsLeaving(false));
+    router.push('/');
+  }
+
   return (
     <div className="flex">
       <div className="w-1/2 m-8" style={{backgroundColor: '#1e1e1e'}}>
@@ -66,14 +87,8 @@ export default function Collab() {
           <h2 className='mb-2'>Editor</h2>
           <p>Current Language: Python</p>
         </div>
-        <Editor
-          height="80vh"
-          theme="vs-dark"
-          defaultLanguage="python"
-          defaultValue="# Type answer here"
-          onChange={handleEditorChange}
-          options={editorOptions}
-        />
+        <Editor height="80vh" theme="vs-dark" defaultLanguage="python"
+         defaultValue="# Type answer here" options={editorOptions}/>
       </div>
     </div>
   )

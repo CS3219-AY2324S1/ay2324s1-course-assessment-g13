@@ -12,6 +12,7 @@ import { useRouter } from 'next/navigation';
 import { logout } from '../../libs/redux/slices/userSlice';
 import { GET } from '../../libs/axios/axios';
 import { usePathname } from 'next/navigation';
+import { setIsLeaving } from '../../libs/redux/slices/collabSlice';
 
 const Nav = () => {
   const dispatch = useDispatch();
@@ -37,10 +38,6 @@ const Nav = () => {
 
   const checkPath = (url : string) => {
     return pathname === url;
-  }
-
-  const displayQuitMsg = () => {
-    
   }
 
   return (
@@ -74,7 +71,7 @@ const Nav = () => {
           color="danger" 
           variant="solid" 
           className="text-lg" 
-          onPress={displayQuitMsg}
+          onPress={() => dispatch(setIsLeaving(true))}
         >
           End Collaboration
         </Button>
