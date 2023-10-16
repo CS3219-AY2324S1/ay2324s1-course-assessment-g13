@@ -26,6 +26,10 @@ export default function Collab() {
     }
   };
 
+  const handleEditorChange = (value: string, event) => {
+    console.log(value);
+  }
+
   useEffect(() => {
     fetchQuestion('Easy');
   }, []);
@@ -62,8 +66,14 @@ export default function Collab() {
           <h2 className='mb-2'>Editor</h2>
           <p>Current Language: Python</p>
         </div>
-        <Editor height="80vh" theme="vs-dark" defaultLanguage="python"
-         defaultValue="# Type answer here" options={editorOptions}/>
+        <Editor
+          height="80vh"
+          theme="vs-dark"
+          defaultLanguage="python"
+          defaultValue="# Type answer here"
+          onChange={handleEditorChange}
+          options={editorOptions}
+        />
       </div>
     </div>
   )
