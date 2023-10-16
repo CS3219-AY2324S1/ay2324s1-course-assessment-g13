@@ -39,6 +39,7 @@ export default function MatchButton({inQueue, setInQueue, setSeconds, matchNotfo
   }
 
   const redirectToCollab = () => {  
+    // Just to match with toast timer, preference whether to instant redirect or not
     const redirectTimer = setTimeout(() => {
       router.push('/collab');
     }, 6000);

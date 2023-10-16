@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import MatchButton from "./matchButton";
 import SetPreferencesModal from "./preferenceModal";
-import {notifyError, notifySuccess} from "../components/toast/notifications";
+import {notifyError} from "../components/toast/notifications";
 import {useSelector} from "react-redux";
 import {selectPreferenceState} from "../libs/redux/slices/matchPreferenceSlice";
 
