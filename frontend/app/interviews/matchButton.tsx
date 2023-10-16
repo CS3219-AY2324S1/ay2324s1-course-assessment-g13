@@ -4,10 +4,12 @@ import {useSelector} from "react-redux";
 import {selectPreferenceState} from "../libs/redux/slices/matchPreferenceSlice";
 import {POST} from "../libs/axios/axios";
 import {selectUsername} from "../libs/redux/slices/userSlice";
+import { useRouter } from 'next/navigation';
 
 export default function MatchButton({inQueue, setInQueue, setSeconds, matchNotfound, setIsCancelled, setShouldNotifyCancelled}) {
   const preferenceState = useSelector(selectPreferenceState)
   const userState = useSelector(selectUsername);
+  const router = useRouter();
 
   const startQueue = () => {
     setInQueue(true);
@@ -18,13 +20,13 @@ export default function MatchButton({inQueue, setInQueue, setSeconds, matchNotfo
         const payload = r.data;
         // If there is a match, notify success and redirect
         if (payload["match_user"] != "") {
-          notifySuccess(`Matched with ${payload["match_user"]}`);
+          notifySuccess(`Matched with ${payload["match_user"]}, redirecting to collaboration room...`);
           setInQueue(false);
           setSeconds(0);
           // TODO perform redirection here based on payload redirect url
           console.log(payload["room_id"])
           const ws = new WebSocket(`ws://localhost:5005/ws/${payload["room_id"]}`)
-          // TODO: router push to collaboration page
+          redirectToCollab();
         } else {
           matchNotfound()
         }
@@ -34,6 +36,15 @@ export default function MatchButton({inQueue, setInQueue, setSeconds, matchNotfo
         return
       }
     });
+  }
+
+  const redirectToCollab = () => {  
+    const redirectTimer = setTimeout(() => {
+      router.push('/collab');
+    }, 6000);
+    return () => {
+      clearTimeout(redirectTimer);
+    }
   }
 
   const getMatch = async () => {

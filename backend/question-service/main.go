@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/labstack/echo/v4"
 	"question-service/config"
 	"question-service/controllers"
+
+	"github.com/labstack/echo/v4"
 
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -20,6 +21,7 @@ func main() {
 
 	questionGroup := e.Group("/questions")
 	questionGroup.GET("", controllers.GetQuestions)
+	questionGroup.GET("/complexity/:complexity", controllers.GetRandomQuestionId)
 	questionGroup.GET("/:id", controllers.GetQuestion)
 	questionGroup.POST("", controllers.CreateQuestion, controllers.AuthorizeAdminMiddleWare)
 	questionGroup.DELETE("/:id", controllers.DeleteQuestion, controllers.AuthorizeAdminMiddleWare)

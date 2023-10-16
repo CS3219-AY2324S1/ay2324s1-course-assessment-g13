@@ -11,6 +11,7 @@ import { AppState } from '../../libs/redux/store';
 import { useRouter } from 'next/navigation';
 import { logout } from '../../libs/redux/slices/userSlice';
 import { GET } from '../../libs/axios/axios';
+import { usePathname } from 'next/navigation';
 
 const Nav = () => {
   const dispatch = useDispatch();
@@ -18,6 +19,7 @@ const Nav = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { isAuthenticated } = useAuth();
   const photoUrl = useSelector((state: AppState) => state.user.photoUrl);
+  const pathname = usePathname();
 
   const handleLogout = async () => {
     try {
@@ -33,32 +35,50 @@ const Nav = () => {
     setIsLoggedIn(isAuthenticated);
   }, [isAuthenticated])
 
+  const checkPath = (url : string) => {
+    return pathname === url;
+  }
+
+  const displayQuitMsg = () => {
+    
+  }
+
   return (
     <Navbar
       isBordered
       maxWidth="xl"
     >
       <NavbarBrand>
-        <Link href={isLoggedIn ? "/questions" : "/"} className="font-bold text-inherit">
+        <Link href={isLoggedIn && !checkPath("/collab") ? "/questions" : "#"} className="font-bold text-inherit">
           PeerPrep
         </Link>
       </NavbarBrand>
-      {isLoggedIn &&
+      {(isLoggedIn && !checkPath("/collab")) &&
       <>
         <NavbarContent justify="center">
           <NavbarItem isActive>
-            <Link href="/questions" aria-current="page">
+            <Link color={checkPath("/questions") ? 'primary' : 'foreground'} href="/questions" aria-current="page">
               Questions
             </Link>
           </NavbarItem>
           <NavbarItem>
-            <Link color="foreground" href="/interviews">
+            <Link color={checkPath("/interviews") ? 'primary' : 'foreground'} href="/interviews">
               Interviews
             </Link>
           </NavbarItem>
         </NavbarContent>
       </>
       }
+      {checkPath("/collab") && (
+        <Button
+          color="danger" 
+          variant="solid" 
+          className="text-lg" 
+          onPress={displayQuitMsg}
+        >
+          End Collaboration
+        </Button>
+      )}
       {isLoggedIn ? 
         <NavbarContent justify="end">
           <NavbarItem>
@@ -68,7 +88,7 @@ const Nav = () => {
               </DropdownTrigger>
               <DropdownMenu aria-label="Profile Actions" variant="flat">
                 <DropdownItem key="profile" color="primary">
-                  <Link href="/profile/info" className="text-white text-sm w-full">
+                  <Link href={!checkPath("/collab") ? "/profile/info" : "#"}className="text-white text-sm w-full">
                     Profile
                   </Link>
                 </DropdownItem>
