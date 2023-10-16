@@ -26,7 +26,7 @@ export default function MatchButton({inQueue, setInQueue, setSeconds, matchNotfo
           // TODO perform redirection here based on payload redirect url
           console.log(payload["room_id"])
           const ws = new WebSocket(`ws://localhost:5005/ws/${payload["room_id"]}`)
-          redirectToCollab();
+          redirectToCollab(payload["room_id"]);
         } else {
           matchNotfound()
         }
@@ -38,10 +38,10 @@ export default function MatchButton({inQueue, setInQueue, setSeconds, matchNotfo
     });
   }
 
-  const redirectToCollab = () => {  
+  const redirectToCollab = (room_id : string) => {  
     // Just to match with toast timer, preference whether to instant redirect or not
     const redirectTimer = setTimeout(() => {
-      router.push('/collab');
+      router.push(`/collab/?room_id=${room_id}`);
     }, 6000);
     return () => {
       clearTimeout(redirectTimer);

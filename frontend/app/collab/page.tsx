@@ -16,12 +16,14 @@ import {
 } from '@nextui-org/modal';
 import { Button } from '@nextui-org/react';
 import { useDispatch } from 'react-redux';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function Collab() {
   const collabState = useSelector(selectCollabState);
   const dispatch = useDispatch();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const roomId = searchParams.get('room_id');
   const [question, setQuestion] = useState<Question>({
     id: "",
     title: "",
