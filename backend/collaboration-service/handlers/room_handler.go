@@ -16,12 +16,12 @@ type Room struct {
 
 type Hub struct {
     Rooms map[string]*Room
-    Broadcast chan *Message
+    BroadcastChannel chan *Message
 }
 
 type User struct {
     Connection *websocket.Conn
-    Message chan *Message
+    MessageChannel chan *Message
     RoomId string
     UserId string
 }
@@ -45,7 +45,7 @@ func NewHandler(h *Hub) *Handler {
 func NewHub() *Hub {
     return &Hub{
         Rooms: make(map[string]*Room),
-        Broadcast: make (chan *Message, 5),
+        BroadcastChannel: make (chan *Message, 5),
     }
 }
 
@@ -80,7 +80,7 @@ func (h *Handler) JoinRoom(c echo.Context) error {
     userId := uuid.New().String()
     user := &User{
         Connection: connection,
-        Message: make(chan *Message, 10),
+        MessageChannel: make(chan *Message, 10),
         RoomId: roomId,
         UserId: userId,
     }
@@ -100,7 +100,7 @@ func (user *User) writeMessage() {
     }()
 
     for {
-        message, ok := <-user.Message
+        message, ok := <-user.MessageChannel
         if !ok {
             return
         }
@@ -128,18 +128,18 @@ func (user *User) readMessage(hub *Hub) {
             UserId: user.UserId,
         }
 
-        hub.Broadcast <- msg
+        hub.BroadcastChannel <- msg
     }
 }
 
 func (hub *Hub) Run() {
     for {
         select {
-        case message := <- hub.Broadcast:
+        case message := <- hub.BroadcastChannel:
             if _, ok := hub.Rooms[message.RoomId]; ok {
                 for _, user := range hub.Rooms[message.RoomId].Users {
                     if message.UserId != user.UserId {
-                        user.Message <- message
+                        user.MessageChannel <- message
                     }
                 }
             }

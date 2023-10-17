@@ -25,8 +25,8 @@ const Nav = () => {
   const handleLogout = async () => {
     try {
         dispatch(logout());
-        router.push('/');
         await GET('/auth/logout');
+        router.push('/');
     } catch (error) {
         console.error(error)
     }
