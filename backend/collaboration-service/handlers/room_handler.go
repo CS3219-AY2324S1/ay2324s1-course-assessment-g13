@@ -3,7 +3,6 @@ package handlers
 import (
 	"github.com/labstack/echo/v4"
 	"net/http"
-	// "fmt"
     "log"
 	"github.com/google/uuid"
     "github.com/gorilla/websocket"
@@ -17,6 +16,7 @@ type Room struct {
 type Hub struct {
     Rooms map[string]*Room
     BroadcastChannel chan *Message
+    DisconnectChannel chan *User
 }
 
 type User struct {
@@ -46,6 +46,7 @@ func NewHub() *Hub {
     return &Hub{
         Rooms: make(map[string]*Room),
         BroadcastChannel: make (chan *Message, 5),
+        DisconnectChannel: make(chan *User),
     }
 }
 
@@ -68,6 +69,11 @@ var upgrader = websocket.Upgrader{
 }
 
 func (h *Handler) JoinRoom(c echo.Context) error {
+    roomId := c.Param("roomId")
+    if len(h.hub.Rooms[roomId].Users) >= 2 {
+        return c.JSON(http.StatusBadRequest, "Error joining room")
+    }
+
     connection, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
     if err != nil {
         log.Printf("error upgrade: %s\n", err.Error())
@@ -75,8 +81,7 @@ func (h *Handler) JoinRoom(c echo.Context) error {
     }
 
     log.Println("Attempting to join room")
-
-    roomId := c.Param("roomId")
+    
     userId := uuid.New().String()
     user := &User{
         Connection: connection,
@@ -85,7 +90,6 @@ func (h *Handler) JoinRoom(c echo.Context) error {
         UserId: userId,
     }
 
-    
     h.hub.Rooms[roomId].Users[userId] = user
 
     go user.writeMessage()
@@ -104,9 +108,6 @@ func (user *User) writeMessage() {
         if !ok {
             return
         }
-        
-        log.Println("Reading from broadcast " + user.UserId)
-        log.Println(string(message.Content))
 
         user.Connection.WriteJSON(message)
     }
@@ -114,9 +115,14 @@ func (user *User) writeMessage() {
 
 // Reads the data from the client, and emit the data to the hub
 func (user *User) readMessage(hub *Hub) {
+    defer func() {
+		hub.DisconnectChannel <- user
+		user.Connection.Close()
+	}()
+
     for {
         _, message, err := user.Connection.ReadMessage()
-        log.Println(string(message))
+        // log.Println(string(message))
         if err != nil {
             log.Println("Error reading message from socket")
             break
@@ -143,8 +149,12 @@ func (hub *Hub) Run() {
                     }
                 }
             }
+        case user := <- hub.DisconnectChannel:
+            delete(hub.Rooms[user.RoomId].Users, user.UserId)
+            if len(hub.Rooms[user.RoomId].Users) == 0 {
+                delete(hub.Rooms, user.RoomId)
+            }
+            close(user.MessageChannel)
         }
     }
 }
-
-

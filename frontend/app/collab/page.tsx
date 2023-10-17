@@ -73,6 +73,7 @@ export default function Collab() {
   };
 
   const exitRoom = () => {
+    ws.current.close();
     dispatch(setIsLeaving(false));
     router.push('/');
   }
