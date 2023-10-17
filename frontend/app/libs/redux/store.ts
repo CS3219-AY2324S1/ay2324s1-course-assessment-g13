@@ -12,7 +12,8 @@ import {
 import preferenceReducer from './slices/matchPreferenceSlice';
 import questionBankReducer, { QuestionBankState } from './slices/questionBankSlice';
 import createWebStorage from 'redux-persist/lib/storage/createWebStorage';
-import userReducer, { UserState } from './slices/userSlice'
+import userReducer, { UserState } from './slices/userSlice';
+import collabReducer from './slices/collabSlice';
 
 export interface RootState {
   user: UserState,
@@ -38,13 +39,14 @@ const storage = typeof window !== 'undefined' ? createWebStorage('local') : crea
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['questionBank', 'user', 'preference'],
+  whitelist: ['questionBank', 'user', 'preference', 'collab'],
 };
 
 const rootReducer = combineReducers({
   questionBank: questionBankReducer,
   user: userReducer,
   preference: preferenceReducer,
+  collab: collabReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
