@@ -23,13 +23,13 @@ type User struct {
     Connection *websocket.Conn
     Message chan *Message
     RoomId string
-    Username string
+    UserId string
 }
 
 type Message struct {
     Content string
     RoomId string
-    Username string
+    UserId string
 }
 
 type Handler struct {
@@ -77,19 +77,23 @@ func (h *Handler) JoinRoom(c echo.Context) error {
     log.Println("Attempting to join room")
 
     roomId := c.Param("roomId")
+    userId := uuid.New().String()
     user := &User{
         Connection: connection,
         Message: make(chan *Message, 10),
         RoomId: roomId,
-        // TODO: get username from either token or param
-        Username: "",
+        UserId: userId,
     }
+
+    
+    h.hub.Rooms[roomId].Users[userId] = user
 
     go user.writeMessage()
     user.readMessage(h.hub)
     return c.JSON(http.StatusOK, "Successfully joined room!")
 }
 
+// Reads data from hub, and emit data to client
 func (user *User) writeMessage() {
     defer func() {
         user.Connection.Close()
@@ -100,23 +104,28 @@ func (user *User) writeMessage() {
         if !ok {
             return
         }
+        
+        log.Println("Reading from broadcast " + user.UserId)
+        log.Println(string(message.Content))
 
         user.Connection.WriteJSON(message)
     }
 }
 
+// Reads the data from the client, and emit the data to the hub
 func (user *User) readMessage(hub *Hub) {
     for {
         _, message, err := user.Connection.ReadMessage()
+        log.Println(string(message))
         if err != nil {
-            log.Println("Error reading message from socker")
+            log.Println("Error reading message from socket")
             break
         }
 
         msg := &Message{
             Content: string(message),
             RoomId: user.RoomId,
-            Username: "",
+            UserId: user.UserId,
         }
 
         hub.Broadcast <- msg
@@ -129,7 +138,9 @@ func (hub *Hub) Run() {
         case message := <- hub.Broadcast:
             if _, ok := hub.Rooms[message.RoomId]; ok {
                 for _, user := range hub.Rooms[message.RoomId].Users {
-                    user.Message <- message
+                    if message.UserId != user.UserId {
+                        user.Message <- message
+                    }
                 }
             }
         }
