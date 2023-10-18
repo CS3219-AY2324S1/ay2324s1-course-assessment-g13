@@ -17,7 +17,7 @@ func GetUser(c echo.Context) error {
 	id := c.Param("id")
 
 	var user model.User
-	if err := config.DB.Where("id = ?", id).First(&user).Error; err != nil {
+	if err := config.DB.Where("auth_user_id = ?", id).First(&user).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return c.JSON(http.StatusNotFound, message.CreateErrorMessage(INVALID_USER_NOT_FOUND))
 		}
@@ -79,7 +79,7 @@ func CreateUser(c echo.Context) error {
 }
 
 func UpdateUser(c echo.Context) error {
-	authUserID := c.Param("authUserId")
+	authUserID := c.Param("id")
 
 	var user model.User
 	if err := config.DB.Where("auth_user_id = ?", authUserID).First(&user).Error; err != nil {
@@ -125,7 +125,7 @@ func UpdateUser(c echo.Context) error {
 }
 
 func DeleteUser(c echo.Context) error {
-	authUserID := c.Param("authUserId")
+	authUserID := c.Param("id")
 
 	var existingUser model.User
 	if err := config.DB.Where("auth_user_id = ?", authUserID).First(&existingUser).Error; err != nil {
