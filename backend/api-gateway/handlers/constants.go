@@ -26,7 +26,6 @@ const (
 	TOKEN_CLAIMS_CONTEXT_KEY    = "token-claims"
 	USER_CONTEXT_KEY            = "user"
 	SUCCESS_MESSAGE_CONTEXT_KEY = "success-message"
-	GITHUB_DATA_CONTEXT_KEY     = "github-data"
 )
 
 const (
