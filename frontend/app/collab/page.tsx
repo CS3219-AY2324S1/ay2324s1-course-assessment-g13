@@ -31,6 +31,7 @@ export default function Collab() {
   // const ws = new WebSocket(`ws://localhost:5005/ws/${roomId}`)
   useEffect(() => {
     ws.current = new WebSocket(`ws://localhost:5005/ws/${roomId}`);
+    fetchQuestion();
     // onmessage is for receiving messages
     ws.current.onmessage = function (event) {
       var messages = event.data;
@@ -47,10 +48,10 @@ export default function Collab() {
     description: ""
   });
 
-  const fetchQuestion = async (complexity : string) => {
+  const fetchQuestion = async () => {
     try {
-      const id_response = await GET(`questions/complexity/${complexity}`);
-      const response = await GET(`questions/${id_response.data}`);
+      const idResponse = await GET(`ws/question/${roomId}`);
+      const response = await GET(`questions/${idResponse.data}`);
       setQuestion(response.data as Question);
     } catch (error) {
       notifyError(error.message.data);
@@ -61,10 +62,6 @@ export default function Collab() {
     // console.log(value);
     ws.current.send(value);
   }
-
-  useEffect(() => {
-    fetchQuestion('Easy');
-  }, []);
 
   const editorOptions = {
     minimap: {

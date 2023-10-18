@@ -4,6 +4,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"net/http"
     "log"
+    "os"
+    "encoding/json"
 	"github.com/google/uuid"
     "github.com/gorilla/websocket"
 )
@@ -11,6 +13,7 @@ import (
 type Room struct {
     Id string
     Users map[string]*User
+    QuestionId string
 }
 
 type Hub struct {
@@ -52,9 +55,28 @@ func NewHub() *Hub {
 
 func (h *Handler) CreateRoom(c echo.Context) error {
     id := uuid.New().String()
+    reqBody := make(map[string]string)
+    err := json.NewDecoder(c.Request().Body).Decode(&reqBody)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+	resp, err := http.Get(os.Getenv("QUESTION_SERVICE_URL") + "/questions/complexity/" + reqBody["complexity"])
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    defer resp.Body.Close()
+    var questionId string
+	err = json.NewDecoder(resp.Body).Decode(&questionId)
+    if err != nil {
+        log.Fatal(err)
+    }
+
     h.hub.Rooms[id] = &Room{
         Id: id,
         Users: make(map[string]*User),
+        QuestionId: questionId,
     }
 
     return c.JSON(http.StatusOK, h.hub.Rooms[id])
@@ -95,6 +117,18 @@ func (h *Handler) JoinRoom(c echo.Context) error {
     go user.writeMessage()
     user.readMessage(h.hub)
     return c.JSON(http.StatusOK, "Successfully joined room!")
+}
+
+
+func (h *Handler) GetQuestionId(c echo.Context) error {
+    roomId := c.Param("roomId")
+
+    questionId := h.hub.Rooms[roomId].QuestionId
+    if questionId == "" {
+        return c.JSON(http.StatusBadRequest, "No question is allocated")
+    }
+
+    return c.JSON(http.StatusOK, questionId)
 }
 
 // Reads data from hub, and emit data to client
