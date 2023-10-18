@@ -9,6 +9,11 @@ type SuccessUserMessage struct {
 	User    User   `json:"user,omitempty"`
 }
 
+type SuccessUsersMessage struct {
+	Message string `json:"message"`
+	Users   []User `json:"users,omitempty"`
+}
+
 type SuccessMessage struct {
 	Message string `json:"message"`
 }

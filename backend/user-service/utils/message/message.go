@@ -26,3 +26,10 @@ func CreateSuccessUserMessage(message string, user ...models.User) models.Succes
 		User:    userData,
 	}
 }
+
+func CreateSuccessUsersMessage(message string, users []models.User) models.SuccessUsersMessage {
+	return models.SuccessUsersMessage{
+		Message: message,
+		Users:   users,
+	}
+}

@@ -17,20 +17,22 @@ func GetUser(c echo.Context) error {
 	id := c.Param("id")
 
 	var user model.User
-	config.DB.Where("user_id = ?", id).First(&user)
-	if user.ID == 0 {
-		return c.JSON(http.StatusBadRequest, "User not found")
+	if err := config.DB.Where("id = ?", id).First(&user).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return c.JSON(http.StatusNotFound, message.CreateErrorMessage(INVALID_USER_NOT_FOUND))
+		}
+		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(INVALID_DB_ERROR))
 	}
 
-	return c.String(http.StatusOK, user.Username)
+	return c.JSON(http.StatusOK, message.CreateSuccessUserMessage(SUCCESS_USER_FOUND, user))
 }
 
 func GetUsers(c echo.Context) error {
 	users := make([]model.User, 0)
 	if err := config.DB.Find(&users).Error; err != nil {
-		return c.JSON(http.StatusBadRequest, "Invalid user input")
+		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(INVALID_DB_ERROR))
 	}
-	return c.JSON(http.StatusOK, users)
+	return c.JSON(http.StatusOK, message.CreateSuccessUsersMessage(SUCCESS_USER_FOUND, users))
 }
 
 func CreateUser(c echo.Context) error {
