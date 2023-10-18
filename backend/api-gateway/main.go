@@ -28,15 +28,12 @@ func main() {
 
 	API_GATEWAY.Use(corsMiddleware, handlers.RequireAuthenticationMiddleWare)
 
-	API_GATEWAY.GET(path.GITHUB_LOGIN, handlers.GithubLogin)
+	API_GATEWAY.POST(path.SIGNUP, handlers.CreateUser)
 	API_GATEWAY.GET(path.LOGOUT, handlers.Logout)
 	API_GATEWAY.GET(path.REFRESH, handlers.Refresh)
 
 	API_GATEWAY.GET(path.AUTH_USER, handlers.GetUser)
 	API_GATEWAY.DELETE(path.AUTH_USER, handlers.DeleteUser)
-
-	API_GATEWAY.GET("/", handlers.RootHandler)
-	API_GATEWAY.GET("/github", handlers.GithubLoginHandler)
 
 	API_GATEWAY.GET(path.AUTH_USER_UPGRADE, handlers.UpgradeUser)
 	API_GATEWAY.GET(path.AUTH_USER_DOWNGRADE, handlers.DowngradeUser)

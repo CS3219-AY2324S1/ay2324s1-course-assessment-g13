@@ -4,7 +4,12 @@ import "gorm.io/gorm"
 
 type User struct {
 	gorm.Model
-	OauthID  int    `json:"oauth_id"`
-	Provider string `json:"provider"`
-	Role     string `json:"role" gorm:"default:'user'"`
+	OauthID       int    `json:"oauth_id"`
+	OauthProvider string `json:"oauth_provider"`
+	Role          string `json:"role" gorm:"default:'user'"`
+}
+
+type CreateUserPayload struct {
+	OauthID       int    `json:"oauth_id" validate:"required"`
+	OauthProvider string `json:"oauth_provider" validate:"required"`
 }

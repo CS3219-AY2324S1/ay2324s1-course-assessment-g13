@@ -12,6 +12,7 @@ import (
 )
 
 var bypassLoginList = map[string]bool{
+	path.SIGNUP:       true,
 	path.GITHUB_LOGIN: true,
 	path.REFRESH:      true,
 	"/":               true,

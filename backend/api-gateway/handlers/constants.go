@@ -6,6 +6,7 @@ const (
 	INVALID_USER_INPUT         = "Invalid User Input!"
 	INVALID_USER_EXIST         = "Username Already Exists!"
 	INVALID_USER_NOT_FOUND     = "User Not Found!"
+	INVALID_DB_ERROR           = "Error Occured when Accessing Database "
 	FAILURE_HASHING_PASSWORD   = "Double Check Your Credentials"
 	FAILURE_CREATE_USER        = "Failed to Create User!"
 	FAILURE_USER_ALREADY_LOGIN = "User Already Logged In"
