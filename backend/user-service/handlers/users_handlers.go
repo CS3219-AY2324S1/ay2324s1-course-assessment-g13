@@ -81,7 +81,7 @@ func UpdateUser(c echo.Context) error {
 
 	var user model.User
 	if err := config.DB.Where("auth_user_id = ?", authUserID).First(&user).Error; err != nil {
-		return c.JSON(http.StatusBadRequest, message.CreateErrorMessage(INVALID_USER_NOT_FOUND))
+		return c.JSON(http.StatusNotFound, message.CreateErrorMessage(INVALID_USER_NOT_FOUND))
 	}
 
 	payload := new(model.UpdateUserPayload)
@@ -123,13 +123,13 @@ func UpdateUser(c echo.Context) error {
 }
 
 func DeleteUser(c echo.Context) error {
-	id := c.Param("id")
+	authUserID := c.Param("authUserId")
 
-	var user model.User
-	if err := config.DB.Where("user_id = ?", id).First(&user).Error; err != nil {
-		return c.JSON(http.StatusBadRequest, "User not found")
+	var existingUser model.User
+	if err := config.DB.Where("auth_user_id = ?", authUserID).First(&existingUser).Error; err != nil {
+		return c.JSON(http.StatusNotFound, message.CreateErrorMessage(INVALID_USER_NOT_FOUND))
 	}
 
-	config.DB.Unscoped().Delete(&user)
-	return c.JSON(http.StatusOK, "User deleted successfully")
+	config.DB.Unscoped().Delete(&existingUser)
+	return c.JSON(http.StatusOK, message.CreateSuccessMessage(SUCCESS_USER_DELETED))
 }

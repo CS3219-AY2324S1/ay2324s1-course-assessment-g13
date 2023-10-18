@@ -29,7 +29,7 @@ func main() {
 	e.GET("/users", handlers.GetUsers)
 	e.GET("/users/:id", handlers.GetUser)
 	e.PUT("/users/:authUserId", handlers.UpdateUser)
-	e.DELETE("/users/delete/:id", handlers.DeleteUser)
+	e.DELETE("/users/:authUserId", handlers.DeleteUser)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
