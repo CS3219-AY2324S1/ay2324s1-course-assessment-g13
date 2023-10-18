@@ -83,16 +83,18 @@ const Nav = () => {
               <DropdownTrigger>
                 <Avatar src={photoUrl} showFallback isBordered as="button" color="primary" />
               </DropdownTrigger>
-              <DropdownMenu aria-label="Profile Actions" variant="flat">
-                <DropdownItem key="profile" color="primary">
-                  <Link href={!checkPath("/collab") ? "/profile/info" : "#"}className="text-white text-sm w-full">
-                    Profile
-                  </Link>
-                </DropdownItem>
-                <DropdownItem key="logout" color="danger" onClick={handleLogout}>
-                  Log Out
-                </DropdownItem>
-              </DropdownMenu>
+              {!checkPath("/collab") && (
+                <DropdownMenu aria-label="Profile Actions" variant="flat">
+                  <DropdownItem key="profile" color="primary">
+                    <Link href="/profile/info" className="text-white text-sm w-full">
+                      Profile
+                    </Link>
+                  </DropdownItem>
+                  <DropdownItem key="logout" color="danger" onClick={handleLogout}>
+                    Log Out
+                  </DropdownItem>
+                </DropdownMenu>
+              )}
             </Dropdown>
           </NavbarItem>
         </NavbarContent>
