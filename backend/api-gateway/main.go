@@ -29,6 +29,7 @@ func main() {
 	API_GATEWAY.Use(corsMiddleware, handlers.RequireAuthenticationMiddleWare)
 
 	API_GATEWAY.POST(path.SIGNUP, handlers.CreateUser)
+	API_GATEWAY.POST(path.LOGIN, handlers.Login)
 	API_GATEWAY.GET(path.LOGOUT, handlers.Logout)
 	API_GATEWAY.GET(path.REFRESH, handlers.Refresh)
 

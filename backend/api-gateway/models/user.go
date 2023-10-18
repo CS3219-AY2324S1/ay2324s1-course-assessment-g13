@@ -9,7 +9,7 @@ type User struct {
 	Role          string `json:"role" gorm:"default:'user'"`
 }
 
-type CreateUserPayload struct {
+type UserRequestPayload struct {
 	OauthID       int    `json:"oauth_id" validate:"required"`
 	OauthProvider string `json:"oauth_provider" validate:"required"`
 }

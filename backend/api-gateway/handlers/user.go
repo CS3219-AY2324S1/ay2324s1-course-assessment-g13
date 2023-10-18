@@ -46,7 +46,7 @@ func DeleteUser(c echo.Context) error {
 }
 
 func CreateUser(c echo.Context) error {
-	payload := new(models.CreateUserPayload)
+	payload := new(models.UserRequestPayload)
 	if err := c.Bind(payload); err != nil {
 		return c.JSON(http.StatusBadRequest, message.CreateErrorMessage(INVALID_JSON_REQUEST))
 	}
