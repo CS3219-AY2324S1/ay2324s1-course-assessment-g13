@@ -18,7 +18,7 @@ type CreateUser struct {
 }
 
 type UpdateUser struct {
-	Username          string `json:"username" validate:"atleastonefield"`
-	PhotoUrl          string `json:"photo_url" validate:"atleastonefield"`
-	PreferredLanguage string `json:"preferred_language" validate:"atleastonefield"`
+	Username          string `json:"username"`
+	PhotoUrl          string `json:"photo_url"`
+	PreferredLanguage string `json:"preferred_language"`
 }
