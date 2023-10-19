@@ -26,6 +26,12 @@ func DeleteUser(c echo.Context) error {
 
 	user := tokenClaims.User
 
+	authUserId := user.ID
+	responseStatusCode, responseMessage := client.UserService.DeleteUser(authUserId)
+	if responseStatusCode != http.StatusOK {
+		return c.JSON(responseStatusCode, message.CreateErrorMessage(responseMessage))
+	}
+
 	err := config.DB.Delete(&user).Error
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(ERROR_OCCURRED))
