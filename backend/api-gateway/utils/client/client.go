@@ -22,17 +22,25 @@ type userServiceClient struct {
 
 var UserService = CreateUserServiceClient()
 
+const (
+	ERROR_MARSHAL_JSON                     = "Error Marshaling JSON"
+	ERROR_UNMARSHAL_JSON                   = "Error Unmarshaling JSON"
+	ERROR_REQUEST_TO_USER_SERVICE          = "Error Requesting User Service"
+	ERROR_CREATING_REQUEST_TO_USER_SERVICE = "Error Making Request to User Service"
+	ERROR_READING_USER_SERVICE_RESPONSE    = "Error Reading User Service Response"
+)
+
 const endpoint = "/users"
 
 func (client *userServiceClient) CreateUser(user models.UserServiceCreateUserRequestBody) (int, string) {
 	userJson, err := json.Marshal(user)
 	if err != nil {
-		return http.StatusInternalServerError, "Error Marshaling JSON"
+		return http.StatusInternalServerError, ERROR_MARSHAL_JSON
 	}
 
 	response, err := http.Post(client.userServiceUrl+endpoint, "application/json", bytes.NewBuffer(userJson))
 	if err != nil {
-		return http.StatusInternalServerError, "Error Making Request to User Service"
+		return http.StatusInternalServerError, ERROR_REQUEST_TO_USER_SERVICE
 	}
 
 	defer response.Body.Close()
@@ -40,11 +48,11 @@ func (client *userServiceClient) CreateUser(user models.UserServiceCreateUserReq
 	if response.StatusCode != http.StatusCreated {
 		responseBody, err := io.ReadAll(response.Body)
 		if err != nil {
-			return http.StatusInternalServerError, "Error Reading User Service Response"
+			return http.StatusInternalServerError, ERROR_READING_USER_SERVICE_RESPONSE
 		}
 		var errorResponse models.ErrorMessage
 		if err := json.Unmarshal(responseBody, &errorResponse); err != nil {
-			return http.StatusInternalServerError, "Error Unmarshaling JSON"
+			return http.StatusInternalServerError, ERROR_UNMARSHAL_JSON
 		}
 		return response.StatusCode, errorResponse.Message
 	}
@@ -56,12 +64,12 @@ func (client *userServiceClient) DeleteUser(authUserId uint) (int, string) {
 	uri := client.userServiceUrl + endpoint + "/" + authUserIdString
 	request, err := http.NewRequest(http.MethodDelete, uri, nil)
 	if err != nil {
-		return http.StatusInternalServerError, "Error Creating the Delete User Request"
+		return http.StatusInternalServerError, ERROR_CREATING_REQUEST_TO_USER_SERVICE
 	}
 
 	response, err := client.httpClient.Do(request)
 	if err != nil {
-		return http.StatusInternalServerError, "Error Making Request to User Service"
+		return http.StatusInternalServerError, ERROR_REQUEST_TO_USER_SERVICE
 	}
 
 	defer response.Body.Close()
@@ -69,11 +77,11 @@ func (client *userServiceClient) DeleteUser(authUserId uint) (int, string) {
 	if response.StatusCode != http.StatusOK {
 		responseBody, err := io.ReadAll(response.Body)
 		if err != nil {
-			return http.StatusInternalServerError, "Error Reading User Service Response"
+			return http.StatusInternalServerError, ERROR_READING_USER_SERVICE_RESPONSE
 		}
 		var errorResponse models.ErrorMessage
 		if err := json.Unmarshal(responseBody, &errorResponse); err != nil {
-			return http.StatusInternalServerError, "Error Unmarshaling JSON"
+			return http.StatusInternalServerError, ERROR_UNMARSHAL_JSON
 		}
 		return response.StatusCode, errorResponse.Message
 	}
