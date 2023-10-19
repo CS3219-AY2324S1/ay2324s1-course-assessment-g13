@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"log"
 	"net/http"
 
 	"user-service/config"
@@ -36,18 +35,18 @@ func GetUsers(c echo.Context) error {
 }
 
 func CreateUser(c echo.Context) error {
-	payload := new(model.CreateUserPayload)
-	if err := c.Bind(payload); err != nil {
+	requestBody := new(model.CreateUser)
+	if err := c.Bind(requestBody); err != nil {
 		return c.JSON(http.StatusBadRequest, message.CreateErrorMessage(INVALID_JSON_REQUEST))
 	}
 
 	validator := validator.New()
-	if err := validator.Struct(payload); err != nil {
+	if err := validator.Struct(requestBody); err != nil {
 		return c.JSON(http.StatusBadRequest, message.CreateErrorMessage(INVALID_USER_INPUT))
 	}
 
 	var existingUser model.User
-	err := config.DB.Where("auth_user_id = ?", payload.AuthUserID).First(&existingUser).Error
+	err := config.DB.Where("auth_user_id = ?", requestBody.AuthUserID).First(&existingUser).Error
 	if err != nil {
 		if err != gorm.ErrRecordNotFound {
 			return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(INVALID_DB_ERROR))
@@ -58,18 +57,18 @@ func CreateUser(c echo.Context) error {
 
 	var newUser model.User
 
-	if err := config.DB.Where("username = ?", payload.Username).First(&existingUser).Error; err != nil {
+	if err := config.DB.Where("username = ?", requestBody.Username).First(&existingUser).Error; err != nil {
 		if err != gorm.ErrRecordNotFound {
 			return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(INVALID_DB_ERROR))
 		}
 	} else {
 		return c.JSON(http.StatusConflict, message.CreateErrorMessage(INVALID_USERNAME_EXIST))
 	}
-	newUser.Username = payload.Username
+	newUser.Username = requestBody.Username
 
-	newUser.AuthUserID = payload.AuthUserID
-	newUser.PhotoUrl = payload.PhotoUrl
-	newUser.PreferredLanguage = payload.PreferredLanguage
+	newUser.AuthUserID = requestBody.AuthUserID
+	newUser.PhotoUrl = requestBody.PhotoUrl
+	newUser.PreferredLanguage = requestBody.PreferredLanguage
 	err = config.DB.Create(&newUser).Error
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(FAILURE_CREATE_USER))
@@ -86,34 +85,33 @@ func UpdateUser(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, message.CreateErrorMessage(INVALID_USER_NOT_FOUND))
 	}
 
-	payload := new(model.UpdateUserPayload)
-	if err := c.Bind(payload); err != nil {
+	requestBody := new(model.UpdateUser)
+	if err := c.Bind(requestBody); err != nil {
 		return c.JSON(http.StatusBadRequest, message.CreateErrorMessage(INVALID_JSON_REQUEST))
 	}
 
-	if payload.PhotoUrl == "" && payload.Username == "" && payload.PreferredLanguage == "" {
+	if requestBody.PhotoUrl == "" && requestBody.Username == "" && requestBody.PreferredLanguage == "" {
 		return c.JSON(http.StatusBadRequest, message.CreateErrorMessage(INVALID_UPDATE_REQUEST))
 	}
 
-	if payload.Username != "" {
+	if requestBody.Username != "" {
 		var existingUser model.User
-		if err := config.DB.Where("username = ?", payload.Username).First(&existingUser).Error; err != nil {
+		if err := config.DB.Where("username = ?", requestBody.Username).First(&existingUser).Error; err != nil {
 			if err != gorm.ErrRecordNotFound {
 				return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(INVALID_DB_ERROR))
 			}
 		} else {
 			return c.JSON(http.StatusConflict, message.CreateErrorMessage(INVALID_USERNAME_EXIST))
 		}
-		log.Println(payload.Username)
-		user.Username = payload.Username
+		user.Username = requestBody.Username
 	}
 
-	if payload.PhotoUrl != "" {
-		user.PhotoUrl = payload.PhotoUrl
+	if requestBody.PhotoUrl != "" {
+		user.PhotoUrl = requestBody.PhotoUrl
 	}
 
-	if payload.PreferredLanguage != "" {
-		user.PreferredLanguage = payload.PreferredLanguage
+	if requestBody.PreferredLanguage != "" {
+		user.PreferredLanguage = requestBody.PreferredLanguage
 	}
 
 	if err := config.DB.Save(&user).Error; err != nil {
