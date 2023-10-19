@@ -14,18 +14,18 @@ import (
 )
 
 func Login(c echo.Context) error {
-	payload := new(models.UserRequestPayload)
-	if err := c.Bind(payload); err != nil {
+	requestBody := new(models.LoginRequest)
+	if err := c.Bind(requestBody); err != nil {
 		return c.JSON(http.StatusBadRequest, message.CreateErrorMessage(INVALID_JSON_REQUEST))
 	}
 
 	validator := validator.New()
-	if err := validator.Struct(payload); err != nil {
+	if err := validator.Struct(requestBody); err != nil {
 		return c.JSON(http.StatusBadRequest, message.CreateErrorMessage(INVALID_USER_INPUT))
 	}
 
 	var user models.User
-	err := config.DB.Where("oauth_id = ? AND oauth_provider = ?", payload.OauthID, payload.OauthProvider).First(&user).Error
+	err := config.DB.Where("oauth_id = ? AND oauth_provider = ?", requestBody.OauthID, requestBody.OauthProvider).First(&user).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return c.JSON(http.StatusBadRequest, message.CreateErrorMessage(INVALID_USER_NOT_FOUND))

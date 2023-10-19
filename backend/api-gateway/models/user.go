@@ -9,7 +9,22 @@ type User struct {
 	Role          string `json:"role" gorm:"default:'user'"`
 }
 
-type UserRequestPayload struct {
+type LoginRequest struct {
 	OauthID       int    `json:"oauth_id" validate:"required"`
 	OauthProvider string `json:"oauth_provider" validate:"required"`
+}
+
+type CreateUser struct {
+	OauthID           int    `json:"oauth_id" validate:"required"`
+	OauthProvider     string `json:"oauth_provider" validate:"required"`
+	Username          string `json:"username" validate:"required"`
+	PhotoUrl          string `json:"photo_url"`
+	PreferredLanguage string `json:"preferred_language"`
+}
+
+type UserServiceCreateUserRequestBody struct {
+	AuthUserID        uint   `json:"auth_user_id"`
+	Username          string `json:"username"`
+	PhotoUrl          string `json:"photo_url"`
+	PreferredLanguage string `json:"preferred_language"`
 }

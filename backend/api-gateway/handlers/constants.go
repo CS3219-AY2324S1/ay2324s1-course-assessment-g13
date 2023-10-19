@@ -4,7 +4,7 @@ const (
 	ERROR_OCCURRED             = "An Error Occurred"
 	INVALID_JSON_REQUEST       = "Invalid JSON Request!"
 	INVALID_USER_INPUT         = "Invalid User Input!"
-	INVALID_USER_EXIST         = "Username Already Exists!"
+	INVALID_USER_EXIST         = "User Already Exists!"
 	INVALID_USER_NOT_FOUND     = "User Not Found!"
 	INVALID_DB_ERROR           = "Error Occured when Accessing Database "
 	FAILURE_HASHING_PASSWORD   = "Double Check Your Credentials"

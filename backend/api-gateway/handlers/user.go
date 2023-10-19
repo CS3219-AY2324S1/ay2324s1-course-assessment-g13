@@ -3,6 +3,7 @@ package handlers
 import (
 	"api-gateway/config"
 	"api-gateway/models"
+	"api-gateway/utils/client"
 	"api-gateway/utils/cookie"
 	"api-gateway/utils/message"
 	"net/http"
@@ -46,18 +47,18 @@ func DeleteUser(c echo.Context) error {
 }
 
 func CreateUser(c echo.Context) error {
-	payload := new(models.UserRequestPayload)
-	if err := c.Bind(payload); err != nil {
+	requestBody := new(models.CreateUser)
+	if err := c.Bind(requestBody); err != nil {
 		return c.JSON(http.StatusBadRequest, message.CreateErrorMessage(INVALID_JSON_REQUEST))
 	}
 
 	validator := validator.New()
-	if err := validator.Struct(payload); err != nil {
+	if err := validator.Struct(requestBody); err != nil {
 		return c.JSON(http.StatusBadRequest, message.CreateErrorMessage(INVALID_USER_INPUT))
 	}
 
 	var existingUser models.User
-	err := config.DB.Where("oauth_id = ? AND oauth_provider = ?", payload.OauthID, payload.OauthProvider).First(&existingUser).Error
+	err := config.DB.Where("oauth_id = ? AND oauth_provider = ?", requestBody.OauthID, requestBody.OauthProvider).First(&existingUser).Error
 	if err != nil {
 		if err != gorm.ErrRecordNotFound {
 			return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(INVALID_DB_ERROR))
@@ -67,12 +68,29 @@ func CreateUser(c echo.Context) error {
 	}
 
 	var newUser models.User
-	newUser.OauthID = payload.OauthID
-	newUser.OauthProvider = payload.OauthProvider
+	newUser.OauthID = requestBody.OauthID
+	newUser.OauthProvider = requestBody.OauthProvider
 	err = config.DB.Create(&newUser).Error
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(FAILURE_CREATE_USER))
 	}
 
-	return c.JSON(http.StatusCreated, message.CreateSuccessMessage(SUCCESS_USER_CREATED))
+	userServiceCreateUserRequestBody := models.UserServiceCreateUserRequestBody{
+		AuthUserID:        newUser.ID,
+		Username:          requestBody.Username,
+		PhotoUrl:          requestBody.PhotoUrl,
+		PreferredLanguage: requestBody.PreferredLanguage,
+	}
+
+	responseStatusCode, responseMessage := client.UserService.CreateUser(userServiceCreateUserRequestBody)
+
+	if responseStatusCode != http.StatusCreated {
+		err := config.DB.Delete(&newUser).Error
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(ERROR_OCCURRED))
+		}
+		return c.JSON(responseStatusCode, message.CreateErrorMessage(responseMessage))
+	}
+
+	return c.JSON(http.StatusCreated, message.CreateSuccessUserMessage(SUCCESS_USER_CREATED, newUser))
 }
