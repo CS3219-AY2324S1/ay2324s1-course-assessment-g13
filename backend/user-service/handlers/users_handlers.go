@@ -58,7 +58,7 @@ func CreateUser(c echo.Context) error {
 
 	var newUser model.User
 
-	if err := config.DB.Where("username = ?", payload.Username).Error; err != nil {
+	if err := config.DB.Where("username = ?", payload.Username).First(&existingUser).Error; err != nil {
 		if err != gorm.ErrRecordNotFound {
 			return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(INVALID_DB_ERROR))
 		}
