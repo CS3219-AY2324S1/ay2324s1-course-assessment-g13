@@ -12,8 +12,8 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { AuthResponse } from "../login/page";
 import { POST } from "../../libs/axios/axios";
-import { AxiosResponse } from "axios";
-import { notifySuccess } from "../../components/toast/notifications";
+import { AxiosError, AxiosResponse } from "axios";
+import { notifyError, notifySuccess } from "../../components/toast/notifications";
 import { useRouter } from "next/navigation";
 
 interface CreateUserRequest {
@@ -55,7 +55,10 @@ export default function SignUpPage() {
             const signOutData = await signOut({redirect:false, callbackUrl: "/login"});
             router.push(signOutData.url)
         } catch (error) {
-            console.log(error);
+            const message = error.message.data.message;
+            notifyError(message);
+            onClose();
+            await signOut({redirect: false})
         }
     });
 

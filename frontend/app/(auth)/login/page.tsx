@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { GET, POST } from "../../libs/axios/axios";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { notifySuccess } from "../../components/toast/notifications";
+import { notifyError, notifySuccess } from "../../components/toast/notifications";
 import { useDispatch } from "react-redux";
 import { AxiosResponse } from "axios";
 import { login as UserLogin } from "../../libs/redux/slices/userSlice";
@@ -67,7 +67,8 @@ export default function LoginPage() {
             notifySuccess(authMessage);
             router.push('/questions');
         } catch (error) {
-            console.log(error);
+            const message = error.message.data.message;
+            notifyError(message);
         }
     }
 

@@ -14,7 +14,7 @@ import useAuth from "../hooks/useAuth";
 import { PUT } from "../libs/axios/axios";
 import { useDispatch } from "react-redux";
 import { AxiosResponse } from "axios";
-import { notifySuccess } from "../components/toast/notifications";
+import { notifyError, notifySuccess } from "../components/toast/notifications";
 import { UserResponse } from "../(auth)/login/page";
 import DeleteAccountModal from "../components/modal/deleteAccountModal";
 
@@ -53,7 +53,8 @@ export default function Profile() {
             notifySuccess(message);
             reset({}, {keepValues: true})
         } catch (error) {
-            console.log(error);
+            const message = error.message.data.message;
+            notifyError(message);
         }
     })
 
