@@ -1,7 +1,7 @@
 'use client';
 import { Link } from '@nextui-org/link';
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem } from '@nextui-org/navbar';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import useAuth from '../../hooks/useAuth';
 import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@nextui-org/dropdown'
 import { Avatar } from '@nextui-org/avatar';
@@ -9,32 +9,36 @@ import { Button } from '@nextui-org/button';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppState } from '../../libs/redux/store';
 import { useRouter } from 'next/navigation';
-import { logout } from '../../libs/redux/slices/userSlice';
+import { logout as UserLogout } from '../../libs/redux/slices/userSlice';
+import { logout as AuthLogout } from '../../libs/redux/slices/authSlice';
 import { GET } from '../../libs/axios/axios';
 import { usePathname } from 'next/navigation';
 import { setIsLeaving } from '../../libs/redux/slices/collabSlice';
+import { signOut } from 'next-auth/react';
 
 const Nav = () => {
   const dispatch = useDispatch();
   const router = useRouter();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const { isAuthenticated } = useAuth();
+  const { status, previouslyLoggedIn } = useAuth();
   const photoUrl = useSelector((state: AppState) => state.user.photoUrl);
   const pathname = usePathname();
+  const isLoggedIn = status === "authenticated";
 
   const handleLogout = async () => {
+    if (!previouslyLoggedIn) return;
     try {
-        dispatch(logout());
+        dispatch(UserLogout());
+        dispatch(AuthLogout());
         await GET('/auth/logout');
-        router.push('/');
+        router.push('/')
     } catch (error) {
         console.error(error)
     }
   }
 
   useEffect(() => {
-    setIsLoggedIn(isAuthenticated);
-  }, [isAuthenticated])
+    status === "unauthenticated" && handleLogout();
+  }, [status])
 
   const checkPath = (url : string) => {
     return pathname === url;
@@ -89,7 +93,7 @@ const Nav = () => {
                     Profile
                   </Link>
                 </DropdownItem>
-                <DropdownItem key="logout" color="danger" onClick={handleLogout}>
+                <DropdownItem key="logout" color="danger" onClick={() => signOut({redirect: false})}>
                   Log Out
                 </DropdownItem>
               </DropdownMenu>
