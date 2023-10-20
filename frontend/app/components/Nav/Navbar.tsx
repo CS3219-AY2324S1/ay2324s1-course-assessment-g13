@@ -19,13 +19,12 @@ import { signOut } from 'next-auth/react';
 const Nav = () => {
   const dispatch = useDispatch();
   const router = useRouter();
-  const { status, previouslyLoggedIn } = useAuth();
+  const { status, isLoggedIn } = useAuth();
   const photoUrl = useSelector((state: AppState) => state.user.photoUrl);
   const pathname = usePathname();
-  const isLoggedIn = status === "authenticated";
 
   const handleLogout = async () => {
-    if (!previouslyLoggedIn) return;
+    if (!isLoggedIn) return;
     try {
         dispatch(UserLogout());
         dispatch(AuthLogout());
