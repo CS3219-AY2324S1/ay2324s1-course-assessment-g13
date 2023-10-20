@@ -8,14 +8,13 @@ import {
   useDisclosure,
 } from '@nextui-org/react';
 import { DELETE } from '../../libs/axios/axios';
-import useAuth from '../../hooks/useAuth';
 import { notifyError, notifySuccess } from '../toast/notifications';
 import { useDispatch } from 'react-redux';
-import { logout } from '../../libs/redux/slices/userSlice';
+import { logout as UserLogout} from '../../libs/redux/slices/userSlice';
+import { logout as AuthLogout} from '../../libs/redux/slices/authSlice';
 import { useRouter } from 'next/navigation';
 
 const DeleteAccountModal = () => {
-  const { userId:id } = useAuth();
   const dispatch = useDispatch();
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const router = useRouter();
@@ -23,7 +22,8 @@ const DeleteAccountModal = () => {
   const handleDelete = async () => {
     try {
       const response = await DELETE(`/auth/user`);
-      dispatch(logout());
+      dispatch(UserLogout());
+      dispatch(AuthLogout());
       router.push('/');
       notifySuccess(response.data);
       onClose();
@@ -34,7 +34,7 @@ const DeleteAccountModal = () => {
 
   return (
     <>
-      <Button className="bg-red-500 rounded-md " onPress={onOpen}>
+      <Button className="bg-red-500 " onPress={onOpen}>
         Delete Account
       </Button>
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>

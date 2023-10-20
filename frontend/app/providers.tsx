@@ -1,6 +1,7 @@
 'use client';
 
 import { NextUIProvider } from '@nextui-org/react';
+import { SessionProvider } from "next-auth/react";
 import { ReactNode } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -13,11 +14,13 @@ export function Providers({ children }: { children: ReactNode }) {
     <>
       <ToastContainer />
       <NextUIProvider>
-        <Provider store={store}>
-          <PersistGate loading={null} persistor={persistor}>
-            {children}
-          </PersistGate>
-        </Provider>
+        <SessionProvider>
+          <Provider store={store}>
+            <PersistGate loading={null} persistor={persistor}>
+              {children}
+            </PersistGate>
+          </Provider>
+        </SessionProvider>
       </NextUIProvider>
     </>
   );
