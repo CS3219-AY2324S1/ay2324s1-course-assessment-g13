@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 
 	"user-service/config"
 	model "user-service/models"
@@ -80,6 +81,13 @@ func CreateUser(c echo.Context) error {
 func UpdateUser(c echo.Context) error {
 	authUserID := c.Param("id")
 
+	intAuthUserId, err := strconv.Atoi(authUserID)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage("Internal Server Error: Unable to Convert String to Uint"))
+	}
+
+	uintAuthUserId := uint(intAuthUserId)
+
 	var user model.User
 	if err := config.DB.Where("auth_user_id = ?", authUserID).First(&user).Error; err != nil {
 		return c.JSON(http.StatusNotFound, message.CreateErrorMessage(INVALID_USER_NOT_FOUND))
@@ -101,7 +109,9 @@ func UpdateUser(c echo.Context) error {
 				return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(INVALID_DB_ERROR))
 			}
 		} else {
-			return c.JSON(http.StatusConflict, message.CreateErrorMessage(INVALID_USERNAME_EXIST))
+			if existingUser.AuthUserID != uintAuthUserId {
+				return c.JSON(http.StatusConflict, message.CreateErrorMessage(INVALID_USERNAME_EXIST))
+			}
 		}
 		user.Username = requestBody.Username
 	}

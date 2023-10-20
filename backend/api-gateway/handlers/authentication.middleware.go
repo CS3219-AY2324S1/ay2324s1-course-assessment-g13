@@ -15,6 +15,7 @@ var bypassLoginList = map[string]bool{
 	path.SIGNUP:  true,
 	path.LOGIN:   true,
 	path.REFRESH: true,
+	path.LOGOUT:  true,
 }
 
 func RequireAuthenticationMiddleWare(next echo.HandlerFunc) echo.HandlerFunc {
