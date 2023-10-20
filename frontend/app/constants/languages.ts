@@ -1,4 +1,5 @@
 export enum Language {
+    NO_LANGUAGE = '',
     C_PLUS_PLUS = 'C_PLUS_PLUS',
     JAVA = 'JAVA',
     PYTHON_THREE = 'PYTHON_THREE',
@@ -29,6 +30,7 @@ export enum Language {
   }
 
 export const LANGUAGES = Object.freeze([
+    Language.NO_LANGUAGE,
     Language.C,
     Language.C_PLUS_PLUS,
     Language.C_SHARP,

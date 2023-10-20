@@ -94,7 +94,7 @@ export default function SignUpPage() {
                             errorMessage={errors.username?.message as string}
                         />
                         <Select 
-                            {...register('preferredLanguage')}
+                            {...register('preferred_language')}
                             label="Preferred Language" 
                         >
                             {languages.map((language) => (
