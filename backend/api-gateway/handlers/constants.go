@@ -33,8 +33,6 @@ const (
 	REFRESH_TOKEN_COOKIE_NAME = "refresh-token"
 )
 
-const USER_ROLE_KEY_REQUEST_HEADER = "X-User-Role"
-
 const (
 	USER  = "user"
 	ADMIN = "admin"

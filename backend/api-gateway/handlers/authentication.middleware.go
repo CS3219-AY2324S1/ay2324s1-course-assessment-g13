@@ -37,7 +37,6 @@ func RequireAuthenticationMiddleWare(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 
 		c.Set(TOKEN_CLAIMS_CONTEXT_KEY, tokenClaims)
-		c.Request().Header.Set(USER_ROLE_KEY_REQUEST_HEADER, tokenClaims.User.Role)
 		return next(c)
 	}
 }
