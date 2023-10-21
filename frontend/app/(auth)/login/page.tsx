@@ -16,7 +16,7 @@ interface LoginRequest {
     oauth_provider: "GitHub"
 }
 
-interface LoginResponse {
+export interface LoginResponse {
     message: string
     user?: AuthResponse
 }
