@@ -24,8 +24,7 @@ type Hub struct {
 
 type User struct {
     Connection *websocket.Conn
-    CodeChannel chan *Message
-    ChatChannel chan *Message
+    MessageChannel chan *Message
     RoomId string
     UserId string
 }
@@ -109,16 +108,14 @@ func (h *Handler) JoinRoom(c echo.Context) error {
     userId := uuid.New().String()
     user := &User{
         Connection: connection,
-        CodeChannel: make(chan *Message, 10),
-        ChatChannel: make(chan *Message, 10),
+        MessageChannel: make(chan *Message, 10),
         RoomId: roomId,
         UserId: userId,
     }
 
     h.hub.Rooms[roomId].Users[userId] = user
 
-    go user.writeCodeMessage()
-    go user.writeChatMessage()
+    go user.writeMessage()
     user.readMessage(h.hub)
     return c.JSON(http.StatusOK, "Successfully joined room!")
 }
@@ -136,28 +133,13 @@ func (h *Handler) GetQuestionId(c echo.Context) error {
 }
 
 // Reads data from hub, and emit data to client
-func (user *User) writeCodeMessage() {
+func (user *User) writeMessage() {
     defer func() {
         user.Connection.Close()
     }()
 
     for {
-        message, ok := <-user.CodeChannel
-        if !ok {
-            return
-        }
-
-        user.Connection.WriteJSON(message)
-    }
-}
-
-func (user *User) writeChatMessage() {
-    defer func() {
-        user.Connection.Close()
-    }()
-
-    for {
-        message, ok := <-user.ChatChannel
+        message, ok := <-user.MessageChannel
         if !ok {
             return
         }
@@ -201,11 +183,7 @@ func (hub *Hub) Run() {
             if _, ok := hub.Rooms[message.RoomId]; ok {
                 for _, user := range hub.Rooms[message.RoomId].Users {
                     if message.UserId != user.UserId {
-                        if message.Type == "code" {
-                            user.CodeChannel <- message
-                        } else {
-                            user.ChatChannel <- message
-                        }
+                        user.MessageChannel <- message
                     }
                 }
             }
@@ -214,8 +192,7 @@ func (hub *Hub) Run() {
             if len(hub.Rooms[user.RoomId].Users) == 0 {
                 delete(hub.Rooms, user.RoomId)
             }
-            close(user.CodeChannel)
-            close(user.ChatChannel)
+            close(user.MessageChannel)
         }
     }
 }

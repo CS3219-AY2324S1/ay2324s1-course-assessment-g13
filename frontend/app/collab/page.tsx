@@ -38,12 +38,14 @@ export default function Collab() {
       var message = JSON.parse(event.data);
       if (message.Type === "code") {
         setCode(message.Content);
-      } else {
+      } else if (message.Type === "chat") {
         setMessages((prevMessages) => [...prevMessages, {
           content: message.Content,
           user: "Other",
         }]);
         notifyWarning("You have unread messages!");
+      } else {
+        notifyError(message.Content);
       }
     }
   }, [])
@@ -96,6 +98,11 @@ export default function Collab() {
   };
 
   const exitRoom = () => {
+    const message = {
+      Content: "The other user has left the room!",
+      Type: "exit",
+    };
+    ws.current.send(JSON.stringify(message));
     ws.current.close();
     dispatch(setIsLeaving(false));
     dispatch(setIsChatOpen(false));
@@ -183,7 +190,7 @@ export default function Collab() {
               ))}
             </ModalBody>
             <ModalFooter>
-              <div className="flex w-full item-center mt-10">
+              <div className="flex w-full item-center mt-10 p-5">
                 <Input
                   autoFocus
                   isRequired
