@@ -4,10 +4,12 @@ import {AppState} from "../store";
 
 export interface CollabState {
     isLeaving : boolean
+    isChatOpen : boolean
 }
 
 const initialState : CollabState = {
-    isLeaving : false
+    isLeaving : false,
+    isChatOpen : false,
 };
 
 export const collabSlice = createSlice({
@@ -17,9 +19,13 @@ export const collabSlice = createSlice({
         setIsLeaving: (state, action) => {
             state.isLeaving = action.payload;
         },
+        setIsChatOpen: (state, action) => {
+            state.isChatOpen = action.payload;
+        },
     },
 });
 
-export const { setIsLeaving } = collabSlice.actions;
-export const selectCollabState = (state : AppState) => state.collab.isLeaving;
+export const { setIsLeaving, setIsChatOpen } = collabSlice.actions;
+export const selectCollabLeavingState = (state : AppState) => state.collab.isLeaving;
+export const selectCollabChatState = (state : AppState) => state.collab.isChatOpen;
 export default collabSlice.reducer;

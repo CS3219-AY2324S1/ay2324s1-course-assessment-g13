@@ -24,7 +24,8 @@ type Hub struct {
 
 type User struct {
     Connection *websocket.Conn
-    MessageChannel chan *Message
+    CodeChannel chan *Message
+    ChatChannel chan *Message
     RoomId string
     UserId string
 }
@@ -33,6 +34,7 @@ type Message struct {
     Content string
     RoomId string
     UserId string
+    Type string 
 }
 
 type Handler struct {
@@ -107,14 +109,16 @@ func (h *Handler) JoinRoom(c echo.Context) error {
     userId := uuid.New().String()
     user := &User{
         Connection: connection,
-        MessageChannel: make(chan *Message, 10),
+        CodeChannel: make(chan *Message, 10),
+        ChatChannel: make(chan *Message, 10),
         RoomId: roomId,
         UserId: userId,
     }
 
     h.hub.Rooms[roomId].Users[userId] = user
 
-    go user.writeMessage()
+    go user.writeCodeMessage()
+    go user.writeChatMessage()
     user.readMessage(h.hub)
     return c.JSON(http.StatusOK, "Successfully joined room!")
 }
@@ -132,13 +136,28 @@ func (h *Handler) GetQuestionId(c echo.Context) error {
 }
 
 // Reads data from hub, and emit data to client
-func (user *User) writeMessage() {
+func (user *User) writeCodeMessage() {
     defer func() {
         user.Connection.Close()
     }()
 
     for {
-        message, ok := <-user.MessageChannel
+        message, ok := <-user.CodeChannel
+        if !ok {
+            return
+        }
+
+        user.Connection.WriteJSON(message)
+    }
+}
+
+func (user *User) writeChatMessage() {
+    defer func() {
+        user.Connection.Close()
+    }()
+
+    for {
+        message, ok := <-user.ChatChannel
         if !ok {
             return
         }
@@ -156,19 +175,22 @@ func (user *User) readMessage(hub *Hub) {
 
     for {
         _, message, err := user.Connection.ReadMessage()
-        // log.Println(string(message))
         if err != nil {
             log.Println("Error reading message from socket")
             break
         }
 
-        msg := &Message{
-            Content: string(message),
-            RoomId: user.RoomId,
-            UserId: user.UserId,
+        var msg Message
+        err = json.Unmarshal(message, &msg)
+        if err != nil {
+            log.Println(err)
+            break
         }
 
-        hub.BroadcastChannel <- msg
+        msg.RoomId = user.RoomId
+        msg.UserId = user.UserId
+
+        hub.BroadcastChannel <- &msg
     }
 }
 
@@ -179,7 +201,11 @@ func (hub *Hub) Run() {
             if _, ok := hub.Rooms[message.RoomId]; ok {
                 for _, user := range hub.Rooms[message.RoomId].Users {
                     if message.UserId != user.UserId {
-                        user.MessageChannel <- message
+                        if message.Type == "code" {
+                            user.CodeChannel <- message
+                        } else {
+                            user.ChatChannel <- message
+                        }
                     }
                 }
             }
@@ -188,7 +214,8 @@ func (hub *Hub) Run() {
             if len(hub.Rooms[user.RoomId].Users) == 0 {
                 delete(hub.Rooms, user.RoomId)
             }
-            close(user.MessageChannel)
+            close(user.CodeChannel)
+            close(user.ChatChannel)
         }
     }
 }
