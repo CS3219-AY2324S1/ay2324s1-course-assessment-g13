@@ -26,6 +26,5 @@ export const collabSlice = createSlice({
 });
 
 export const { setIsLeaving, setIsChatOpen } = collabSlice.actions;
-export const selectCollabLeavingState = (state : AppState) => state.collab.isLeaving;
-export const selectCollabChatState = (state : AppState) => state.collab.isChatOpen;
+export const selectCollabState = (state : AppState) => state.collab;
 export default collabSlice.reducer;

@@ -12,11 +12,11 @@ import { useRouter } from 'next/navigation';
 import { logout } from '../../libs/redux/slices/userSlice';
 import { GET } from '../../libs/axios/axios';
 import { usePathname } from 'next/navigation';
-import { setIsLeaving, setIsChatOpen, selectCollabChatState } from '../../libs/redux/slices/collabSlice';
+import { setIsLeaving, setIsChatOpen, selectCollabState } from '../../libs/redux/slices/collabSlice';
 import { ChatIcon } from '../../../public/ChatIcon';
 
 const Nav = () => {
-  const chatState = useSelector(selectCollabChatState);
+  const collabState = useSelector(selectCollabState);
   const dispatch = useDispatch();
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -88,8 +88,8 @@ const Nav = () => {
         <NavbarContent justify="end">
           {checkPath("/collab") && (
             <NavbarItem>
-              <Button onPress={() => dispatch(setIsChatOpen(!chatState))}className="h-fit min-w-0 px-0 bg-transparent flex item-center">
-                <span className="text-lg cursor-pointer active:opacity-50">
+              <Button onPress={() => dispatch(setIsChatOpen(!collabState.isChatOpen))} className="h-fit min-w-0 px-0 bg-transparent flex item-center">
+                <span className="cursor-pointer active:opacity-50">
                   <ChatIcon />
                 </span>
               </Button>

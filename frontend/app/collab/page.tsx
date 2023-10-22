@@ -3,10 +3,10 @@ import { useState, useEffect } from 'react';
 import { Chip } from '@nextui-org/chip';
 import { Category, Complexity, ComplexityToColor, Question } from '../types/question';
 import { GET } from "../libs/axios/axios";
-import { notifyError } from '../components/toast/notifications';
+import { notifyError, notifyWarning } from '../components/toast/notifications';
 import Editor from '@monaco-editor/react';
 import { useSelector } from 'react-redux';
-import { selectCollabChatState, selectCollabLeavingState, setIsLeaving } from '../libs/redux/slices/collabSlice';
+import { selectCollabState, setIsChatOpen, setIsLeaving } from '../libs/redux/slices/collabSlice';
 import {
   Modal,
   ModalContent,
@@ -14,16 +14,13 @@ import {
   ModalBody,
   ModalFooter
 } from '@nextui-org/modal';
-import { Button } from '@nextui-org/react';
+import { Button, Input } from '@nextui-org/react';
 import { useDispatch } from 'react-redux';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useRef } from 'react';
-import { selectUsername } from '../libs/redux/slices/userSlice';
 
 export default function Collab() {
-  const collabLeavingState = useSelector(selectCollabLeavingState);
-  const chatOpenState = useSelector(selectCollabChatState);
-  const userId = useSelector(selectUsername);
+  const collabState = useSelector(selectCollabState);
   const dispatch = useDispatch();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -39,11 +36,14 @@ export default function Collab() {
     // onmessage is for receiving messages
     ws.current.onmessage = function (event) {
       var message = JSON.parse(event.data);
-      if (message["Type"] === "code") {
-        setCode(message["Content"]);
+      if (message.Type === "code") {
+        setCode(message.Content);
       } else {
-        console.log(message);
-        setMessages((prevMessages) => [...prevMessages, message]);
+        setMessages((prevMessages) => [...prevMessages, {
+          content: message.Content,
+          user: "Other",
+        }]);
+        notifyWarning("You have unread messages!");
       }
     }
   }, [])
@@ -76,14 +76,14 @@ export default function Collab() {
 
   const handleSendMessage = () => {
     const sendMessage = {
-      content: newMessage,
-      type: "chat",
+      Content: newMessage,
+      Type: "chat",
     };
     ws.current.send(JSON.stringify(sendMessage));
 
     const message = {
-      UserId: userId,
-      Content: newMessage,
+      content: newMessage,
+      user: "Current",
     }
     setNewMessage('');
     setMessages((prevMessages) => [...prevMessages, message]);
@@ -98,6 +98,7 @@ export default function Collab() {
   const exitRoom = () => {
     ws.current.close();
     dispatch(setIsLeaving(false));
+    dispatch(setIsChatOpen(false));
     router.push('/');
   }
 
@@ -138,7 +139,7 @@ export default function Collab() {
           />
         </div>
       </div>
-      <Modal size={'xl'} isOpen={collabLeavingState} onClose={() => dispatch(setIsLeaving(false))} placement="top-center">
+      <Modal size="xl" isOpen={collabState.isLeaving} onClose={() => dispatch(setIsLeaving(false))} placement="top-center">
         <ModalContent>
           {onClose => (
             <>
@@ -158,31 +159,48 @@ export default function Collab() {
           )}
         </ModalContent>
       </Modal>
-      {chatOpenState && (
-        <div className="bg-black w-1/4 h-2/5 absolute left-0 bottom-0 border border-white border-opacity-20">
-        <div className="h-5/6 p-4 overflow-y-auto">
-          {messages.map((message, index) => (
-            <div key={index} className="mb-4 flex">
-              <span>{message.UserId}</span>
-              <span>{message.Content}</span>
-            </div>
-          ))}
-        </div>
-        <div className="mb-4 border-b border-gray-400"></div>
-        <div className="flex justify-center p-4">
-          <input
-            type="text"
-            placeholder="Type your message..."
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            className="w-3/4 p-2 rounded"
-          />
-          <Button onClick={handleSendMessage} color="primary" className='ml-5'>
-            Send
-          </Button>
-        </div>
-      </div>
-      )}
+      <Modal 
+        size="full" 
+        isOpen={collabState.isChatOpen} 
+        onClose={() => dispatch(setIsChatOpen(false))} 
+        scrollBehavior="inside" 
+        placement="center"
+      >
+        <ModalContent>
+          <>
+            <ModalHeader className="flex flex-col gap-1">Chat Room</ModalHeader>
+            <ModalBody>
+              {messages.map((message, index) => (
+                <Chip 
+                  variant="bordered" 
+                  key={index}
+                  size="lg"
+                  className={message.user === "Other" ? "mx-10" : "mx-10 ml-auto"}
+                  color={message.user === "Other" ? "secondary" : "primary"}
+                >
+                  {message.content}
+                </Chip>
+              ))}
+            </ModalBody>
+            <ModalFooter>
+              <div className="flex w-full item-center mt-10">
+                <Input
+                  autoFocus
+                  isRequired
+                  type="text"
+                  variant="bordered"
+                  placeholder="Type your message..."
+                  value={newMessage}
+                  onValueChange={setNewMessage}
+                />
+                <Button onClick={handleSendMessage} color="primary" className="ml-5">
+                  Send
+                </Button>
+              </div>
+            </ModalFooter>
+          </>
+        </ModalContent>
+      </Modal>
     </>
-  )
+  );
 }
