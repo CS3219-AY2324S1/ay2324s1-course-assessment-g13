@@ -1,6 +1,5 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Chip } from '@nextui-org/chip';
 import { Category, Complexity, ComplexityToColor, Question } from '../types/question';
 import { GET } from "../libs/axios/axios";
 import { notifyError, notifyWarning } from '../components/toast/notifications';
@@ -14,7 +13,7 @@ import {
   ModalBody,
   ModalFooter
 } from '@nextui-org/modal';
-import { Button, Input } from '@nextui-org/react';
+import { Button, Input, Chip } from '@nextui-org/react';
 import { useDispatch } from 'react-redux';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useRef } from 'react';
@@ -30,9 +29,9 @@ export default function Collab() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const ws = useRef(null);
+
   useEffect(() => {
     ws.current = new WebSocket(`ws://localhost:5005/ws/${roomId}`);
-    fetchQuestion();
     // onmessage is for receiving messages
     ws.current.onmessage = function (event) {
       var message = JSON.parse(event.data);
@@ -48,7 +47,13 @@ export default function Collab() {
         notifyError(message.Content);
       }
     }
-  }, [])
+  }, []);
+
+  useEffect(() => {
+    fetchQuestion();
+    dispatch(setIsLeaving(false));
+    dispatch(setIsChatOpen(false));
+  }, []);
 
   const [question, setQuestion] = useState<Question>({
     id: "",
@@ -104,8 +109,6 @@ export default function Collab() {
     };
     ws.current.send(JSON.stringify(message));
     ws.current.close();
-    dispatch(setIsLeaving(false));
-    dispatch(setIsChatOpen(false));
     router.push('/');
   }
 
@@ -178,15 +181,14 @@ export default function Collab() {
             <ModalHeader className="flex flex-col gap-1">Chat Room</ModalHeader>
             <ModalBody>
               {messages.map((message, index) => (
-                <Chip 
-                  variant="bordered" 
+                <p
                   key={index}
-                  size="lg"
-                  className={message.user === "Other" ? "mx-10" : "mx-10 ml-auto"}
-                  color={message.user === "Other" ? "secondary" : "primary"}
+                  className={"my-5 border rounded-lg p-2 max-w-md break-words" 
+                    + (message.user === "Other" ? " ml-10 mr-auto text-cyan-100 border-cyan-100" 
+                    : " mr-10 ml-auto text-violet-100 border-violet-100")}
                 >
                   {message.content}
-                </Chip>
+                </p>
               ))}
             </ModalBody>
             <ModalFooter>
