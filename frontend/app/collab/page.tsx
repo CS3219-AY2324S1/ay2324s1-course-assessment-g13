@@ -31,7 +31,7 @@ export default function Collab() {
   const ws = useRef(null);
 
   useEffect(() => {
-    ws.current = new WebSocket(`ws://localhost:5005/ws/${roomId}`);
+    ws.current = new WebSocket(`${process.env.COLLAB_SERVICE_URL}/ws/${roomId}`);
     // onmessage is for receiving messages
     ws.current.onmessage = function (event) {
       var message = JSON.parse(event.data);

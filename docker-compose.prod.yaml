@@ -21,10 +21,6 @@ services:
       context: ./frontend
       dockerfile: Dockerfile.prod
     container_name: frontend
-    volumes:
-      - ./frontend:/usr/src/app
-      - /usr/src/app/node_modules
-      - /usr/src/app/.next
     ports:
       - "3000:3000" # Maps container port 3000 to local 3000
 
@@ -37,8 +33,6 @@ services:
       - ./backend/api-gateway/.env
     ports:
       - "1234:1234"  # Maps container port 1234 to local 1234
-    volumes:
-      - ./backend/api-gateway:/usr/src/app
     networks:
       - peerpreps-backend
     depends_on:
@@ -54,8 +48,6 @@ services:
       - "5005:8080" # Maps container port 8080 to local 5005
     environment:
       QUESTION_SERVICE_URL: http://question-service:8080
-    volumes:
-      -  ./backend/collaboration-service:/usr/src/app
     networks:
       - peerpreps-backend
 
@@ -68,8 +60,6 @@ services:
       - ./backend/user-service/.env
     ports:
       - "5006:8080" # Maps container port 8080 to local 5006
-    volumes:
-      - ./backend/user-service:/usr/src/app
     depends_on:
       db-us:
         condition: service_healthy
@@ -88,8 +78,6 @@ services:
     networks:
       - peerpreps-backend
       - rabbitmq-network
-    volumes:
-      - ./backend/matching-service/producer:/usr/src/app
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -107,8 +95,6 @@ services:
     networks:
       - peerpreps-backend
       - rabbitmq-network
-    volumes:
-      - ./backend/matching-service/consumer:/usr/src/app
     depends_on:
       matching-producer:
         condition: service_started
@@ -126,7 +112,7 @@ services:
       - "5672:5672"
       - "15672:15672"
     healthcheck:
-      test: rabbitmq-diagnostics -q ping
+      test: [ "CMD", "nc", "-z", "rabbitmq", "5672" ]
       interval: 5s
       timeout: 10s
       retries: 5
@@ -140,8 +126,6 @@ services:
         - ./backend/question-service/.env
       ports:
         - "5009:8080" # Maps container port 8080 to local 5009
-      volumes:
-        - ./backend/question-service:/usr/src/app
       depends_on:
         mongodb:
           condition: service_started
@@ -175,7 +159,6 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./scripts/init_user_db.sh:/docker-entrypoint-initdb.d/init_user_db.sh
       - data:/var/lib/postgresql/data
     networks:
       - peerpreps-backend
@@ -194,7 +177,6 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      - ./scripts/init_apigw_db.sh:/docker-entrypoint-initdb.d/init_apigw_db.sh
       - agw-data:/var/lib/postgresql/data
     networks:
       - peerpreps-backend

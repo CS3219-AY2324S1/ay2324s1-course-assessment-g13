@@ -9,6 +9,8 @@
 ```
 NEXT_PUBLIC_BACKEND_URL=http://localhost:1234
 NEXT_PUBLIC_GITHUB_OAUTH_CLIENT_ID=<details_omitted>
+FRONTEND_URL=http://localhost:3000
+COLLAB_SERVICE_URL=ws://localhost:5005
 
 NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=<details_omitted>
 NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=<details_omitted>
