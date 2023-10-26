@@ -46,6 +46,8 @@ services:
       dockerfile: Dockerfile.prod
     ports:
       - "5005:8080" # Maps container port 8080 to local 5005
+    environment:
+      QUESTION_SERVICE_URL: http://question-service:8080
     networks:
       - peerpreps-backend
 
