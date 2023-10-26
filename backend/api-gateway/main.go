@@ -5,6 +5,7 @@ import (
 	"api-gateway/handlers"
 	"api-gateway/utils/path"
 	"log"
+	"os"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -20,7 +21,7 @@ func main() {
 	API_GATEWAY := echo.New()
 
 	corsMiddleware := middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins:     []string{"http://localhost:3000"},
+		AllowOrigins:     []string{os.Getenv("FRONTEND_URL")},
 		AllowMethods:     []string{http.MethodPut, http.MethodGet, http.MethodPost, http.MethodDelete, http.MethodPatch},
 		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
 		AllowCredentials: true,
