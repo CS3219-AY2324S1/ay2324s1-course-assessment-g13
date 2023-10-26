@@ -1,4 +1,4 @@
-# Question Service
+# Matching Producer
 
 ## Setting up environment
 
@@ -7,6 +7,6 @@
 2. Here's an example of the `.env` file:
 
 ```
-MONGO_URI="mongodb://mongodb:27017"
+AMQP_SERVER_URL=amqp://guest:guest@localhost:5672/
 AGW_URL="http://localhost:1234"
 ```

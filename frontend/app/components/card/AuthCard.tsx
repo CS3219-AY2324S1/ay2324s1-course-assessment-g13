@@ -18,7 +18,7 @@ export default function AuthCard({authTitle} : AuthCardProps) {
 
     const handleGithubLogin = async () => {
         const clientId = process.env.NEXT_PUBLIC_GITHUB_OAUTH_CLIENT_ID;
-        const redirectUrl = "http://localhost:3000/oauth/callback";
+        const redirectUrl = `${process.env.FRONTEND_URL}/oauth/callback`;
         const github_authorize_url = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUrl}`;
         router.push(github_authorize_url);
     }

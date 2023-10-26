@@ -43,7 +43,7 @@ func GithubLoginHandler(c echo.Context) error {
 	redirectURL := fmt.Sprintf(
 		"https://github.com/login/oauth/authorize?client_id=%s&redirect_uri=%s",
 		githubClientID,
-		"http://localhost:1234/auth/login/github",
+		os.Getenv("AGW_URL") + "/auth/login/github",
 	)
 	return c.Redirect(http.StatusMovedPermanently, redirectURL)
 }

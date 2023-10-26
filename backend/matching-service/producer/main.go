@@ -5,6 +5,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"log"
+	"os"
 	"net/http"
 	"producer/handlers"
 	"producer/rmq"
@@ -16,7 +17,7 @@ func main() {
 
 	e := echo.New()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"http://localhost:1234"},
+		AllowOrigins: []string{os.Getenv("AGW_URL")},
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
 		AllowMethods: []string{http.MethodGet, http.MethodPost},
 	}))

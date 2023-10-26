@@ -10,6 +10,7 @@
 PGUSER="postgres"
 POSTGRES_PASSWORD="postgres"
 POSTGRES_DB="users"
+AGW_URL="http://localhost:1234"
 ```
 
 ## Commands
