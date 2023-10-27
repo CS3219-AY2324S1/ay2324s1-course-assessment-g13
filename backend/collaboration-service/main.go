@@ -20,5 +20,6 @@ func main() {
 	})
 	e.POST("/room", wsHandler.CreateRoom)
 	e.GET("/ws/:roomId", wsHandler.JoinRoom)
+	e.GET("/ws/question/:roomId", wsHandler.GetQuestionId)
 	e.Logger.Fatal(e.Start(":8080"))
 }

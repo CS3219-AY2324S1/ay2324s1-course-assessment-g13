@@ -1,12 +1,11 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Chip } from '@nextui-org/chip';
 import { Category, Complexity, ComplexityToColor, Question } from '../types/question';
 import { GET } from "../libs/axios/axios";
-import { notifyError } from '../components/toast/notifications';
+import { notifyError, notifyWarning } from '../components/toast/notifications';
 import Editor from '@monaco-editor/react';
 import { useSelector } from 'react-redux';
-import { selectCollabState, setIsLeaving } from '../libs/redux/slices/collabSlice';
+import { selectCollabState, setIsChatOpen, setIsLeaving } from '../libs/redux/slices/collabSlice';
 import {
   Modal,
   ModalContent,
@@ -14,7 +13,7 @@ import {
   ModalBody,
   ModalFooter
 } from '@nextui-org/modal';
-import { Button } from '@nextui-org/react';
+import { Button, Input, Chip } from '@nextui-org/react';
 import { useDispatch } from 'react-redux';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useRef } from 'react';
@@ -27,17 +26,34 @@ export default function Collab() {
   const roomId = searchParams.get('room_id');
   const defaultCode = "# Type answer here";
   const [code, setCode] = useState(defaultCode);
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState('');
   const ws = useRef(null);
-  // const ws = new WebSocket(`ws://localhost:5005/ws/${roomId}`)
+
   useEffect(() => {
-    ws.current = new WebSocket(`ws://localhost:5005/ws/${roomId}`);
+    ws.current = new WebSocket(`${process.env.COLLAB_SERVICE_URL}/ws/${roomId}`);
     // onmessage is for receiving messages
     ws.current.onmessage = function (event) {
-      var messages = event.data;
-      // console.log(JSON.parse(messages));
-      setCode(JSON.parse(messages)["Content"]);
+      var message = JSON.parse(event.data);
+      if (message.Type === "code") {
+        setCode(message.Content);
+      } else if (message.Type === "chat") {
+        setMessages((prevMessages) => [...prevMessages, {
+          content: message.Content,
+          user: "Other",
+        }]);
+        notifyWarning("You have unread messages!");
+      } else {
+        notifyError(message.Content);
+      }
     }
-  }, [])
+  }, []);
+
+  useEffect(() => {
+    fetchQuestion();
+    dispatch(setIsLeaving(false));
+    dispatch(setIsChatOpen(false));
+  }, []);
 
   const [question, setQuestion] = useState<Question>({
     id: "",
@@ -47,10 +63,10 @@ export default function Collab() {
     description: ""
   });
 
-  const fetchQuestion = async (complexity : string) => {
+  const fetchQuestion = async () => {
     try {
-      const id_response = await GET(`questions/complexity/${complexity}`);
-      const response = await GET(`questions/${id_response.data}`);
+      const idResponse = await GET(`ws/question/${roomId}`);
+      const response = await GET(`questions/${idResponse.data}`);
       setQuestion(response.data as Question);
     } catch (error) {
       notifyError(error.message.data);
@@ -58,13 +74,27 @@ export default function Collab() {
   };
 
   const handleEditorChange = (value: string, event) => {
-    // console.log(value);
-    ws.current.send(value);
+    const message = {
+      content: value,
+      type: "code",
+    };
+    ws.current.send(JSON.stringify(message));
   }
 
-  useEffect(() => {
-    fetchQuestion('Easy');
-  }, []);
+  const handleSendMessage = () => {
+    const sendMessage = {
+      Content: newMessage,
+      Type: "chat",
+    };
+    ws.current.send(JSON.stringify(sendMessage));
+
+    const message = {
+      content: newMessage,
+      user: "Current",
+    }
+    setNewMessage('');
+    setMessages((prevMessages) => [...prevMessages, message]);
+  };
 
   const editorOptions = {
     minimap: {
@@ -73,8 +103,12 @@ export default function Collab() {
   };
 
   const exitRoom = () => {
+    const message = {
+      Content: "The other user has left the room!",
+      Type: "exit",
+    };
+    ws.current.send(JSON.stringify(message));
     ws.current.close();
-    dispatch(setIsLeaving(false));
     router.push('/');
   }
 
@@ -115,7 +149,7 @@ export default function Collab() {
           />
         </div>
       </div>
-      <Modal size={'xl'} isOpen={collabState} onClose={() => dispatch(setIsLeaving(false))} placement="top-center">
+      <Modal size="xl" isOpen={collabState.isLeaving} onClose={() => dispatch(setIsLeaving(false))} placement="top-center">
         <ModalContent>
           {onClose => (
             <>
@@ -135,6 +169,47 @@ export default function Collab() {
           )}
         </ModalContent>
       </Modal>
+      <Modal 
+        size="full" 
+        isOpen={collabState.isChatOpen} 
+        onClose={() => dispatch(setIsChatOpen(false))} 
+        scrollBehavior="inside" 
+        placement="center"
+      >
+        <ModalContent>
+          <>
+            <ModalHeader className="flex flex-col gap-1">Chat Room</ModalHeader>
+            <ModalBody>
+              {messages.map((message, index) => (
+                <p
+                  key={index}
+                  className={"my-5 border rounded-lg p-2 max-w-md break-words" 
+                    + (message.user === "Other" ? " ml-10 mr-auto text-cyan-100 border-cyan-100" 
+                    : " mr-10 ml-auto text-violet-100 border-violet-100")}
+                >
+                  {message.content}
+                </p>
+              ))}
+            </ModalBody>
+            <ModalFooter>
+              <div className="flex w-full item-center mt-10 p-5">
+                <Input
+                  autoFocus
+                  isRequired
+                  type="text"
+                  variant="bordered"
+                  placeholder="Type your message..."
+                  value={newMessage}
+                  onValueChange={setNewMessage}
+                />
+                <Button onClick={handleSendMessage} color="primary" className="ml-5">
+                  Send
+                </Button>
+              </div>
+            </ModalFooter>
+          </>
+        </ModalContent>
+      </Modal>
     </>
-  )
+  );
 }

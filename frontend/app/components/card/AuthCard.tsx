@@ -14,6 +14,15 @@ interface AuthCardProps {
 };
 
 export default function AuthCard({authTitle} : AuthCardProps) {
+    const router = useRouter();
+
+    const handleGithubLogin = async () => {
+        const clientId = process.env.NEXT_PUBLIC_GITHUB_OAUTH_CLIENT_ID;
+        const redirectUrl = `${process.env.FRONTEND_URL}/oauth/callback`;
+        const github_authorize_url = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUrl}`;
+        router.push(github_authorize_url);
+    }
+
     return (
         <Card className="max-w-lg mx-auto mt-48">
             <div className="flex h-96 items-center justify-center">
