@@ -1,7 +1,7 @@
 'use client';
 import { Link } from '@nextui-org/link';
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem } from '@nextui-org/navbar';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import useAuth from '../../hooks/useAuth';
 import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@nextui-org/dropdown'
 import { Avatar } from '@nextui-org/avatar';
@@ -9,34 +9,39 @@ import { Button } from '@nextui-org/button';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppState } from '../../libs/redux/store';
 import { useRouter } from 'next/navigation';
-import { logout } from '../../libs/redux/slices/userSlice';
+import { logout as UserLogout } from '../../libs/redux/slices/userSlice';
+import { logout as AuthLogout } from '../../libs/redux/slices/authSlice';
 import { GET } from '../../libs/axios/axios';
 import { usePathname } from 'next/navigation';
 import { setIsLeaving, setIsChatOpen, selectCollabState } from '../../libs/redux/slices/collabSlice';
 import { ChatIcon } from '../../../public/ChatIcon';
+import { signOut } from 'next-auth/react';
+import { notifyError } from '../toast/notifications';
 
 const Nav = () => {
   const collabState = useSelector(selectCollabState);
   const dispatch = useDispatch();
   const router = useRouter();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const { isAuthenticated } = useAuth();
+  const { status, isLoggedIn } = useAuth();
   const photoUrl = useSelector((state: AppState) => state.user.photoUrl);
   const pathname = usePathname();
 
   const handleLogout = async () => {
+    if (!isLoggedIn) return;
     try {
-        dispatch(logout());
+        dispatch(UserLogout());
+        dispatch(AuthLogout());
         await GET('/auth/logout');
-        router.push('/');
+        router.push('/')
     } catch (error) {
-        console.error(error)
+      const message =  error.message.data.message;
+      notifyError(message);
     }
   }
 
   useEffect(() => {
-    setIsLoggedIn(isAuthenticated);
-  }, [isAuthenticated])
+    status === "unauthenticated" && handleLogout();
+  }, [status])
 
   const checkPath = (url : string) => {
     return pathname === url;

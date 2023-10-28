@@ -4,8 +4,9 @@ const (
 	ERROR_OCCURRED             = "An Error Occurred"
 	INVALID_JSON_REQUEST       = "Invalid JSON Request!"
 	INVALID_USER_INPUT         = "Invalid User Input!"
-	INVALID_USER_EXIST         = "Username Already Exists!"
+	INVALID_USER_EXIST         = "User Already Exists!"
 	INVALID_USER_NOT_FOUND     = "User Not Found!"
+	INVALID_DB_ERROR           = "Error Occured when Accessing Database "
 	FAILURE_HASHING_PASSWORD   = "Double Check Your Credentials"
 	FAILURE_CREATE_USER        = "Failed to Create User!"
 	FAILURE_USER_ALREADY_LOGIN = "User Already Logged In"
@@ -25,15 +26,12 @@ const (
 	TOKEN_CLAIMS_CONTEXT_KEY    = "token-claims"
 	USER_CONTEXT_KEY            = "user"
 	SUCCESS_MESSAGE_CONTEXT_KEY = "success-message"
-	GITHUB_DATA_CONTEXT_KEY     = "github-data"
 )
 
 const (
 	ACCESS_TOKEN_COOKIE_NAME  = "access-token"
 	REFRESH_TOKEN_COOKIE_NAME = "refresh-token"
 )
-
-const USER_ROLE_KEY_REQUEST_HEADER = "X-User-Role"
 
 const (
 	USER  = "user"
