@@ -15,7 +15,6 @@ import { GET } from '../../libs/axios/axios';
 import { usePathname } from 'next/navigation';
 import { setIsLeaving, setIsChatOpen, selectCollabState } from '../../libs/redux/slices/collabSlice';
 import { ChatIcon } from '../../../public/ChatIcon';
-import { signOut } from 'next-auth/react';
 import { notifyError } from '../toast/notifications';
 
 const Nav = () => {
@@ -108,7 +107,7 @@ const Nav = () => {
               {!checkPath("/collab") && (
                 <DropdownMenu aria-label="Profile Actions" variant="flat">
                   <DropdownItem key="profile" color="primary">
-                    <Link href="/profile/info" className="text-white text-sm w-full">
+                    <Link href="/profile" className="text-white text-sm w-full">
                       Profile
                     </Link>
                   </DropdownItem>

@@ -17,9 +17,11 @@ import { Button, Input, Chip } from '@nextui-org/react';
 import { useDispatch } from 'react-redux';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useRef } from 'react';
+import { selectUsername } from '../libs/redux/slices/userSlice';
 
 export default function Collab() {
   const collabState = useSelector(selectCollabState);
+  const username = useSelector(selectUsername);
   const dispatch = useDispatch();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -55,6 +57,29 @@ export default function Collab() {
     dispatch(setIsChatOpen(false));
   }, []);
 
+  useEffect(() => {
+    const handleUnexpectedExit = (e) => {
+      sendMessage(`${username} has left the room!`, "exit");
+      ws.current.close();
+    };
+
+    window.addEventListener('beforeunload', handleUnexpectedExit);
+    window.addEventListener('popstate', handleUnexpectedExit);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleUnexpectedExit);
+      window.removeEventListener('popstate', handleUnexpectedExit);
+    };
+  }, []);
+
+  const sendMessage = (value : string, type : string) => {
+    const message = {
+      content: value,
+      type: type,
+    };
+    ws.current.send(JSON.stringify(message));
+  }
+
   const [question, setQuestion] = useState<Question>({
     id: "",
     title: "",
@@ -74,19 +99,11 @@ export default function Collab() {
   };
 
   const handleEditorChange = (value: string, event) => {
-    const message = {
-      content: value,
-      type: "code",
-    };
-    ws.current.send(JSON.stringify(message));
+    sendMessage(value, "code");
   }
 
   const handleSendMessage = () => {
-    const sendMessage = {
-      Content: newMessage,
-      Type: "chat",
-    };
-    ws.current.send(JSON.stringify(sendMessage));
+    sendMessage(newMessage, "chat");
 
     const message = {
       content: newMessage,
@@ -103,11 +120,7 @@ export default function Collab() {
   };
 
   const exitRoom = () => {
-    const message = {
-      Content: "The other user has left the room!",
-      Type: "exit",
-    };
-    ws.current.send(JSON.stringify(message));
+    sendMessage(`${username} has left the room!`, "exit");
     ws.current.close();
     router.push('/');
   }
