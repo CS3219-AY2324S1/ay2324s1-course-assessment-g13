@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Category, Complexity, ComplexityToColor, Question } from '../types/question';
 import { GET } from "../libs/axios/axios";
-import { notifyError, notifyWarning } from '../components/toast/notifications';
+import { notifyError, notifySuccess, notifyWarning } from '../components/toast/notifications';
 import Editor from '@monaco-editor/react';
 import { useSelector } from 'react-redux';
 import { selectCollabState, setIsChatOpen, setIsLeaving } from '../libs/redux/slices/collabSlice';
@@ -33,7 +33,18 @@ export default function Collab() {
   const ws = useRef(null);
 
   useEffect(() => {
-    ws.current = new WebSocket(`${process.env.NEXT_PUBLIC_COLLAB_SERVICE_URL}/ws/${roomId}`);
+    window.addEventListener('popstate', exitRoom);
+    window.addEventListener('beforeunload', sendExitMessage);
+    window.history.pushState(null, '', "");
+
+    return () => {
+      window.removeEventListener('popstate', exitRoom);
+      window.removeEventListener('beforeunload', sendExitMessage);
+    };
+  }, []);
+
+  useEffect(() => {
+    ws.current = new WebSocket(`${process.env.NEXT_PUBLIC_COLLAB_SERVICE_URL}/ws/${roomId}/${username}`);
     // onmessage is for receiving messages
     ws.current.onmessage = function (event) {
       var message = JSON.parse(event.data);
@@ -45,9 +56,15 @@ export default function Collab() {
           user: "Other",
         }]);
         notifyWarning("You have unread messages!");
-      } else {
+      } else if (message.Type === "exit") {
         notifyError(message.Content);
+      } else {
+        notifySuccess(message.Content);
       }
+    }
+
+    ws.current.onopen = function (event) {
+      sendMessage(`${username} has joined the room!`, "enter");
     }
   }, []);
 
@@ -55,21 +72,6 @@ export default function Collab() {
     fetchQuestion();
     dispatch(setIsLeaving(false));
     dispatch(setIsChatOpen(false));
-  }, []);
-
-  useEffect(() => {
-    const handleUnexpectedExit = (e) => {
-      sendMessage(`${username} has left the room!`, "exit");
-      ws.current.close();
-    };
-
-    window.addEventListener('beforeunload', handleUnexpectedExit);
-    window.addEventListener('popstate', handleUnexpectedExit);
-
-    return () => {
-      window.removeEventListener('beforeunload', handleUnexpectedExit);
-      window.removeEventListener('popstate', handleUnexpectedExit);
-    };
   }, []);
 
   const sendMessage = (value : string, type : string) => {
@@ -119,9 +121,13 @@ export default function Collab() {
     }
   };
 
-  const exitRoom = () => {
+  const sendExitMessage = () => {
     sendMessage(`${username} has left the room!`, "exit");
     ws.current.close();
+  }
+
+  const exitRoom = () => {
+    sendExitMessage();
     router.push('/');
   }
 
