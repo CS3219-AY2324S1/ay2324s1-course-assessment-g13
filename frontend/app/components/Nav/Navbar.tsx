@@ -108,7 +108,7 @@ const Nav = () => {
               {!checkPath("/collab") && (
                 <DropdownMenu aria-label="Profile Actions" variant="flat">
                   <DropdownItem key="profile" color="primary">
-                    <Link href="/profile/info" className="text-white text-sm w-full">
+                    <Link href="/profile" className="text-white text-sm w-full">
                       Profile
                     </Link>
                   </DropdownItem>
