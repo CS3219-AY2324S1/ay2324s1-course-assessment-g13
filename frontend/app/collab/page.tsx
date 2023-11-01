@@ -66,6 +66,11 @@ export default function Collab() {
     ws.current.onopen = function (event) {
       sendMessage(`${username} has joined the room!`, "enter");
     }
+
+    ws.current.onerror = function (event) {
+      notifyError("Room does not exist!");
+      router.push('/');
+    }
   }, []);
 
   useEffect(() => {
@@ -96,7 +101,9 @@ export default function Collab() {
       const response = await GET(`questions/${idResponse.data}`);
       setQuestion(response.data as Question);
     } catch (error) {
-      notifyError(error.message.data);
+      if (error.message.data != "") {
+        notifyError(error.message.data);
+      }
     }
   };
 
