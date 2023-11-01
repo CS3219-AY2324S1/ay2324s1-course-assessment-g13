@@ -68,7 +68,6 @@ export default function Collab() {
     }
 
     ws.current.onerror = function (event) {
-      notifyError("Room does not exist!");
       router.push('/');
     }
   }, []);
@@ -101,9 +100,7 @@ export default function Collab() {
       const response = await GET(`questions/${idResponse.data}`);
       setQuestion(response.data as Question);
     } catch (error) {
-      if (error.message.data != "") {
-        notifyError(error.message.data);
-      }
+      notifyError(error.message.data);
     }
   };
 

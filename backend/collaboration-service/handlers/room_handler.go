@@ -145,12 +145,17 @@ func (h *Handler) JoinRoom(c echo.Context) error {
 func (h *Handler) GetQuestionId(c echo.Context) error {
     roomId := c.Param("roomId")
 
-    questionId := h.hub.Rooms[roomId].QuestionId
-    if questionId == "" {
+    
+    room, exists := h.hub.Rooms[roomId]
+    if !exists {
+        return c.JSON(http.StatusBadRequest, "Room does not exist!")
+    }
+
+    if room.QuestionId == "" {
         return c.JSON(http.StatusBadRequest, "No question is allocated")
     }
 
-    return c.JSON(http.StatusOK, questionId)
+    return c.JSON(http.StatusOK, room.QuestionId)
 }
 
 // Reads data from hub, and emit data to client
