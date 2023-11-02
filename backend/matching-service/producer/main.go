@@ -5,8 +5,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"log"
-	"os"
 	"net/http"
+	"os"
 	"producer/handlers"
 	"producer/rmq"
 )
@@ -21,7 +21,7 @@ func main() {
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
 		AllowMethods: []string{http.MethodGet, http.MethodPost},
 	}))
-
+	
 	e.POST("/match/find", handlers.MatchHandler)
 	e.POST("/match/cancel", handlers.UserCancelHandler)
 

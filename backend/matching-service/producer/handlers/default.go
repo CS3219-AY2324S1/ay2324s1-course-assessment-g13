@@ -175,7 +175,6 @@ func MatchHandler(c echo.Context) error {
 			shouldBreak = true
 			break
 		case res := <-resChan:
-			utils.PrintCancelledUsers() // TODO remove once live
 			matchResponseBody = models.MatchResponse{
 				MatchUser:    res.MatchUser,
 				MatchStatus:  1,

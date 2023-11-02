@@ -24,7 +24,7 @@ func SpinMQConsumer(criteria utils.MatchCriteria) {
 			reqChannel = curr
 		} else {
 			msg := fmt.Sprintf("[SpinMQConsumer] Criteria channel is unknown | ok: %v", ok)
-			log.Println(msg)
+			log.Fatal(msg)
 			return
 		}
 
@@ -39,7 +39,7 @@ func SpinMQConsumer(criteria utils.MatchCriteria) {
 		)
 		if err != nil {
 			msg := fmt.Sprintf("[SpinMQConsumer] Error consuming from channel | err: %v", err)
-			log.Println(msg)
+			log.Fatal(msg)
 			return
 		}
 
@@ -49,7 +49,7 @@ func SpinMQConsumer(criteria utils.MatchCriteria) {
 			syncChannel = curr
 		} else {
 			msg := fmt.Sprintf("[SpinMQConsumer] Sync criteria channel is unknown | ok: %v", ok)
-			log.Println(msg)
+			log.Fatal(msg)
 			return
 		}
 		syncQueueName := string(criteria) + "sync"
@@ -65,7 +65,7 @@ func SpinMQConsumer(criteria utils.MatchCriteria) {
 		)
 		if err != nil {
 			msg := fmt.Sprintf("[SpinMQConsumer] Error consuming from sync channel | err: %v", err)
-			log.Println(msg)
+			log.Fatal(msg)
 			return
 		}
 
@@ -75,7 +75,7 @@ func SpinMQConsumer(criteria utils.MatchCriteria) {
 		resultChan, err := rmq.Conn.Channel()
 		if err != nil {
 			msg := fmt.Sprintf("[SpinMQConsumer] Error creating unique result channel | err: %v", err)
-			log.Println(msg)
+			log.Fatal(msg)
 			return
 		}
 		defer resultChan.Close()
@@ -106,7 +106,7 @@ func SpinMQConsumer(criteria utils.MatchCriteria) {
 						})
 					if err != nil {
 						msg := fmt.Sprintf("[SpinMQConsumer] Error publishing message to sync channel | err: %v", err)
-						log.Println(msg)
+						log.Fatal(msg)
 						return
 					}
 				}
@@ -117,7 +117,7 @@ func SpinMQConsumer(criteria utils.MatchCriteria) {
 					err := reqChannel.Ack(message.DeliveryTag, false)
 					if err != nil {
 						msg := fmt.Sprintf("[SpinMQConsumer] Error ACKing request packet | err: %v", err)
-						log.Println(msg)
+						log.Fatal(msg)
 						return
 					}
 
@@ -125,7 +125,7 @@ func SpinMQConsumer(criteria utils.MatchCriteria) {
 					err = json.Unmarshal(message.Body, &res)
 					if err != nil {
 						msg := fmt.Sprintf("[SpinMQConsumer] Error unmarshalling request packet | err: %v", err)
-						log.Println(msg)
+						log.Fatal(msg)
 						return
 					}
 
@@ -191,7 +191,7 @@ func SpinMQConsumer(criteria utils.MatchCriteria) {
 							responsePacket, err := json.Marshal(pubMsg)
 							if err != nil {
 								msg := fmt.Sprintf("[SpinMQConsumer] Error marshalling response packet | err: %v", err)
-								log.Println(msg)
+								log.Fatal(msg)
 								return
 							}
 
@@ -218,7 +218,7 @@ func SpinMQConsumer(criteria utils.MatchCriteria) {
 							)
 							if err != nil {
 								msg := fmt.Sprintf("[SpinMQConsumer] Error publishing message to results channel | err: %v", err)
-								log.Println(msg)
+								log.Fatal(msg)
 								return
 							}
 						}
@@ -226,6 +226,12 @@ func SpinMQConsumer(criteria utils.MatchCriteria) {
 						// Remove sync msg from sync channel
 						for syncMsg := range syncMsges {
 							log.Printf("Sync messaged retrieved | %v\n", syncMsg)
+							err = syncChannel.Ack(syncMsg.DeliveryTag, false)
+							if err != nil {
+								msg := fmt.Sprintf("[SpinMQConsumer] Error ACKing sync channel content | err: %v", err)
+								log.Fatal(msg)
+								return
+							}
 							break
 						}
 						break // Break out of the message consumption loop
