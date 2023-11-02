@@ -26,6 +26,10 @@ func DeleteUser(c echo.Context) error {
 
 	user := tokenClaims.User
 
+	if user.Role == SUPER_ADMIN {
+		return c.JSON(http.StatusForbidden, message.CreateErrorMessage(FAILURE_DELETE_SUPERADMIN))
+	}
+
 	authUserId := user.ID
 	responseStatusCode, responseMessage := client.UserService.DeleteUser(authUserId)
 	if responseStatusCode != http.StatusOK {

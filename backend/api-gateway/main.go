@@ -5,8 +5,8 @@ import (
 	"api-gateway/handlers"
 	"api-gateway/utils/path"
 	"log"
-	"os"
 	"net/http"
+	"os"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -37,8 +37,9 @@ func main() {
 	API_GATEWAY.GET(path.AUTH_USER, handlers.GetUser)
 	API_GATEWAY.DELETE(path.AUTH_USER, handlers.DeleteUser)
 
-	API_GATEWAY.GET(path.AUTH_USER_UPGRADE, handlers.UpgradeUser)
-	API_GATEWAY.GET(path.AUTH_USER_DOWNGRADE, handlers.DowngradeUser)
+	API_GATEWAY.POST(path.AUTH_USER_UPGRADE, handlers.UpgradeUser)
+	API_GATEWAY.POST(path.AUTH_USER_DOWNGRADE, handlers.DowngradeUser)
+	API_GATEWAY.GET(path.AUTH_USER_UPGRADE_SUPER_ADMIN, handlers.UpgradeSuperAdmin)
 
 	API_GATEWAY.Any(path.ALL_USER_SERVICE, handlers.HandleUserService)
 	API_GATEWAY.Any(path.ALL_QUESTION_SERVICE, handlers.HandleQuestionService)
