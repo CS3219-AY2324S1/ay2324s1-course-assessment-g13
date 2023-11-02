@@ -108,7 +108,7 @@ func MatchHandler(c echo.Context) error {
 	ctxTimer, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	syncChan := make(chan int)   // Used to break consumer goroutine once timeout hits
+	syncChan := make(chan int)                 // Used to break consumer goroutine once timeout hits
 	resChan := make(chan models.MatchResponse) // Used to pass result from consumer goroutine to main thread
 
 	// Spins off consumer goroutine to listen to results channel
@@ -128,6 +128,7 @@ func MatchHandler(c echo.Context) error {
 				matchedUser := packetResponse.ResponseBody.MatchUser
 				// Check if matched user is already out of queue
 				if utils.IsUserCancelled(matchedUser) {
+					log.Printf("User is already out of queue: %s\n", matchedUser)
 					// Publishes the user request into the selected MQ
 					err = channel.PublishWithContext(
 						ctx,
@@ -148,6 +149,7 @@ func MatchHandler(c echo.Context) error {
 					continue
 				} else if utils.IsUserCancelled(requestBody.Username) {
 					// If user is already cancelled, cancel the timer
+					log.Printf("User is already cancelled: %s\n", requestBody.Username)
 					cancel()
 				} else {
 					// If matched user is valid, return matched user
@@ -177,7 +179,7 @@ func MatchHandler(c echo.Context) error {
 			matchResponseBody = models.MatchResponse{
 				MatchUser:    res.MatchUser,
 				MatchStatus:  1,
-				RoomId:  res.RoomId,
+				RoomId:       res.RoomId,
 				ErrorMessage: "",
 			}
 			return c.JSON(http.StatusOK, matchResponseBody)
@@ -190,7 +192,7 @@ func MatchHandler(c echo.Context) error {
 	matchResponseBody = models.MatchResponse{
 		MatchUser:    "",
 		MatchStatus:  0,
-		RoomId:  "",
+		RoomId:       "",
 		ErrorMessage: "Match not found within 30 seconds.",
 	}
 

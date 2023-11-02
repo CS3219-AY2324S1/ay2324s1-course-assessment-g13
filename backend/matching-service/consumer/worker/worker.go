@@ -18,20 +18,20 @@ import (
 
 func SpinMQConsumer(criteria utils.MatchCriteria) {
 	go func() {
-		var channel *amqp.Channel
+		var reqChannel *amqp.Channel
 		// Declare message queues to ensure it exists
 		if curr, ok := rmq.OpenChannelsMap[criteria]; ok {
-			channel = curr
+			reqChannel = curr
 		} else {
 			msg := fmt.Sprintf("[SpinMQConsumer] Criteria channel is unknown | ok: %v", ok)
 			log.Println(msg)
 			return
 		}
 
-		messages, err := channel.Consume(
+		messages, err := reqChannel.Consume(
 			string(criteria), // queue name
 			"",               // consumer
-			true,             // auto-ack
+			false,            // auto-ack
 			false,            // exclusive
 			false,            // no local
 			false,            // no wait
@@ -39,6 +39,32 @@ func SpinMQConsumer(criteria utils.MatchCriteria) {
 		)
 		if err != nil {
 			msg := fmt.Sprintf("[SpinMQConsumer] Error consuming from channel | err: %v", err)
+			log.Println(msg)
+			return
+		}
+
+		var syncChannel *amqp.Channel
+		// Declare sync MQ to ensure it exists
+		if curr, ok := rmq.SyncChannelsMap[criteria]; ok {
+			syncChannel = curr
+		} else {
+			msg := fmt.Sprintf("[SpinMQConsumer] Sync criteria channel is unknown | ok: %v", ok)
+			log.Println(msg)
+			return
+		}
+		syncQueueName := string(criteria) + "sync"
+
+		syncMsges, err := syncChannel.Consume(
+			syncQueueName, // queue name
+			"",            // consumer
+			false,         // auto-ack
+			false,         // exclusive
+			false,         // no local
+			false,         // no wait
+			nil,           // arguments
+		)
+		if err != nil {
+			msg := fmt.Sprintf("[SpinMQConsumer] Error consuming from sync channel | err: %v", err)
 			log.Println(msg)
 			return
 		}
@@ -54,114 +80,160 @@ func SpinMQConsumer(criteria utils.MatchCriteria) {
 		}
 		defer resultChan.Close()
 
-		//matchMakingBufferMap := map[string]models.MessageQueueRequestPacket{}
-		matchMakingBuffer := []models.MessageQueueRequestPacket{}
-
-		for message := range messages {
-			res := models.MessageQueueRequestPacket{}
-			err := json.Unmarshal(message.Body, &res)
-			if err != nil {
-				msg := fmt.Sprintf("[SpinMQConsumer] Error unmarshalling request packet | err: %v", err)
-				log.Println(msg)
-				return
-			}
-
-			isReplaced := false
-
-			// Check if user is currently stale data in map
-			for index, bufferedUser := range matchMakingBuffer {
-				if bufferedUser.RequestBody.Username == res.RequestBody.Username {
-					matchMakingBuffer[index] = res
-					isReplaced = true
-				}
-			}
-
-			if !isReplaced {
-				matchMakingBuffer = append(matchMakingBuffer, res)
-			}
-
-			// Just for assignment 5 PDF buffer illustration
-			log.Printf(" > Received message: %s with buffer size %d\n", res, len(matchMakingBuffer))
-			log.Printf("----- Current Queue (%d) -----\n", len(matchMakingBuffer))
-			for _, v := range matchMakingBuffer {
-				log.Printf("%s\n", v.RequestBody.Username)
-			}
-			log.Printf("----- End of Queue -----\n")
-
-			// Match found. Safe to do since single threaded within this goroutine
-			if len(matchMakingBuffer) == 2 {
-				fmt.Println("Found a match!")
-				// TODO: create room here
-				reqBody, err := json.Marshal(map[string]string{
-					"user1": matchMakingBuffer[0].RequestBody.Username,
-					"user2": matchMakingBuffer[1].RequestBody.Username,
-					"complexity": string(criteria),
-				})
-				if err != nil {
-					log.Fatal(err)
-				}
-				resp, err := http.Post(os.Getenv("COLLAB_URL") + "/room", "application/json", bytes.NewBuffer(reqBody))
-				if err != nil {
-					log.Fatal(err)
-					return
-				}
-				defer resp.Body.Close()
-				body := map[string]interface{}{}
-				json.NewDecoder(resp.Body).Decode(&body)
-				log.Println(body["Id"])
-
-				// body, err := io.ReadAll(resp.Body)
-				// if err != nil {
-				// 	log.Fatal(err)
-				// }
-				// log.Println(string(body))
-				
-				for index, user := range matchMakingBuffer {
-					pubMsg := models.MessageQueueResponsePacket{
-						ResponseBody: models.MatchResponse{
-							MatchUser:    matchMakingBuffer[(index+1)%2].RequestBody.Username,
-							MatchStatus:  1,
-							RoomId:  body["Id"].(string),
-							ErrorMessage: "",
-						},
-					}
-
-					responsePacket, err := json.Marshal(pubMsg)
-					if err != nil {
-						msg := fmt.Sprintf("[SpinMQConsumer] Error marshalling response packet | err: %v", err)
-						log.Println(msg)
-						return
-					}
-
-					// Declare unique result queue
-					resultQueue, err := resultChan.QueueDeclare(
-						utils.ConstructResultChanIdentifier(user.RequestBody.Username),
-						false,
-						false,
-						false,
-						false,
-						nil,
-					)
-
-					err = resultChan.PublishWithContext(
+		// Worker polls queue every 1 second
+		for {
+			// Get current MQ length
+			queueSize := rmq.GetQueueSize(string(criteria))
+			log.Printf("Current queue length: %d\n", queueSize)
+			// If queue has sufficient people queued up
+			if queueSize >= 2 {
+				// Check if request channel is being consumed via sync channel
+				syncQueueSize := rmq.GetQueueSize(syncQueueName)
+				if syncQueueSize == 1 {
+					// If request channel is being consumed, re-loop
+					continue
+				} else {
+					// If not, add into sync channel that this worker is currently consuming from request queue
+					err = syncChannel.PublishWithContext(
 						ctx,
-						"",               // exchange
-						resultQueue.Name, // queue name
-						false,            // mandatory
-						false,            // immediate
+						"",            // exchange
+						syncQueueName, // queue name
+						false,         // mandatory
+						false,         // immediate
 						amqp.Publishing{
 							ContentType: "text/plain",
-							Body:        responsePacket, // message to publish
-						},
-					)
+							Body:        []byte{1}, // message to publish
+						})
 					if err != nil {
-						msg := fmt.Sprintf("[SpinMQConsumer] Error publishing message to results channel | err: %v", err)
+						msg := fmt.Sprintf("[SpinMQConsumer] Error publishing message to sync channel | err: %v", err)
 						log.Println(msg)
 						return
 					}
 				}
-				matchMakingBuffer = nil
+				// Sequentially dequeue them and match them
+				matchMakingBuffer := []models.MessageQueueRequestPacket{}
+				for message := range messages {
+					// Ack the message that is consumed
+					err := reqChannel.Ack(message.DeliveryTag, false)
+					if err != nil {
+						msg := fmt.Sprintf("[SpinMQConsumer] Error ACKing request packet | err: %v", err)
+						log.Println(msg)
+						return
+					}
+
+					res := models.MessageQueueRequestPacket{}
+					err = json.Unmarshal(message.Body, &res)
+					if err != nil {
+						msg := fmt.Sprintf("[SpinMQConsumer] Error unmarshalling request packet | err: %v", err)
+						log.Println(msg)
+						return
+					}
+
+					isReplaced := false
+
+					// Check if user is currently stale data in map
+					for index, bufferedUser := range matchMakingBuffer {
+						if bufferedUser.RequestBody.Username == res.RequestBody.Username {
+							matchMakingBuffer[index] = res
+							isReplaced = true
+						}
+					}
+
+					if !isReplaced {
+						matchMakingBuffer = append(matchMakingBuffer, res)
+					}
+
+					// Just for assignment 5 PDF buffer illustration
+					log.Printf(" > Received message: %s with buffer size %d\n", res, len(matchMakingBuffer))
+					log.Printf("----- Current Queue (%d) -----\n", len(matchMakingBuffer))
+					for _, v := range matchMakingBuffer {
+						log.Printf("%s\n", v.RequestBody.Username)
+					}
+					log.Printf("----- End of Queue -----\n")
+
+					// Once 2 users are grabbed from the MQ, match them
+					if len(matchMakingBuffer) == 2 {
+						fmt.Println("Found a match!")
+						reqBody, err := json.Marshal(map[string]string{
+							"user1":      matchMakingBuffer[0].RequestBody.Username,
+							"user2":      matchMakingBuffer[1].RequestBody.Username,
+							"complexity": string(criteria),
+						})
+						if err != nil {
+							log.Fatal(err)
+						}
+
+						collabLink := os.Getenv("COLLAB_URL")
+						// Workaround if env variable is empty
+						if collabLink == "" {
+							collabLink = "http://collaboration-service:8080"
+						}
+
+						resp, err := http.Post(collabLink+"/room", "application/json", bytes.NewBuffer(reqBody))
+						if err != nil {
+							log.Fatal(err)
+							return
+						}
+						defer resp.Body.Close()
+						body := map[string]interface{}{}
+						json.NewDecoder(resp.Body).Decode(&body)
+
+						for index, user := range matchMakingBuffer {
+							pubMsg := models.MessageQueueResponsePacket{
+								ResponseBody: models.MatchResponse{
+									MatchUser:    matchMakingBuffer[(index+1)%2].RequestBody.Username,
+									MatchStatus:  1,
+									RoomId:       body["Id"].(string),
+									ErrorMessage: "",
+								},
+							}
+
+							responsePacket, err := json.Marshal(pubMsg)
+							if err != nil {
+								msg := fmt.Sprintf("[SpinMQConsumer] Error marshalling response packet | err: %v", err)
+								log.Println(msg)
+								return
+							}
+
+							// Declare unique result queue
+							resultQueue, err := resultChan.QueueDeclare(
+								utils.ConstructResultChanIdentifier(user.RequestBody.Username),
+								false,
+								false,
+								false,
+								false,
+								nil,
+							)
+
+							err = resultChan.PublishWithContext(
+								ctx,
+								"",               // exchange
+								resultQueue.Name, // queue name
+								false,            // mandatory
+								false,            // immediate
+								amqp.Publishing{
+									ContentType: "text/plain",
+									Body:        responsePacket, // message to publish
+								},
+							)
+							if err != nil {
+								msg := fmt.Sprintf("[SpinMQConsumer] Error publishing message to results channel | err: %v", err)
+								log.Println(msg)
+								return
+							}
+						}
+						matchMakingBuffer = nil
+						// Remove sync msg from sync channel
+						for syncMsg := range syncMsges {
+							log.Printf("Sync messaged retrieved | %v\n", syncMsg)
+							break
+						}
+						break // Break out of the message consumption loop
+					}
+				}
 			}
+			// 1 second interval polling
+			time.Sleep(time.Second * 1)
 		}
 	}()
 }

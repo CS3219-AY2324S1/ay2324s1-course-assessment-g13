@@ -1,14 +1,19 @@
 package rmq
 
 import (
+	"consumer/models"
 	"consumer/utils"
+	"encoding/json"
 	"fmt"
 	amqp "github.com/rabbitmq/amqp091-go"
+	"io"
 	"log"
+	"net/http"
 	"os"
 )
 
 var OpenChannelsMap map[utils.MatchCriteria]*amqp.Channel
+var SyncChannelsMap map[utils.MatchCriteria]*amqp.Channel
 var ResultChannel *amqp.Channel
 var Conn *amqp.Connection
 
@@ -23,6 +28,7 @@ func Init() {
 	}
 
 	OpenChannelsMap = make(map[utils.MatchCriteria]*amqp.Channel, 4)
+	SyncChannelsMap = make(map[utils.MatchCriteria]*amqp.Channel, 4)
 	Conn = connectRabbitMQ
 
 	// Construct requests MQ
@@ -46,6 +52,28 @@ func Init() {
 		)
 		if err != nil {
 			msg := fmt.Sprintf("[Init] Error declaring criteria MQ | err: %v", err)
+			log.Println(msg)
+			panic(err)
+		}
+
+		// Constructs sync MQ for distributed workers
+		syncChannelMQ, err := connectRabbitMQ.Channel()
+		if err != nil {
+			msg := fmt.Sprintf("[Init] Error creating unique sync channel | err: %v", err)
+			log.Println(msg)
+			panic(err)
+		}
+		SyncChannelsMap[channelType] = syncChannelMQ
+		_, err = syncChannelMQ.QueueDeclare(
+			string(channelType)+"sync", // queue name
+			false,                      // durable
+			false,                      // auto delete
+			false,                      // exclusive
+			false,                      // no wait
+			nil,                        // arguments
+		)
+		if err != nil {
+			msg := fmt.Sprintf("[Init] Error declaring sync MQ | err: %v", err)
 			log.Println(msg)
 			panic(err)
 		}
@@ -85,6 +113,15 @@ func Reset() {
 		}
 	}
 
+	for _, syncChannel := range SyncChannelsMap {
+		err = syncChannel.Close()
+		if err != nil {
+			msg := fmt.Sprintf("[Reset] Error closing sync channels | err: %v", err)
+			log.Println(msg)
+			panic(err)
+		}
+	}
+
 	err = Conn.Close()
 	if err != nil {
 		msg := fmt.Sprintf("[Reset] Error closing TCP connection | err: %v", err)
@@ -98,4 +135,34 @@ func Reset() {
 		log.Println(msg)
 		panic(err)
 	}
+}
+
+func GetQueueSize(queueName string) int64 {
+	client := &http.Client{}
+	// TODO extract into env variable
+	url := "http://rabbitmq:15672/api/queues/%2f/" + queueName
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		msg := fmt.Sprintf("[GetQueueSize] Error creating new request | err: %v", err)
+		log.Fatal(msg)
+	}
+	req.SetBasicAuth("guest", "guest")
+	resp, err := client.Do(req)
+	if err != nil {
+		msg := fmt.Sprintf("[GetQueueSize] Error executing HTTP request | err: %v", err)
+		log.Fatal(msg)
+	}
+	defer resp.Body.Close()
+	bodyText, err := io.ReadAll(resp.Body)
+	if err != nil {
+		msg := fmt.Sprintf("[GetQueueSize] Error reading response body | err: %v", err)
+		log.Fatal(msg)
+	}
+	var queueSizeResponse models.MessageQueueLengthResponse
+	err = json.Unmarshal(bodyText, &queueSizeResponse)
+	if err != nil {
+		msg := fmt.Sprintf("[GetQueueSize] Error unmarshaling content | err: %v", err)
+		log.Fatal(msg)
+	}
+	return queueSizeResponse.MessageStats.Publish - queueSizeResponse.MessageStats.Ack
 }
