@@ -13,6 +13,22 @@ import (
 	"gorm.io/gorm"
 )
 
+func GetUsers(c echo.Context) error {
+	tokenClaims := c.Get(TOKEN_CLAIMS_CONTEXT_KEY).(*models.Claims)
+
+	superAdmin := tokenClaims.User
+
+	if superAdmin.Role != SUPER_ADMIN {
+		return c.JSON(http.StatusForbidden, message.CreateErrorMessage(FAILURE_NOT_SUPERADMIN_GET_USERS))
+	}
+
+	users := make([]models.User, 0)
+	if err := config.DB.Find(&users).Error; err != nil {
+		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(INVALID_DB_ERROR))
+	}
+	return c.JSON(http.StatusOK, message.CreateSuccessUsersMessage(SUCCESS_USER_FOUND, users))
+}
+
 func GetUser(c echo.Context) error {
 	tokenClaims := c.Get(TOKEN_CLAIMS_CONTEXT_KEY).(*models.Claims)
 

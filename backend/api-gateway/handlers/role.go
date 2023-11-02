@@ -54,7 +54,7 @@ func UpgradeUser(c echo.Context) error {
 
 	currentSuperAdminRole := superAdmin.Role
 	if currentSuperAdminRole != SUPER_ADMIN {
-		return c.JSON(http.StatusForbidden, message.CreateErrorMessage(FAILURE_NOT_SUPERADMIN))
+		return c.JSON(http.StatusForbidden, message.CreateErrorMessage(FAILURE_NOT_SUPERADMIN_CHANGE_ROLE))
 	}
 
 	requestBody := new(models.LoginRequest)
@@ -99,7 +99,7 @@ func DowngradeUser(c echo.Context) error {
 
 	currentSuperAdminRole := superAdmin.Role
 	if currentSuperAdminRole != SUPER_ADMIN {
-		return c.JSON(http.StatusForbidden, message.CreateErrorMessage(FAILURE_NOT_SUPERADMIN))
+		return c.JSON(http.StatusForbidden, message.CreateErrorMessage(FAILURE_NOT_SUPERADMIN_CHANGE_ROLE))
 	}
 
 	requestBody := new(models.LoginRequest)

@@ -34,6 +34,7 @@ func main() {
 	API_GATEWAY.GET(path.LOGOUT, handlers.Logout)
 	API_GATEWAY.GET(path.REFRESH, handlers.Refresh)
 
+	API_GATEWAY.GET(path.AUTH_USERS, handlers.GetUsers)
 	API_GATEWAY.GET(path.AUTH_USER, handlers.GetUser)
 	API_GATEWAY.DELETE(path.AUTH_USER, handlers.DeleteUser)
 
