@@ -69,7 +69,7 @@ func SpinMQConsumer(criteria utils.MatchCriteria) {
 			return
 		}
 
-		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 
 		resultChan, err := rmq.Conn.Channel()
@@ -84,7 +84,6 @@ func SpinMQConsumer(criteria utils.MatchCriteria) {
 		for {
 			// Get current MQ length
 			queueSize := rmq.GetQueueSize(string(criteria))
-			log.Printf("Current queue length: %d\n", queueSize)
 			// If queue has sufficient people queued up
 			if queueSize >= 2 {
 				// Check if request channel is being consumed via sync channel

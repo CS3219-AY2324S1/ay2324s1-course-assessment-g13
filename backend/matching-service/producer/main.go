@@ -15,13 +15,15 @@ func main() {
 	rmq.Init()
 	defer rmq.Reset()
 
+	handlers.Init()
+
 	e := echo.New()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{os.Getenv("AGW_URL")},
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
 		AllowMethods: []string{http.MethodGet, http.MethodPost},
 	}))
-	
+
 	e.POST("/match/find", handlers.MatchHandler)
 	e.POST("/match/cancel", handlers.UserCancelHandler)
 

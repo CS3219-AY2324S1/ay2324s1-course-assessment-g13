@@ -165,16 +165,28 @@ func MatchHandler(c echo.Context) error {
 	var matchResponseBody models.MatchResponse
 
 	// Loops infinitely until context timer is hit, or result is returned from consumer, whichever occurs first
+	userCancelChan := make(chan bool)
+	UserToChanMap[requestBody.Username] = userCancelChan
 	for {
 		select {
+		// User cancelled, so terminate listener
+		case <-userCancelChan:
+			log.Println("User manually cancelled on producer side")
+			// Remove user from queue
+			utils.CancelUser(requestBody.Username)
+			<-syncChan // Reads from sync channel to allow goroutine listening to result to break out of loop
+			shouldBreak = true
+			break
 		// 30 seconds timer hit
 		case <-ctxTimer.Done():
+			log.Println("30 seconds timer hit on producer side")
 			// Remove user from queue
 			utils.CancelUser(requestBody.Username)
 			<-syncChan // Reads from sync channel to allow goroutine listening to result to break out of loop
 			shouldBreak = true
 			break
 		case res := <-resChan:
+			log.Printf("Found a match for current user with: %s\n", res.MatchUser)
 			matchResponseBody = models.MatchResponse{
 				MatchUser:    res.MatchUser,
 				MatchStatus:  1,
