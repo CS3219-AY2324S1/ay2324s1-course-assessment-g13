@@ -163,10 +163,6 @@ func SpinMQConsumer(criteria utils.MatchCriteria) {
 						}
 
 						collabLink := os.Getenv("COLLAB_URL")
-						// Workaround if env variable is empty
-						if collabLink == "" {
-							collabLink = "http://collaboration-service:8080"
-						}
 
 						resp, err := http.Post(collabLink+"/room", "application/json", bytes.NewBuffer(reqBody))
 						if err != nil {

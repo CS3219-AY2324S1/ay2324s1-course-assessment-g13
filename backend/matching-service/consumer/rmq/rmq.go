@@ -139,8 +139,8 @@ func Reset() {
 
 func GetQueueSize(queueName string) int64 {
 	client := &http.Client{}
-	// TODO extract into env variable
-	url := "http://rabbitmq:15672/api/queues/%2f/" + queueName
+	url := os.Getenv("RMQ_QUEUE_URL") + queueName
+	log.Printf("URL OF QUEUE: %s\n", url)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		msg := fmt.Sprintf("[GetQueueSize] Error creating new request | err: %v", err)
