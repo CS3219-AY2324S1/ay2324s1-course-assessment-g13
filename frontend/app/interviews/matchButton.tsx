@@ -56,7 +56,8 @@ export default function MatchButton({inQueue, setInQueue, setSeconds, matchNotfo
 
   const cancelMatch = async () => {
     return await POST("/match/cancel", {
-      "username": `${userState}`
+      "username": `${userState}`,
+      "match_criteria": `${preferenceState}`
     });
   }
 
