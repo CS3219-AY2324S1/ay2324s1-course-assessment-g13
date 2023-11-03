@@ -10,6 +10,7 @@ import (
 
 var OpenChannelsMap map[utils.MatchCriteria]*amqp.Channel
 var ResultChannel *amqp.Channel
+var CancelChannel *amqp.Channel
 var Conn *amqp.Connection
 
 // Init Initialises all required connection and channels based on the MatchCriteria
@@ -75,6 +76,56 @@ func Init() {
 		log.Println(msg)
 		panic(err)
 	}
+
+	// Constructs cancel MQ
+	cancelMQ, err := connectRabbitMQ.Channel()
+	if err != nil {
+		msg := fmt.Sprintf("[Init] Error creating unique cancel channel | err: %v", err)
+		log.Println(msg)
+		panic(err)
+	}
+	CancelChannel = cancelMQ
+	// Declare cancel exchange
+	err = CancelChannel.ExchangeDeclare(
+		"cancels",           // name
+		amqp.ExchangeFanout, // type
+		true,                // durable
+		false,               // auto-deleted
+		false,               // internal
+		false,               // no-wait
+		nil,                 // arguments
+	)
+	if err != nil {
+		msg := fmt.Sprintf("[Init] Error declaring exchange | err: %v", err)
+		log.Println(msg)
+		panic(err)
+	}
+	declaredCancelQueue, err := ResultChannel.QueueDeclare(
+		"cancelQueue", // name
+		false,         // durable
+		false,         // delete when unused
+		true,          // exclusive
+		false,         // no-wait
+		nil,           // arguments
+	)
+	if err != nil {
+		msg := fmt.Sprintf("[Init] Error declaring cancel queue | err: %v", err)
+		log.Println(msg)
+		panic(err)
+	}
+
+	err = ResultChannel.QueueBind(
+		declaredCancelQueue.Name, // queue name
+		"",                       // routing key
+		"cancels",                // exchange
+		false,
+		nil,
+	)
+	if err != nil {
+		msg := fmt.Sprintf("[Init] Error binding cancel queue to exchange | err: %v", err)
+		log.Println(msg)
+		panic(err)
+	}
 }
 
 // Reset Closes all connections and channels to prevent leaks
@@ -99,6 +150,13 @@ func Reset() {
 	err = ResultChannel.Close()
 	if err != nil {
 		msg := fmt.Sprintf("[Reset] Error closing result channel | err: %v", err)
+		log.Println(msg)
+		panic(err)
+	}
+
+	err = CancelChannel.Close()
+	if err != nil {
+		msg := fmt.Sprintf("[Reset] Error closing cancel channel | err: %v", err)
 		log.Println(msg)
 		panic(err)
 	}
