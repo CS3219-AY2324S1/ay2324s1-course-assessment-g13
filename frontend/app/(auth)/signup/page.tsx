@@ -99,6 +99,8 @@ export default function SignUpPage() {
                         <Select 
                             {...register('preferred_language')}
                             label="Preferred Language" 
+                            disallowEmptySelection={true}
+                            isRequired={true}
                         >
                             {languages.map((language) => (
                             <SelectItem key={language} value={language}>

@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, ChangeEvent } from 'react';
 import { Category, Complexity, ComplexityToColor, Question } from '../types/question';
 import { GET } from "../libs/axios/axios";
 import { notifyError, notifyWarning } from '../components/toast/notifications';
@@ -13,10 +13,11 @@ import {
   ModalBody,
   ModalFooter
 } from '@nextui-org/modal';
-import { Button, Input, Chip } from '@nextui-org/react';
+import { Button, Input, Chip, Select, SelectItem } from '@nextui-org/react';
 import { useDispatch } from 'react-redux';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useRef } from 'react';
+import { LANGUAGES, Language } from '../constants/languages';
 
 export default function Collab() {
   const collabState = useSelector(selectCollabState);
@@ -29,6 +30,8 @@ export default function Collab() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const ws = useRef(null);
+  const languages = LANGUAGES.slice(1)
+  const [currentLanguage, setCurrentLanguage] = useState(languages[11])
 
   useEffect(() => {
     ws.current = new WebSocket(`${process.env.NEXT_PUBLIC_COLLAB_SERVICE_URL}/ws/${roomId}`);
@@ -43,6 +46,9 @@ export default function Collab() {
           user: "Other",
         }]);
         notifyWarning("You have unread messages!");
+      } else if (message.Type === "language") {
+        setCurrentLanguage(message.Content as Language);
+        notifyWarning(`Editor's Language has been Changed to ${message.Content}`);
       } else {
         notifyError(message.Content);
       }
@@ -112,6 +118,16 @@ export default function Collab() {
     router.push('/');
   }
 
+  const handleLanguageChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const newLanguage = e.target.value as Language;
+    setCurrentLanguage(newLanguage);
+    const sendMessage = {
+      Content: newLanguage,
+      Type: "language",
+    };
+    ws.current.send(JSON.stringify(sendMessage));
+  }
+
   return (
     <>
       <div className="flex">
@@ -137,12 +153,28 @@ export default function Collab() {
         <div className="w-1/2 m-6 flex flex-col">
           <div className="flex align-center justify-between font-bold">
             <h2 className='mb-2'>Editor</h2>
-            <p>Current Language: Python</p>
+            <Select
+                className='w-1/5 mb-2 items-center'
+                classNames={{"label": "text-md"}}
+                size='sm'
+                label="Language" 
+                labelPlacement='outside-left'
+                selectedKeys={[currentLanguage]}
+                onChange={handleLanguageChange}
+                disallowEmptySelection={true}
+            >
+              {languages.map((language) => (
+              <SelectItem key={language} value={language}>
+                  {language}
+              </SelectItem>
+              ))}
+            </Select>
           </div>
           <Editor
             height="80vh"
             theme="vs-dark"
-            defaultLanguage="python"
+            defaultLanguage={currentLanguage.toLowerCase()}
+            language={currentLanguage.toLowerCase()}
             value={code}
             onChange={handleEditorChange}
             options={editorOptions}
