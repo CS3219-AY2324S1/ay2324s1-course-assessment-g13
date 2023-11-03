@@ -37,10 +37,10 @@ type User = {
 
 const UserTableColumn = [
     {key:"index", label: "INDEX"},
+    {key:"username", label: "USERNAME"},
     {key:"oauth_id", label: "OAUTH ID"},
     {key:"oauth_provider", label: "OAUTH PROVIDER"},
     {key:"role", label: "ROLE"},
-    {key:"username", label: "USERNAME"},
     {key:"action", label: "ACTION"},
 ]
 
