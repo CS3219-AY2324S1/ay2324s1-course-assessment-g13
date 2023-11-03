@@ -32,7 +32,18 @@ func GetUsers(c echo.Context) error {
 func GetUser(c echo.Context) error {
 	tokenClaims := c.Get(TOKEN_CLAIMS_CONTEXT_KEY).(*models.Claims)
 
-	user := tokenClaims.User
+	currentUser := tokenClaims.User
+	oauthId := currentUser.OauthID
+	oauthProvider := currentUser.OauthProvider
+
+	var user models.User
+	err := config.DB.Where("oauth_id = ? AND oauth_provider = ?", oauthId, oauthProvider).First(&user).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return c.JSON(http.StatusBadRequest, message.CreateErrorMessage(INVALID_USER_NOT_FOUND))
+		}
+		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(INVALID_DB_ERROR))
+	}
 
 	return c.JSON(http.StatusOK, message.CreateSuccessUserMessage(SUCCESS_USER_FOUND, user))
 }

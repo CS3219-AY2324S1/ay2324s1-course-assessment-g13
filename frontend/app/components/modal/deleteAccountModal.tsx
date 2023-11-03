@@ -28,7 +28,7 @@ const DeleteAccountModal = () => {
       notifySuccess(response.data);
       onClose();
     } catch (error) {
-      notifyError(error.message.data);
+      notifyError(error.message.data.message);
     }
   };
 
