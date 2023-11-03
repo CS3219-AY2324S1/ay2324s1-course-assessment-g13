@@ -22,7 +22,7 @@ const Nav = () => {
   const collabState = useSelector(selectCollabState);
   const dispatch = useDispatch();
   const router = useRouter();
-  const { status, isLoggedIn } = useAuth();
+  const { status, isLoggedIn, role } = useAuth();
   const photoUrl = useSelector((state: AppState) => state.user.photoUrl);
   const pathname = usePathname();
 
@@ -112,6 +112,13 @@ const Nav = () => {
                       Profile
                     </Link>
                   </DropdownItem>
+                  { role === 'super admin' && 
+                  <DropdownItem key="manage-users" color="primary">
+                    <Link href="/manage-users" className="text-white text-sm w-full">
+                      Manage Users
+                    </Link>
+                  </DropdownItem>
+                  }
                   <DropdownItem key="logout" color="danger" onClick={handleLogout}>
                     Log Out
                   </DropdownItem>

@@ -157,8 +157,8 @@ export default function Profile() {
                     </div>    
                 </div>
                 <Divider className="my-2" />
-                <div className="flex flex-row m-5 justify-between">
-                    <div className="flex flex-col">
+                {/* <div className="flex flex-row m-5 justify-between"> */}
+                    {/* <div className="flex flex-col">
                         <p className="text-2xl font-medium my-1">{role === 'admin' ? "Downgrade" : "Upgrade"} Account</p>
                         {
                             role === "admin" ?
@@ -173,14 +173,14 @@ export default function Profile() {
                                     </p>
                                 )
                         }
-                    </div>
-                    <div className="flex flex-row items-center my-1">
+                    </div> */}
+                    {/* <div className="flex flex-row items-center my-1">
                         <Button color="primary" onClick={handleChangeRole} className=" my-1">
                             {role === 'admin' ? "Downgrade" : "Upgrade"} Account
                         </Button>
-                    </div>
-                </div>
-                <Divider className="my-2" />
+                    </div> */}
+                {/* </div>
+                <Divider className="my-2" /> */}
                 <div className="flex flex-row m-5 justify-between">
                     <div className="flex flex-col">
                         <p className="text-2xl font-medium my-1">Delete Account</p>
