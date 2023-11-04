@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: matching-consumer
+  name: matching-consumer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: matching-consumer
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: matching-consumer
+    spec:
+      containers:
+      - image: gcr.io/smooth-research-397708/matching-consumer:v1
+        name: matching-consumer
+        imagePullPolicy: Always
+        resources: {}
+        ports:
+          - containerPort: 8080
+        env:
+          - name: AMQP_SERVER_URL
+            valueFrom:
+              configMapKeyRef:
+                key: AMQP_SERVER_URL
+                name: configmap
+status: {}

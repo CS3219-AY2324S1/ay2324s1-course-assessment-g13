@@ -10,6 +10,7 @@ data:
   COLLABORATION_SERVICE_URL: "http://collaboration-service:8080"
   MATCHING_PRODUCER_URL: "http://matching-producer:8080"
   MATCHING_CONSUMER_URL: "http://matching-consumer:8080"
+  AMQP_SERVER_URL: "amqp://guest:guest@rabbitmq:5672/"
   NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: "dgxltgjxl"
   NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET: "usohal3c"
   USER_SERVICE_POSTGRES_HOST: "34.142.211.69"
