@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: user-service
+  name: user-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-service
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: user-service
+    spec:
+      containers:
+      - image: gcr.io/smooth-research-397708/user-service:v1
+        name: user-service
+        imagePullPolicy: Always
+        resources: {}
+        ports:
+          - containerPort: 8080
+        env:
+          - name: POSTGRES_HOST
+            valueFrom:
+              configMapKeyRef:
+                key: USER_SERVICE_POSTGRES_HOST
+                name: configmap
+          - name: PGUSER
+            valueFrom:
+              secretKeyRef:
+                key: USER_SERVICE_PGUSER
+                name: secrets
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: USER_SERVICE_PGPASSWORD
+                name: secrets
+          - name: POSTGRES_DB
+            valueFrom:
+              configMapKeyRef:
+                key: USER_SERVICE_POSTGRES_NAME
+                name: configmap
+          - name: AGW_URL
+            valueFrom:
+              configMapKeyRef:
+                key: API_GATEWAY_URL
+                name: configmap
+status: {}

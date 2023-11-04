@@ -28,7 +28,6 @@ export default function Collab() {
   const defaultCode = "# Type answer here";
   const [code, setCode] = useState(defaultCode);
   const ws = useRef(null);
-  // const ws = new WebSocket(`ws://localhost:5005/ws/${roomId}`)
   useEffect(() => {
     ws.current = new WebSocket(`${process.env.COLLAB_SERVICE_URL}/ws/${roomId}`);
     // onmessage is for receiving messages
