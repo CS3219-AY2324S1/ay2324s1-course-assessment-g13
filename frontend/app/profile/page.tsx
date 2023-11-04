@@ -4,7 +4,6 @@ import { Divider } from "@nextui-org/divider";
 import { Input } from "@nextui-org/input";
 import { Select, SelectItem } from "@nextui-org/select";
 import { LANGUAGES } from "../constants/languages";
-import useUser from "../hooks/useUser";
 import { useForm, Controller } from "react-hook-form";
 import { Button } from "@nextui-org/button";
 import { UserState, updateUser } from "../libs/redux/slices/userSlice";
@@ -26,9 +25,24 @@ interface UpdateUserRequest {
 }
 
 export default function Profile() {
-    const currentUserInfo = useUser();
     const { authId, role } = useAuth();
     const dispatch = useDispatch();
+
+    const getUser = async () => {
+        try {
+            const userResponse: AxiosResponse<UserResponse> = await GET(`/users/${authId}`)
+            const { user } = userResponse.data
+            dispatch(updateUser(user));
+            return {
+                username: user.username,
+                photoUrl: user.photo_url,
+                preferredLanguage: user.preferred_language
+            }
+        } catch (error) {
+            const message = error.message.data.message;
+            notifyError(message);
+        }
+    }
 
     const {
         control,
@@ -38,7 +52,7 @@ export default function Profile() {
         reset,
         formState: { isDirty, errors },
       } = useForm({
-        defaultValues: currentUserInfo
+        defaultValues: getUser
       });
 
     const onSubmit = handleSubmit(async (data: UserState) => {
@@ -115,10 +129,9 @@ export default function Profile() {
                     <Controller 
                         name="preferredLanguage"
                         control={control}
-                        defaultValue={currentUserInfo.preferredLanguage}
                         render={({field: {onChange, value}}) => (
                             <>
-                            <Select onChange={onChange} defaultSelectedKeys={[value]} className="w-1/3 h-1/2" labelPlacement="outside">
+                            <Select onChange={onChange} selectedKeys={[value]} className="w-1/3 h-1/2" labelPlacement="outside">
                                 {languages.map((language) => (
                                     <SelectItem className="px-2" key={language} value={language}>
                                         {language}
