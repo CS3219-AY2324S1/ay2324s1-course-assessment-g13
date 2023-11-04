@@ -23,7 +23,7 @@ export default function OAuthCallback() {
                 "username": rUser.username,
                 "photo_url": rUser.picture,
                 "password": "1234"
-            }).catch(err => console.log(err));
+            });
             notifySuccess(response.data.message);
             dispatch(login(rUser));
             router.push('/questions');
