@@ -22,7 +22,7 @@ const DeleteConfirmationModal = ({ title, id, fetchQuestions }) => {
       fetchQuestions();
       notifyWarning(response.data);
     } catch (error) {
-      notifyError(error.message.data.message);
+      notifyError(error.message.data);
     } finally {
       onClose();
     }

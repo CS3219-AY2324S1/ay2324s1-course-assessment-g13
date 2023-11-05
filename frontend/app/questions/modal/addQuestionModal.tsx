@@ -42,7 +42,7 @@ export default function QuestionAddModal({fetchQuestions}) {
       onOpenChange();
       reset();
     } catch (error) {
-      notifyError(error.message.data.message);
+      notifyError(error.message.data);
     }
   });
 
