@@ -13,6 +13,7 @@ import { useDispatch } from 'react-redux';
 import { logout as UserLogout} from '../../libs/redux/slices/userSlice';
 import { logout as AuthLogout} from '../../libs/redux/slices/authSlice';
 import { useRouter } from 'next/navigation';
+import { signOut } from 'next-auth/react';
 
 const DeleteAccountModal = () => {
   const dispatch = useDispatch();
@@ -27,6 +28,7 @@ const DeleteAccountModal = () => {
       router.push('/');
       notifySuccess(response.data);
       onClose();
+      signOut();
     } catch (error) {
       notifyError(error.message.data);
     }

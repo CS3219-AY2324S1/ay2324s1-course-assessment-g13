@@ -32,7 +32,8 @@ const Nav = () => {
         dispatch(UserLogout());
         dispatch(AuthLogout());
         await GET('/auth/logout');
-        router.push('/')
+        router.push('/');
+        signOut();
     } catch (error) {
       const message =  error.message.data.message;
       notifyError(message);
