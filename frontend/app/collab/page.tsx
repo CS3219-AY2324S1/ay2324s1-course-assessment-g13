@@ -96,7 +96,7 @@ export default function Collab() {
 
   const fetchQuestion = async () => {
     try {
-      const idResponse = await GET(`ws/question/${roomId}`);
+      const idResponse = await GET(`ws/${roomId}`);
       const response = await GET(`questions/${idResponse.data}`);
       setQuestion(response.data as Question);
     } catch (error) {
