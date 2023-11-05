@@ -17,6 +17,6 @@ func AuthorizeAdminMiddleWare(next echo.HandlerFunc) echo.HandlerFunc {
 		if userRole == ADMIN {
 			return next(c)
 		}
-		return c.JSON(http.StatusForbidden, map[string]string{"error": "Not Authorized!"})
+		return c.JSON(http.StatusForbidden, map[string]string{"message": "Not Authorized!"})
 	}
 }

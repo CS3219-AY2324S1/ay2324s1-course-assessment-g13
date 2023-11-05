@@ -45,3 +45,5 @@ const (
 	ADMIN       = "admin"
 	SUPER_ADMIN = "super admin"
 )
+
+const USER_ROLE_KEY_REQUEST_HEADER = "X-User-Role"
