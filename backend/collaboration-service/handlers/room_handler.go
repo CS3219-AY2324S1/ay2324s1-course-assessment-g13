@@ -195,9 +195,6 @@ func (user *User) readMessage(hub *Hub) {
             break
         }
 
-        msg.RoomId = user.RoomId
-        msg.Username = user.Username
-
         hub.BroadcastChannel <- &msg
     }
 }

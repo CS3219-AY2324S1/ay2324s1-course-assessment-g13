@@ -81,6 +81,8 @@ export default function Collab() {
   const sendMessage = (value : string, type : string) => {
     const message = {
       content: value,
+      roomId: roomId,
+      username: username,
       type: type,
     };
     ws.current.send(JSON.stringify(message));
