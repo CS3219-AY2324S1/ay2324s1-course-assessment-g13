@@ -31,3 +31,17 @@ spec:
                 key: AMQP_SERVER_URL
                 name: configmap
 status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: matching-consumer
+  labels:
+    run: matching-consumer
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: matching-consumer

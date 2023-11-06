@@ -36,3 +36,17 @@ spec:
                 key: API_GATEWAY_URL
                 name: configmap
 status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: question-service
+  labels:
+    run: question-service
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: question-service

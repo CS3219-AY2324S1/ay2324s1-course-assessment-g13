@@ -95,5 +95,21 @@ spec:
               secretKeyRef:
                 key: GITHUB_CLIENT_SECRET
                 name: secrets
-          
 status: {}
+---
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  name: "api-gateway-service"
+  namespace: "default"
+  labels:
+    app: "api-gateway"
+spec:
+  ports:
+  - protocol: "TCP"
+    port: 80
+    targetPort: 1234
+  selector:
+    app: "api-gateway"
+  type: "LoadBalancer"
+  loadBalancerIP: "34.87.127.0"

@@ -37,3 +37,17 @@ spec:
       # - name: rabbitmq-persistent-storage
       #   persistentVolumeClaim:
       #     claimName: rabbitmq-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+  labels:
+    run: rabbitmq
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 5672
+  selector:
+    app: rabbitmq

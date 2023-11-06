@@ -56,9 +56,7 @@ spec:
         #         name: secrets
         #         key: GITHUB_CLIENT_ID
 status: {}
-
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
