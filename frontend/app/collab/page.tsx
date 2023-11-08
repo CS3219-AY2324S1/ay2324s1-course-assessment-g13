@@ -47,7 +47,7 @@ export default function Collab() {
   }, []);
 
   useEffect(() => {
-    ws.current = new WebSocket(`${process.env.NEXT_PUBLIC_COLLAB_SERVICE_URL}/ws/${roomId}`);
+    ws.current = new WebSocket(`${process.env.NEXT_PUBLIC_COLLAB_SERVICE_URL}/ws/${roomId}/${username}`);
     // onmessage is for receiving messages
     ws.current.onmessage = function (event) {
       var message = JSON.parse(event.data);
