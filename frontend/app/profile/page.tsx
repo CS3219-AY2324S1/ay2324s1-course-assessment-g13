@@ -14,9 +14,8 @@ import { GET, PUT } from "../libs/axios/axios";
 import { useDispatch } from "react-redux";
 import { AxiosResponse } from "axios";
 import { notifyError, notifySuccess } from "../components/toast/notifications";
-import { LoginResponse, UserResponse } from "../(auth)/login/page";
+import { UserResponse } from "../(auth)/login/page";
 import DeleteAccountModal from "../components/modal/deleteAccountModal";
-import { update } from "../libs/redux/slices/authSlice";
 
 interface UpdateUserRequest {
     username: string;
@@ -72,18 +71,6 @@ export default function Profile() {
             notifyError(message);
         }
     })
-
-    const handleChangeRole = async () => {
-        try {
-            const response: AxiosResponse<LoginResponse> = await GET(`/auth/user/${role === 'user' ? "upgrade" : "downgrade"}`);
-            const { message, user } = response.data;
-            dispatch(update(user))
-            notifySuccess(message)
-        } catch (error) {
-            const message = error.message.data.message;
-            notifyError(message);
-        }
-      }
 
     const photo = watch('photoUrl');
     
@@ -168,30 +155,6 @@ export default function Profile() {
                             />
                         </div>
                     </div>    
-                </div>
-                <Divider className="my-2" />
-                <div className="flex flex-row m-5 justify-between">
-                    <div className="flex flex-col">
-                        <p className="text-2xl font-medium my-1">{role === 'admin' ? "Downgrade" : "Upgrade"} Account</p>
-                        {
-                            role === "admin" ?
-                                (
-                                    <p className="text-start text-sm my-1 md:text-base">
-                                        Remove access to <span className="font-medium">add/delete</span> questions.
-                                    </p>
-                                ) :
-                                (
-                                    <p className="text-start text-sm my-1 md:text-base">
-                                        Gain access to <span className="font-medium">add/delete</span> questions.
-                                    </p>
-                                )
-                        }
-                    </div>
-                    <div className="flex flex-row items-center my-1">
-                        <Button color="primary" onClick={handleChangeRole} className=" my-1">
-                            {role === 'admin' ? "Downgrade" : "Upgrade"} Account
-                        </Button>
-                    </div>
                 </div>
                 <Divider className="my-2" />
                 <div className="flex flex-row m-5 justify-between">

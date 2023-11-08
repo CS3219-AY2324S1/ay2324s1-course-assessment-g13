@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"api-gateway/config"
+	"api-gateway/models"
 	"api-gateway/utils/cookie"
 	"api-gateway/utils/message"
 	"api-gateway/utils/path"
@@ -38,7 +39,7 @@ func RequireAuthenticationMiddleWare(next echo.HandlerFunc) echo.HandlerFunc {
 			return c.JSON(statusCode, message.CreateErrorMessage(responseMessage))
 		}
 
-		user := tokenClaims.User
+		var user models.User
 		oauthId := user.OauthID
 		oauthProvider := user.OauthProvider
 		err := config.DB.Where("oauth_id = ? AND oauth_provider = ?", oauthId, oauthProvider).First(&user).Error
@@ -61,6 +62,8 @@ func RequireAuthenticationMiddleWare(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 
 		c.Set(TOKEN_CLAIMS_CONTEXT_KEY, tokenClaims)
+		c.Request().Header.Set(USER_ROLE_KEY_REQUEST_HEADER, "")
+		c.Request().Header.Set(USER_ROLE_KEY_REQUEST_HEADER, user.Role)
 		return next(c)
 	}
 }

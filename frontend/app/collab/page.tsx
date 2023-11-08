@@ -1,8 +1,8 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, ChangeEvent } from 'react';
 import { Category, Complexity, ComplexityToColor, Question } from '../types/question';
 import { GET } from "../libs/axios/axios";
-import { notifyError, notifyWarning } from '../components/toast/notifications';
+import { notifyError, notifySuccess, notifyWarning } from '../components/toast/notifications';
 import Editor from '@monaco-editor/react';
 import { useSelector } from 'react-redux';
 import { selectCollabState, setIsChatOpen, setIsLeaving } from '../libs/redux/slices/collabSlice';
@@ -13,13 +13,16 @@ import {
   ModalBody,
   ModalFooter
 } from '@nextui-org/modal';
-import { Button, Input, Chip } from '@nextui-org/react';
+import { Button, Input, Chip, Select, SelectItem } from '@nextui-org/react';
 import { useDispatch } from 'react-redux';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useRef } from 'react';
+import { selectUsername } from '../libs/redux/slices/userSlice';
+import { LANGUAGES, Language } from '../constants/languages';
 
 export default function Collab() {
   const collabState = useSelector(selectCollabState);
+  const username = useSelector(selectUsername);
   const dispatch = useDispatch();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -29,9 +32,22 @@ export default function Collab() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const ws = useRef(null);
+  const languages = LANGUAGES.slice(1)
+  const [currentLanguage, setCurrentLanguage] = useState(languages[11])
 
   useEffect(() => {
-    ws.current = new WebSocket(`${process.env.NEXT_PUBLIC_COLLAB_SERVICE_URL}/ws/${roomId}`);
+    window.addEventListener('popstate', exitRoom);
+    window.addEventListener('beforeunload', sendExitMessage);
+    window.history.pushState(null, '', "");
+
+    return () => {
+      window.removeEventListener('popstate', exitRoom);
+      window.removeEventListener('beforeunload', sendExitMessage);
+    };
+  }, []);
+
+  useEffect(() => {
+    ws.current = new WebSocket(`${process.env.NEXT_PUBLIC_COLLAB_SERVICE_URL}/ws/${roomId}/${username}`);
     // onmessage is for receiving messages
     ws.current.onmessage = function (event) {
       var message = JSON.parse(event.data);
@@ -43,9 +59,22 @@ export default function Collab() {
           user: "Other",
         }]);
         notifyWarning("You have unread messages!");
-      } else {
+      } else if (message.Type === "language") {
+        setCurrentLanguage(message.Content as Language);
+        notifyWarning(`Editor's Language has been Changed to ${message.Content}`);
+      } else if (message.Type === "exit") {
         notifyError(message.Content);
+      } else {
+        notifySuccess(message.Content);
       }
+    }
+
+    ws.current.onopen = function (event) {
+      sendMessage(`${username} has joined the room!`, "enter");
+    }
+
+    ws.current.onerror = function (event) {
+      router.push('/');
     }
   }, []);
 
@@ -54,6 +83,16 @@ export default function Collab() {
     dispatch(setIsLeaving(false));
     dispatch(setIsChatOpen(false));
   }, []);
+
+  const sendMessage = (value : string, type : string) => {
+    const message = {
+      content: value,
+      roomId: roomId,
+      username: username,
+      type: type,
+    };
+    ws.current.send(JSON.stringify(message));
+  }
 
   const [question, setQuestion] = useState<Question>({
     id: "",
@@ -65,7 +104,7 @@ export default function Collab() {
 
   const fetchQuestion = async () => {
     try {
-      const idResponse = await GET(`ws/question/${roomId}`);
+      const idResponse = await GET(`ws/${roomId}`);
       const response = await GET(`questions/${idResponse.data}`);
       setQuestion(response.data as Question);
     } catch (error) {
@@ -74,19 +113,11 @@ export default function Collab() {
   };
 
   const handleEditorChange = (value: string, event) => {
-    const message = {
-      content: value,
-      type: "code",
-    };
-    ws.current.send(JSON.stringify(message));
+    sendMessage(value, "code");
   }
 
   const handleSendMessage = () => {
-    const sendMessage = {
-      Content: newMessage,
-      Type: "chat",
-    };
-    ws.current.send(JSON.stringify(sendMessage));
+    sendMessage(newMessage, "chat");
 
     const message = {
       content: newMessage,
@@ -102,14 +133,24 @@ export default function Collab() {
     }
   };
 
-  const exitRoom = () => {
-    const message = {
-      Content: "The other user has left the room!",
-      Type: "exit",
-    };
-    ws.current.send(JSON.stringify(message));
+  const sendExitMessage = () => {
+    sendMessage(`${username} has left the room!`, "exit");
     ws.current.close();
+  }
+
+  const exitRoom = () => {
+    sendExitMessage();
     router.push('/');
+  }
+
+  const handleLanguageChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const newLanguage = e.target.value as Language;
+    setCurrentLanguage(newLanguage);
+    const sendMessage = {
+      Content: newLanguage,
+      Type: "language",
+    };
+    ws.current.send(JSON.stringify(sendMessage));
   }
 
   return (
@@ -137,12 +178,28 @@ export default function Collab() {
         <div className="w-1/2 m-6 flex flex-col">
           <div className="flex align-center justify-between font-bold">
             <h2 className='mb-2'>Editor</h2>
-            <p>Current Language: Python</p>
+            <Select
+                className='w-1/5 mb-2 items-center'
+                classNames={{"label": "text-md"}}
+                size='sm'
+                label="Language" 
+                labelPlacement='outside-left'
+                selectedKeys={[currentLanguage]}
+                onChange={handleLanguageChange}
+                disallowEmptySelection={true}
+            >
+              {languages.map((language) => (
+              <SelectItem key={language} value={language}>
+                  {language}
+              </SelectItem>
+              ))}
+            </Select>
           </div>
           <Editor
             height="80vh"
             theme="vs-dark"
-            defaultLanguage="python"
+            defaultLanguage={currentLanguage.toLowerCase()}
+            language={currentLanguage.toLowerCase()}
             value={code}
             onChange={handleEditorChange}
             options={editorOptions}

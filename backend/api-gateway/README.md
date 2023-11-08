@@ -23,6 +23,8 @@ FRONTEND_URL=http://localhost:3000
 
 GITHUB_CLIENT_ID=<details omitted>
 GITHUB_CLIENT_SECRET=<details omitted>
+
+SUPER_ADMIN_KEY=i_want_to_be_superadmin
 ```
 
 For `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`, please refer to the assignment submission folder.

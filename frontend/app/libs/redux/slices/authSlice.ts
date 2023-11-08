@@ -5,7 +5,7 @@ export interface AuthState {
     authId: number;
     oauthId: number;
     oauthProvider: string;
-    role: "user" | "admin"
+    role: "user" | "admin" | "super admin"
 }
 
 const initialState: AuthState = {
