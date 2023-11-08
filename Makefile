@@ -1,6 +1,6 @@
 .PHONY: push_images build_images images
 
-# Build all microservice images based on prod Dockerfiles
+# Build all microservice images with the v2 tag based on prod Dockerfiles
 build_images:
 	docker build -f ./frontend/Dockerfile.prod -t gcr.io/smooth-research-397708/frontend:v2 ./frontend
 	docker build -f ./backend/api-gateway/Dockerfile.prod -t gcr.io/smooth-research-397708/api-gateway:v2 ./backend/api-gateway
