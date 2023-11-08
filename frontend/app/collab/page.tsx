@@ -2,7 +2,7 @@
 import { useState, useEffect, ChangeEvent } from 'react';
 import { Category, Complexity, ComplexityToColor, Question } from '../types/question';
 import { GET } from "../libs/axios/axios";
-import { notifyError, notifyWarning } from '../components/toast/notifications';
+import { notifyError, notifySuccess, notifyWarning } from '../components/toast/notifications';
 import Editor from '@monaco-editor/react';
 import { useSelector } from 'react-redux';
 import { selectCollabState, setIsChatOpen, setIsLeaving } from '../libs/redux/slices/collabSlice';
@@ -17,10 +17,12 @@ import { Button, Input, Chip, Select, SelectItem } from '@nextui-org/react';
 import { useDispatch } from 'react-redux';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useRef } from 'react';
+import { selectUsername } from '../libs/redux/slices/userSlice';
 import { LANGUAGES, Language } from '../constants/languages';
 
 export default function Collab() {
   const collabState = useSelector(selectCollabState);
+  const username = useSelector(selectUsername);
   const dispatch = useDispatch();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -32,6 +34,17 @@ export default function Collab() {
   const ws = useRef(null);
   const languages = LANGUAGES.slice(1)
   const [currentLanguage, setCurrentLanguage] = useState(languages[11])
+
+  useEffect(() => {
+    window.addEventListener('popstate', exitRoom);
+    window.addEventListener('beforeunload', sendExitMessage);
+    window.history.pushState(null, '', "");
+
+    return () => {
+      window.removeEventListener('popstate', exitRoom);
+      window.removeEventListener('beforeunload', sendExitMessage);
+    };
+  }, []);
 
   useEffect(() => {
     ws.current = new WebSocket(`${process.env.NEXT_PUBLIC_COLLAB_SERVICE_URL}/ws/${roomId}`);
@@ -49,9 +62,19 @@ export default function Collab() {
       } else if (message.Type === "language") {
         setCurrentLanguage(message.Content as Language);
         notifyWarning(`Editor's Language has been Changed to ${message.Content}`);
-      } else {
+      } else if (message.Type === "exit") {
         notifyError(message.Content);
+      } else {
+        notifySuccess(message.Content);
       }
+    }
+
+    ws.current.onopen = function (event) {
+      sendMessage(`${username} has joined the room!`, "enter");
+    }
+
+    ws.current.onerror = function (event) {
+      router.push('/');
     }
   }, []);
 
@@ -60,6 +83,16 @@ export default function Collab() {
     dispatch(setIsLeaving(false));
     dispatch(setIsChatOpen(false));
   }, []);
+
+  const sendMessage = (value : string, type : string) => {
+    const message = {
+      content: value,
+      roomId: roomId,
+      username: username,
+      type: type,
+    };
+    ws.current.send(JSON.stringify(message));
+  }
 
   const [question, setQuestion] = useState<Question>({
     id: "",
@@ -71,7 +104,7 @@ export default function Collab() {
 
   const fetchQuestion = async () => {
     try {
-      const idResponse = await GET(`ws/question/${roomId}`);
+      const idResponse = await GET(`ws/${roomId}`);
       const response = await GET(`questions/${idResponse.data}`);
       setQuestion(response.data as Question);
     } catch (error) {
@@ -80,19 +113,11 @@ export default function Collab() {
   };
 
   const handleEditorChange = (value: string, event) => {
-    const message = {
-      content: value,
-      type: "code",
-    };
-    ws.current.send(JSON.stringify(message));
+    sendMessage(value, "code");
   }
 
   const handleSendMessage = () => {
-    const sendMessage = {
-      Content: newMessage,
-      Type: "chat",
-    };
-    ws.current.send(JSON.stringify(sendMessage));
+    sendMessage(newMessage, "chat");
 
     const message = {
       content: newMessage,
@@ -108,13 +133,13 @@ export default function Collab() {
     }
   };
 
-  const exitRoom = () => {
-    const message = {
-      Content: "The other user has left the room!",
-      Type: "exit",
-    };
-    ws.current.send(JSON.stringify(message));
+  const sendExitMessage = () => {
+    sendMessage(`${username} has left the room!`, "exit");
     ws.current.close();
+  }
+
+  const exitRoom = () => {
+    sendExitMessage();
     router.push('/');
   }
 

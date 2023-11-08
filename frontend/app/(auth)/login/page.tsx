@@ -38,7 +38,7 @@ export interface AuthResponse {
     UpdatedAt: string,
     DeleteAt?: string, 
     ID: number,
-    role: "user" | "admin",
+    role: "user" | "admin" | "super admin",
     oauth_id: number,
     oauth_provider: string
 }

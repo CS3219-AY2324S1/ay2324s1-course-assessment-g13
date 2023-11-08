@@ -5,6 +5,7 @@ import (
 	"net/http"
     "log"
     "os"
+    "fmt"
     "encoding/json"
 	"github.com/google/uuid"
     "github.com/gorilla/websocket"
@@ -26,13 +27,13 @@ type User struct {
     Connection *websocket.Conn
     MessageChannel chan *Message
     RoomId string
-    UserId string
+    Username string
 }
 
 type Message struct {
     Content string
     RoomId string
-    UserId string
+    Username string
     Type string 
 }
 
@@ -93,8 +94,24 @@ var upgrader = websocket.Upgrader{
 
 func (h *Handler) JoinRoom(c echo.Context) error {
     roomId := c.Param("roomId")
-    if len(h.hub.Rooms[roomId].Users) >= 2 {
+    username := c.Param("username")
+
+    room := h.hub.Rooms[roomId]
+    if len(room.Users) >= 2 {
         return c.JSON(http.StatusBadRequest, "Error joining room")
+    }
+
+    // Websockets open at different times, so second user would not be able to know the first user has joined
+    var message *Message
+    if len(room.Users) == 1 {
+        for _, otherUser := range room.Users {
+            message = &Message {
+                Content: fmt.Sprintf("%s has joined the room!", otherUser.Username),
+                RoomId: roomId,
+                Username: otherUser.Username,
+                Type: "enter",
+            }
+        }
     }
 
     connection, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
@@ -105,17 +122,21 @@ func (h *Handler) JoinRoom(c echo.Context) error {
 
     log.Println("Attempting to join room")
     
-    userId := uuid.New().String()
     user := &User{
         Connection: connection,
         MessageChannel: make(chan *Message, 10),
         RoomId: roomId,
-        UserId: userId,
+        Username: username,
     }
 
-    h.hub.Rooms[roomId].Users[userId] = user
+    room.Users[username] = user
 
     go user.writeMessage()
+    
+    if message != nil {
+        h.hub.BroadcastChannel <- message 
+    } 
+
     user.readMessage(h.hub)
     return c.JSON(http.StatusOK, "Successfully joined room!")
 }
@@ -124,12 +145,17 @@ func (h *Handler) JoinRoom(c echo.Context) error {
 func (h *Handler) GetQuestionId(c echo.Context) error {
     roomId := c.Param("roomId")
 
-    questionId := h.hub.Rooms[roomId].QuestionId
-    if questionId == "" {
+    
+    room, exists := h.hub.Rooms[roomId]
+    if !exists {
+        return c.JSON(http.StatusBadRequest, "Room does not exist!")
+    }
+
+    if room.QuestionId == "" {
         return c.JSON(http.StatusBadRequest, "No question is allocated")
     }
 
-    return c.JSON(http.StatusOK, questionId)
+    return c.JSON(http.StatusOK, room.QuestionId)
 }
 
 // Reads data from hub, and emit data to client
@@ -169,9 +195,6 @@ func (user *User) readMessage(hub *Hub) {
             break
         }
 
-        msg.RoomId = user.RoomId
-        msg.UserId = user.UserId
-
         hub.BroadcastChannel <- &msg
     }
 }
@@ -182,13 +205,13 @@ func (hub *Hub) Run() {
         case message := <- hub.BroadcastChannel:
             if _, ok := hub.Rooms[message.RoomId]; ok {
                 for _, user := range hub.Rooms[message.RoomId].Users {
-                    if message.UserId != user.UserId {
+                    if message.Username != user.Username {
                         user.MessageChannel <- message
                     }
                 }
             }
         case user := <- hub.DisconnectChannel:
-            delete(hub.Rooms[user.RoomId].Users, user.UserId)
+            delete(hub.Rooms[user.RoomId].Users, user.Username)
             if len(hub.Rooms[user.RoomId].Users) == 0 {
                 delete(hub.Rooms, user.RoomId)
             }
