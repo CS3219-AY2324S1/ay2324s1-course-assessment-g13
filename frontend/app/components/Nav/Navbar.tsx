@@ -10,18 +10,20 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppState } from '../../libs/redux/store';
 import { useRouter } from 'next/navigation';
 import { logout as UserLogout } from '../../libs/redux/slices/userSlice';
-import { logout as AuthLogout } from '../../libs/redux/slices/authSlice';
+import { logout as AuthLogout, update } from '../../libs/redux/slices/authSlice';
 import { GET } from '../../libs/axios/axios';
 import { usePathname } from 'next/navigation';
 import { setIsLeaving, setIsChatOpen, selectCollabState } from '../../libs/redux/slices/collabSlice';
 import { ChatIcon } from '../../../public/ChatIcon';
 import { notifyError } from '../toast/notifications';
+import { AxiosResponse } from 'axios';
+import { LoginResponse } from '../../(auth)/login/page';
 
 const Nav = () => {
   const collabState = useSelector(selectCollabState);
   const dispatch = useDispatch();
   const router = useRouter();
-  const { status, isLoggedIn } = useAuth();
+  const { status, isLoggedIn, role } = useAuth();
   const photoUrl = useSelector((state: AppState) => state.user.photoUrl);
   const pathname = usePathname();
 
@@ -39,8 +41,22 @@ const Nav = () => {
     }
   }
 
+  const handleGetUser = async () => {
+    try {
+      const authResponse: AxiosResponse<LoginResponse> = await GET("/auth/user");
+      const { user } = authResponse.data
+      if (role != user.role) {
+        dispatch(update(user));
+      }
+    } catch (error) {
+      const message = error.message.data.message;
+      notifyError(message);
+    } 
+  }
+
   useEffect(() => {
     status === "unauthenticated" && handleLogout();
+    status === "authenticated" && handleGetUser();
   }, [status])
 
   const checkPath = (url : string) => {
@@ -112,6 +128,13 @@ const Nav = () => {
                       Profile
                     </Link>
                   </DropdownItem>
+                  { role === 'super admin' && 
+                  <DropdownItem key="manage-users" color="primary">
+                    <Link href="/manage-users" className="text-white text-sm w-full">
+                      Manage Users
+                    </Link>
+                  </DropdownItem>
+                  }
                   <DropdownItem key="logout" color="danger" onClick={handleLogout}>
                     Log Out
                   </DropdownItem>

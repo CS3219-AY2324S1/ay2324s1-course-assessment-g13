@@ -30,7 +30,7 @@ const DeleteAccountModal = () => {
       onClose();
       signOut();
     } catch (error) {
-      notifyError(error.message.data);
+      notifyError(error.message.data.message);
     }
   };
 

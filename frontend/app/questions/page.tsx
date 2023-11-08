@@ -27,7 +27,7 @@ export default function Questions() {
         {isAdmin && <QuestionAddModal fetchQuestions={fetchQuestions} />}
       </div>
       <div className="table w-full">
-        <QuestionsTable isAdmin={isAdmin} fetchQuestions={fetchQuestions} questions={questions} />
+        <QuestionsTable fetchQuestions={fetchQuestions} questions={questions} />
       </div>
     </div>
   );
