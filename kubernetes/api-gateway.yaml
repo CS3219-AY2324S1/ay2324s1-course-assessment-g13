@@ -111,5 +111,5 @@ spec:
     targetPort: 1234
   selector:
     app: "api-gateway"
-  type: "LoadBalancer"
-  loadBalancerIP: "34.87.127.0"
+  # type: "LoadBalancer"
+  # loadBalancerIP: "34.87.127.0"
