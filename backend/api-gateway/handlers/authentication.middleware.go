@@ -39,14 +39,24 @@ func RequireAuthenticationMiddleWare(next echo.HandlerFunc) echo.HandlerFunc {
 			return c.JSON(statusCode, message.CreateErrorMessage(responseMessage))
 		}
 
-		oauthId := tokenClaims.User.OauthID
-		oauthProvider := tokenClaims.User.OauthProvider
-
 		var user models.User
+		oauthId := user.OauthID
+		oauthProvider := user.OauthProvider
 		err := config.DB.Where("oauth_id = ? AND oauth_provider = ?", oauthId, oauthProvider).First(&user).Error
 		if err != nil {
 			if err == gorm.ErrRecordNotFound {
-				return c.JSON(http.StatusBadRequest, message.CreateErrorMessage(INVALID_USER_NOT_FOUND))
+				cookie_, statusCode, responseMessage := cookie.Service.SetCookieExpires(c.Cookie(ACCESS_TOKEN_COOKIE_NAME))
+				if statusCode != http.StatusOK {
+					return c.JSON(statusCode, message.CreateErrorMessage(responseMessage))
+				}
+				c.SetCookie(cookie_)
+
+				cookie_, statusCode, responseMessage = cookie.Service.SetCookieExpires(c.Cookie(REFRESH_TOKEN_COOKIE_NAME))
+				if statusCode != http.StatusOK {
+					return c.JSON(statusCode, message.CreateErrorMessage(responseMessage))
+				}
+				c.SetCookie(cookie_)
+				return c.JSON(http.StatusNotFound, message.CreateErrorMessage("User Not Found!"))
 			}
 			return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(INVALID_DB_ERROR))
 		}
