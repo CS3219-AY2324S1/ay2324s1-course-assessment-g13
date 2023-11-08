@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-ubuntu
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-ubuntu
+  template:
+    metadata:
+      labels:
+        app: my-ubuntu
+    spec:
+      containers:
+        - name: my-ubuntu-container
+          image: ubuntu:latest
+          command: ["/bin/sleep", "infinity"]
