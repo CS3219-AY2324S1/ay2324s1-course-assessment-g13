@@ -13,5 +13,7 @@ tmp
 *.log
 package-lock.json
 
+kubernetes/secrets.yaml
+
 # build files
 .next

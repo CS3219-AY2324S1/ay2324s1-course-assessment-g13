@@ -3,9 +3,9 @@ package utils
 type MatchCriteria string
 
 const (
-	Easy   MatchCriteria = "Easy"
-	Medium MatchCriteria = "Medium"
-	Hard   MatchCriteria = "Hard"
+	Easy   MatchCriteria = "easy"
+	Medium MatchCriteria = "medium"
+	Hard   MatchCriteria = "hard"
 )
 
 var MatchCriterias = []MatchCriteria{

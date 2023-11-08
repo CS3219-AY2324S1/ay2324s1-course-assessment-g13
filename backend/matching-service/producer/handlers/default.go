@@ -11,6 +11,7 @@ import (
 	"producer/models"
 	"producer/rmq"
 	"producer/utils"
+	"strings"
 	"time"
 )
 
@@ -31,7 +32,7 @@ func MatchHandler(c echo.Context) error {
 	defer cancel()
 	// Retrieves the appropriate channel to publish the user into
 	var channel *amqp.Channel
-	if curr, ok := rmq.OpenChannelsMap[utils.MatchCriteria(requestBody.MatchCriteria)]; ok {
+	if curr, ok := rmq.OpenChannelsMap[utils.MatchCriteria(strings.ToLower(requestBody.MatchCriteria))]; ok {
 		channel = curr
 	} else {
 		msg := fmt.Sprintf("[MatchHandler] Criteria to match is unknown | ok: %v", ok)
