@@ -30,6 +30,11 @@ spec:
               configMapKeyRef:
                 key: AMQP_SERVER_URL
                 name: configmap
+          - name: COLLAB_URL
+            valueFrom:
+              configMapKeyRef:
+                key: COLLABORATION_SERVICE_URL
+                name: configmap
 status: {}
 ---
 apiVersion: v1
