@@ -61,7 +61,7 @@ export default function Collab() {
         notifyWarning("You have unread messages!");
       } else if (message.Type === "language") {
         setCurrentLanguage(message.Content as Language);
-        notifyWarning(`Editor's Language has been Changed to ${message.Content}`);
+        notifyWarning(`Editor's language has been changed to ${message.Content}`);
       } else if (message.Type === "exit") {
         notifyError(message.Content);
       } else {
@@ -116,9 +116,12 @@ export default function Collab() {
     sendMessage(value, "code");
   }
 
-  const handleSendMessage = () => {
-    sendMessage(newMessage, "chat");
+  const sendChatMessage = () => {
+    if (newMessage.trim() === "") {
+      return;
+    }
 
+    sendMessage(newMessage, "chat");
     const message = {
       content: newMessage,
       user: "Current",
@@ -146,11 +149,7 @@ export default function Collab() {
   const handleLanguageChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const newLanguage = e.target.value as Language;
     setCurrentLanguage(newLanguage);
-    const sendMessage = {
-      Content: newLanguage,
-      Type: "language",
-    };
-    ws.current.send(JSON.stringify(sendMessage));
+    sendMessage(newLanguage, "language");
   }
 
   return (
@@ -259,7 +258,7 @@ export default function Collab() {
                   value={newMessage}
                   onValueChange={setNewMessage}
                 />
-                <Button onClick={handleSendMessage} color="primary" className="ml-5">
+                <Button onClick={sendChatMessage} color="primary" className="ml-5">
                   Send
                 </Button>
               </div>

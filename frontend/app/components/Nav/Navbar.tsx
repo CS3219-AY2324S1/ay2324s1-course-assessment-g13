@@ -18,6 +18,7 @@ import { ChatIcon } from '../../../public/ChatIcon';
 import { notifyError } from '../toast/notifications';
 import { AxiosResponse } from 'axios';
 import { LoginResponse } from '../../(auth)/login/page';
+import { signOut } from 'next-auth/react';
 
 const Nav = () => {
   const collabState = useSelector(selectCollabState);

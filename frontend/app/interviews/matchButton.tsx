@@ -23,8 +23,6 @@ export default function MatchButton({inQueue, setInQueue, setSeconds, matchNotfo
           notifySuccess(`Matched with ${payload["match_user"]}, redirecting to collaboration room...`);
           setInQueue(false);
           setSeconds(0);
-          // TODO perform redirection here based on payload redirect url
-          // console.log(payload["room_id"])
           redirectToCollab(payload["room_id"]);
         } else {
           matchNotfound()
@@ -50,14 +48,14 @@ export default function MatchButton({inQueue, setInQueue, setSeconds, matchNotfo
   const getMatch = async () => {
     return await POST("/match/find", {
       "username":`${userState}`,
-      "match_criteria":`${preferenceState}`
+      "match_criteria":`${preferenceState.toLowerCase()}`
     });
   };
 
   const cancelMatch = async () => {
     return await POST("/match/cancel", {
       "username": `${userState}`,
-      "match_criteria": `${preferenceState}`
+      "match_criteria": `${preferenceState.toLowerCase()}`
     });
   }
 
