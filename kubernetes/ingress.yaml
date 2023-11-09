@@ -15,21 +15,21 @@ spec:
     http:
       paths:
       - pathType: ImplementationSpecific
-        path: /api(/|$)(.*)
+        path: /api(/|$)(.*) # rewrites /api/hello to /hello
         backend:
           service:
             name: api-gateway-service
             port:
               number: 80
       - pathType: ImplementationSpecific
-        path: /()(ws)(.*)
+        path: /()(ws)(.*) # keeps /ws/hello to /ws/hello
         backend:
           service:
             name: collaboration-service
             port:
               number: 80
       - pathType: ImplementationSpecific
-        path: /()(.*)
+        path: /()(.*) # keep all routes without prefix
         backend:
           service:
             name: frontend
