@@ -29,7 +29,7 @@ export default function Questions() {
       </div>
       <div className="table w-full">
         <div className="text-2xl my-7">User Defined Questions</div>
-        <QuestionsTable isAdmin={isAdmin} fetchQuestions={fetchQuestions} questions={questions} />
+        <QuestionsTable fetchQuestions={fetchQuestions} questions={questions} />
         <div className="text-2xl my-7">Leetcode Questions</div>
         <LeetCodeQuestionsTable />
       </div>

@@ -16,38 +16,32 @@ const leetcodeQuestionsURL = `https://asia-southeast1-peer-preps-assignment6.clo
 
 const LeetCodeQuestionsTable = () => {
   const [page, setPage] = useState(1);
-  const [offset, setOffset] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [questions, setQuestions] = useState<Question[]>([]);
   const rowsPerPage = 10;
 
-  const fetchLeetcodeQuestions = async (offset : number, pageSize: number) => {
+  const fetchLeetcodeQuestions = async () => {
     try {
         const queryParams = {
-        'offset': offset * pageSize,
-        'page-size': 5 * pageSize,
+          'offset': 0,
+          'page-size': 100,
         }
-        console.log(queryParams);
         const response = await axios.get<ApiResponse>(leetcodeQuestionsURL, {
         params: queryParams
         });
-        const {total, problems} = response.data;
-        setTotalPages(Math.ceil(total/rowsPerPage));
-        setQuestions(prev => [...prev, ...problems]);
+        const {problems} = response.data;
+        setTotalPages(Math.ceil(100/rowsPerPage));
+        setQuestions(problems);
     } catch (error) {
         console.error("Unable to get leetcode questions")
     }
   }
 
   useEffect(() => {
-    fetchLeetcodeQuestions(offset, rowsPerPage);
-  }, [offset]);
+    fetchLeetcodeQuestions();
+  }, []);
 
   const handlePageChange = (newPage: number) => {
-    
-    if (page < newPage) {
-        setOffset(prev => prev + 1)
-    }
     setPage(newPage);
   }
 
