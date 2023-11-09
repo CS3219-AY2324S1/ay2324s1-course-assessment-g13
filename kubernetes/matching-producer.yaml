@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: matching-producer
+  name: matching-producer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: matching-producer
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: matching-producer
+    spec:
+      containers:
+      - image: gcr.io/smooth-research-397708/matching-producer:v1
+        name: matching-producer
+        imagePullPolicy: Always
+        resources: {}
+        ports:
+          - containerPort: 8080
+        env:
+          - name: AMQP_SERVER_URL
+            valueFrom:
+              configMapKeyRef:
+                key: AMQP_SERVER_URL
+                name: configmap
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: matching-producer
+  labels:
+    run: matching-producer
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: matching-producer

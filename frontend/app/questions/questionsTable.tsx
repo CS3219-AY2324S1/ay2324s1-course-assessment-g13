@@ -7,12 +7,11 @@ import { Question } from '../types/question';
 import StyleCell from './style-cell';
 
 interface QuestionProps {
-  isAdmin: boolean,
   questions: Question[];
   fetchQuestions: () => void;
 }
 
-const QuestionsTable = ({isAdmin, questions, fetchQuestions} : QuestionProps) => {
+const QuestionsTable = ({ questions, fetchQuestions} : QuestionProps) => {
   const [page, setPage] = useState(1);
   const rowsPerPage = 10;
 
@@ -36,8 +35,6 @@ const QuestionsTable = ({isAdmin, questions, fetchQuestions} : QuestionProps) =>
       };
     });
   }, [page, questions]);
-
-  const renderCell = useCallback(StyleCell, []);
 
   const columns = useMemo(() => {
     return [
@@ -76,7 +73,11 @@ const QuestionsTable = ({isAdmin, questions, fetchQuestions} : QuestionProps) =>
       <TableBody items={items} emptyContent={'No rows to display.'}>
         {item => (
           <TableRow key={item.id}>
-            {columnKey => <TableCell>{renderCell({isAdmin, item, columnKey, fetchQuestions })}</TableCell>}
+            {columnKey => 
+              <TableCell>
+                <StyleCell item={item} columnKey={columnKey} fetchQuestions={fetchQuestions}/>
+              </TableCell>
+            }
           </TableRow>
         )}
       </TableBody>

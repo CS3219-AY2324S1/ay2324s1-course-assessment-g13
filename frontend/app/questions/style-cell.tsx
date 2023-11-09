@@ -3,15 +3,18 @@ import QuestionDescriptionModal from './modal/descriptionModal';
 import { Category, ComplexityToColor, Question } from '../types/question';
 import { Key } from 'react';
 import DeleteConfirmationModal from './modal/deleteConfirmationModal';
+import useAuth from '../hooks/useAuth';
 
 interface StyleCellProps {
-  isAdmin: boolean,
   item: Question & { listId: number };
   columnKey: Key;
   fetchQuestions?: () => void;
 }
 
-const StyleCell: React.FC<StyleCellProps> = ({ isAdmin, item, columnKey, fetchQuestions }) => {
+const StyleCell: React.FC<StyleCellProps> = ({ item, columnKey, fetchQuestions }) => {
+  const { role } = useAuth();
+  const isAdmin = role === "admin";
+  
   switch (columnKey) {
     case 'id':
       return <span>{item.listId}</span>;

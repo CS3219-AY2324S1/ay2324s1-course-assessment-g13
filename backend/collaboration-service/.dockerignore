@@ -1,6 +1,5 @@
-# air local
 tmp
 bin
-
-# git
 .gitignore
+README.md
+Dockerfile*

@@ -11,6 +11,7 @@ import (
 	"producer/models"
 	"producer/rmq"
 	"producer/utils"
+	"strings"
 	"time"
 )
 
@@ -31,7 +32,7 @@ func MatchHandler(c echo.Context) error {
 	defer cancel()
 	// Retrieves the appropriate channel to publish the user into
 	var channel *amqp.Channel
-	if curr, ok := rmq.OpenChannelsMap[utils.MatchCriteria(requestBody.MatchCriteria)]; ok {
+	if curr, ok := rmq.OpenChannelsMap[utils.MatchCriteria(strings.ToLower(requestBody.MatchCriteria))]; ok {
 		channel = curr
 	} else {
 		msg := fmt.Sprintf("[MatchHandler] Criteria to match is unknown | ok: %v", ok)
@@ -108,8 +109,8 @@ func MatchHandler(c echo.Context) error {
 	ctxTimer, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	syncChan := make(chan int)   // Used to break consumer goroutine once timeout hits
-	resChan := make(chan string) // Used to pass result from consumer goroutine to main thread
+	syncChan := make(chan int)                 // Used to break consumer goroutine once timeout hits
+	resChan := make(chan models.MatchResponse) // Used to pass result from consumer goroutine to main thread
 
 	// Spins off consumer goroutine to listen to results channel
 	go func(syncChan chan int) {
@@ -128,6 +129,7 @@ func MatchHandler(c echo.Context) error {
 				matchedUser := packetResponse.ResponseBody.MatchUser
 				// Check if matched user is already out of queue
 				if utils.IsUserCancelled(matchedUser) {
+					log.Printf("User is already out of queue: %s\n", matchedUser)
 					// Publishes the user request into the selected MQ
 					err = channel.PublishWithContext(
 						ctx,
@@ -148,10 +150,11 @@ func MatchHandler(c echo.Context) error {
 					continue
 				} else if utils.IsUserCancelled(requestBody.Username) {
 					// If user is already cancelled, cancel the timer
+					log.Printf("User is already cancelled: %s\n", requestBody.Username)
 					cancel()
 				} else {
 					// If matched user is valid, return matched user
-					resChan <- packetResponse.ResponseBody.MatchUser
+					resChan <- packetResponse.ResponseBody
 					return
 				}
 			}
@@ -163,21 +166,32 @@ func MatchHandler(c echo.Context) error {
 	var matchResponseBody models.MatchResponse
 
 	// Loops infinitely until context timer is hit, or result is returned from consumer, whichever occurs first
+	userCancelChan := make(chan bool)
+	UserToChanMap[requestBody.Username] = userCancelChan
 	for {
 		select {
+		// User cancelled, so terminate listener
+		case <-userCancelChan:
+			log.Println("User manually cancelled on producer side")
+			// Remove user from queue
+			utils.CancelUser(requestBody.Username)
+			<-syncChan // Reads from sync channel to allow goroutine listening to result to break out of loop
+			shouldBreak = true
+			break
 		// 30 seconds timer hit
 		case <-ctxTimer.Done():
+			log.Println("30 seconds timer hit on producer side")
 			// Remove user from queue
 			utils.CancelUser(requestBody.Username)
 			<-syncChan // Reads from sync channel to allow goroutine listening to result to break out of loop
 			shouldBreak = true
 			break
 		case res := <-resChan:
-			utils.PrintCancelledUsers() // TODO remove once live
+			log.Printf("Found a match for current user with: %s\n", res.MatchUser)
 			matchResponseBody = models.MatchResponse{
-				MatchUser:    res,
+				MatchUser:    res.MatchUser,
 				MatchStatus:  1,
-				RedirectURL:  "https://google.com",
+				RoomId:       res.RoomId,
 				ErrorMessage: "",
 			}
 			return c.JSON(http.StatusOK, matchResponseBody)
@@ -190,7 +204,7 @@ func MatchHandler(c echo.Context) error {
 	matchResponseBody = models.MatchResponse{
 		MatchUser:    "",
 		MatchStatus:  0,
-		RedirectURL:  "https://google.com",
+		RoomId:       "",
 		ErrorMessage: "Match not found within 30 seconds.",
 	}
 

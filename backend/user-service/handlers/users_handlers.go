@@ -2,152 +2,144 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 
 	"user-service/config"
 	model "user-service/models"
+	"user-service/utils/message"
 
-	"github.com/go-playground/validator/v10"
-	// "github.com/labstack/echo-contrib/session"
+	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
-	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 func GetUser(c echo.Context) error {
 	id := c.Param("id")
 
 	var user model.User
-	config.DB.Where("user_id = ?", id).First(&user)
-	if user.ID == 0 {
-		return c.JSON(http.StatusBadRequest, "User not found")
+	if err := config.DB.Where("auth_user_id = ?", id).First(&user).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return c.JSON(http.StatusNotFound, message.CreateErrorMessage(INVALID_USER_NOT_FOUND))
+		}
+		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(INVALID_DB_ERROR))
 	}
 
-	return c.String(http.StatusOK, user.Username)
+	return c.JSON(http.StatusOK, message.CreateSuccessUserMessage(SUCCESS_USER_FOUND, user))
 }
 
 func GetUsers(c echo.Context) error {
 	users := make([]model.User, 0)
 	if err := config.DB.Find(&users).Error; err != nil {
-		return c.JSON(http.StatusBadRequest, "Invalid user input")
+		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(INVALID_DB_ERROR))
 	}
-	return c.JSON(http.StatusOK, users)
+	return c.JSON(http.StatusOK, message.CreateSuccessUsersMessage(SUCCESS_USER_FOUND, users))
 }
 
 func CreateUser(c echo.Context) error {
-	req := new(model.CreateUserRequest)
-	if err := c.Bind(req); err != nil {
-		return c.JSON(http.StatusBadRequest, "Invalid JSON request")
+	requestBody := new(model.CreateUser)
+	if err := c.Bind(requestBody); err != nil {
+		return c.JSON(http.StatusBadRequest, message.CreateErrorMessage(INVALID_JSON_REQUEST))
 	}
 
-	// Validate the request input
 	validator := validator.New()
-	if err := validator.Struct(req); err != nil {
-		return c.JSON(http.StatusBadRequest, "Invalid user input")
+	if err := validator.Struct(requestBody); err != nil {
+		return c.JSON(http.StatusBadRequest, message.CreateErrorMessage(INVALID_USER_INPUT))
 	}
 
 	var existingUser model.User
-	config.DB.Where("username = ?", req.Username).First(&existingUser)
-	if existingUser.ID != 0 {
-		return c.JSON(http.StatusBadRequest, "Username already exists")
-	}
-
-	// Map CreateUserRequest fields to User model
-	user := new(model.User)
-	user.Username = req.Username
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	err := config.DB.Where("auth_user_id = ?", requestBody.AuthUserID).First(&existingUser).Error
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, "Internal server error")
-	}
-	user.HashedPassword = string(hashedPassword)
-
-	user.UserID = req.UserID
-	user.PhotoUrl = req.PhotoURL
-
-	// Create a new user record in the database
-	if err := config.DB.Create(user).Error; err != nil {
-		return c.JSON(http.StatusInternalServerError, "Failed to create user")
+		if err != gorm.ErrRecordNotFound {
+			return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(INVALID_DB_ERROR))
+		}
+	} else {
+		return c.JSON(http.StatusBadRequest, message.CreateErrorMessage(INVALID_USER_EXIST))
 	}
 
-	res := &model.LoginResponse{
-		Id:       user.ID,
-		Username: user.Username,
-		PhotoUrl: user.PhotoUrl,
+	var newUser model.User
+
+	if err := config.DB.Where("username = ?", requestBody.Username).First(&existingUser).Error; err != nil {
+		if err != gorm.ErrRecordNotFound {
+			return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(INVALID_DB_ERROR))
+		}
+	} else {
+		return c.JSON(http.StatusConflict, message.CreateErrorMessage(INVALID_USERNAME_EXIST))
 	}
-	return c.JSON(http.StatusCreated, res)
+	newUser.Username = requestBody.Username
+
+	newUser.AuthUserID = requestBody.AuthUserID
+	newUser.PhotoUrl = requestBody.PhotoUrl
+	newUser.PreferredLanguage = requestBody.PreferredLanguage
+	err = config.DB.Create(&newUser).Error
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(FAILURE_CREATE_USER))
+	}
+
+	return c.JSON(http.StatusCreated, message.CreateSuccessMessage(SUCCESS_USER_CREATED))
 }
 
-func UpdateUserInfo(c echo.Context) error {
-	id := c.Param("id")
-	var user model.User
-	
-	if err := config.DB.Where("user_id = ?", id).First(&user).Error; err != nil {
-		return c.JSON(http.StatusBadRequest, "User not found")
-	}
+func UpdateUser(c echo.Context) error {
+	authUserID := c.Param("id")
 
-	req := new(model.UpdateUserInfo)
-	if err := c.Bind(req); err != nil {
-		return c.JSON(http.StatusBadRequest, "Invalid JSON request")
-	}
-
-	updates := make(map[string]interface{})
-
-	if req.Username != "" {
-		updates["username"] = req.Username
-	}
-
-	if req.PhotoUrl != "" {
-		updates["photo_url"] = req.PhotoUrl
-	}
-
-	if err := config.DB.Model(&user).Updates(updates).Error; err != nil {
-		return c.JSON(http.StatusInternalServerError, "Failed to update user")
-	}
-
-	return c.JSON(http.StatusOK, "User updated successfully")
-}
-
-func UpdateUserPassword(c echo.Context) error {
-	id := c.Param("id")
-
-	var user model.User
-	if err := config.DB.Where("user_id = ?", id).First(&user).Error; err != nil {
-		return c.JSON(http.StatusBadRequest, "User not found")
-	}
-
-	req := new(model.UpdateUserPassword)
-	if err := c.Bind(req); err != nil {
-		return c.JSON(http.StatusBadRequest, "Invalid JSON request")
-	}
-
-	if err := bcrypt.CompareHashAndPassword([]byte(user.HashedPassword), []byte(req.OldPassword)); err != nil {
-		return c.JSON(http.StatusBadRequest, "Invalid old password")
-	}
-
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
+	intAuthUserId, err := strconv.Atoi(authUserID)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, "Internal server error")
+		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage("Internal Server Error: Unable to Convert String to Uint"))
 	}
 
-	if err := config.DB.Model(&user).Update("hashed_password", string(hashedPassword)).Error; err != nil {
-		return c.JSON(http.StatusInternalServerError, "Failed to update password")
+	uintAuthUserId := uint(intAuthUserId)
+
+	var user model.User
+	if err := config.DB.Where("auth_user_id = ?", authUserID).First(&user).Error; err != nil {
+		return c.JSON(http.StatusNotFound, message.CreateErrorMessage(INVALID_USER_NOT_FOUND))
 	}
 
-	return c.JSON(http.StatusOK, "Password updated successfully")
+	requestBody := new(model.UpdateUser)
+	if err := c.Bind(requestBody); err != nil {
+		return c.JSON(http.StatusBadRequest, message.CreateErrorMessage(INVALID_JSON_REQUEST))
+	}
+
+	if requestBody.PhotoUrl == "" && requestBody.Username == "" && requestBody.PreferredLanguage == "" {
+		return c.JSON(http.StatusBadRequest, message.CreateErrorMessage(INVALID_UPDATE_REQUEST))
+	}
+
+	if requestBody.Username != "" {
+		var existingUser model.User
+		if err := config.DB.Where("username = ?", requestBody.Username).First(&existingUser).Error; err != nil {
+			if err != gorm.ErrRecordNotFound {
+				return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(INVALID_DB_ERROR))
+			}
+		} else {
+			if existingUser.AuthUserID != uintAuthUserId {
+				return c.JSON(http.StatusConflict, message.CreateErrorMessage(INVALID_USERNAME_EXIST))
+			}
+		}
+		user.Username = requestBody.Username
+	}
+
+	if requestBody.PhotoUrl != "" {
+		user.PhotoUrl = requestBody.PhotoUrl
+	}
+
+	if requestBody.PreferredLanguage != "" {
+		user.PreferredLanguage = requestBody.PreferredLanguage
+	}
+
+	if err := config.DB.Save(&user).Error; err != nil {
+		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(FAILURE_UPDATE_USER))
+	}
+
+	return c.JSON(http.StatusOK, message.CreateSuccessUserMessage(SUCCESS_USER_UPDATED, user))
+
 }
 
 func DeleteUser(c echo.Context) error {
-	// sess, err := session.Get("session", c)
-	// if err != nil {
-	// 	return c.JSON(http.StatusInternalServerError, "Internal server error")
-	// }
+	authUserID := c.Param("id")
 
-	// id := sess.Values["userId"]
-	id := c.Param("id")
-
-	var user model.User
-	if err := config.DB.Where("user_id = ?", id).First(&user).Error; err != nil {
-		return c.JSON(http.StatusBadRequest, "User not found")
+	var existingUser model.User
+	if err := config.DB.Where("auth_user_id = ?", authUserID).First(&existingUser).Error; err != nil {
+		return c.JSON(http.StatusNotFound, message.CreateErrorMessage(INVALID_USER_NOT_FOUND))
 	}
 
-	config.DB.Unscoped().Delete(&user)
-	return c.JSON(http.StatusOK, "User deleted successfully")
+	config.DB.Unscoped().Delete(&existingUser)
+	return c.JSON(http.StatusOK, message.CreateSuccessMessage(SUCCESS_USER_DELETED))
 }

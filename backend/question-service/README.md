@@ -8,4 +8,5 @@
 
 ```
 MONGO_URI="mongodb://mongodb:27017"
+AGW_URL="http://localhost:1234"
 ```

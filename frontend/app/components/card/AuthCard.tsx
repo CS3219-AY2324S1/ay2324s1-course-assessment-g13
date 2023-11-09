@@ -3,6 +3,7 @@ import { Card, CardBody } from "@nextui-org/card";
 import { Divider } from "@nextui-org/divider";
 import { Button } from "@nextui-org/button";
 import { GithubIcon } from "../../../public/GithubIcon";
+import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 type authTitle = (
@@ -14,14 +15,6 @@ interface AuthCardProps {
 };
 
 export default function AuthCard({authTitle} : AuthCardProps) {
-    const router = useRouter();
-
-    const handleGithubLogin = async () => {
-        const clientId = process.env.NEXT_PUBLIC_GITHUB_OAUTH_CLIENT_ID;
-        const redirectUrl = "http://localhost:3000/oauth/callback";
-        const github_authorize_url = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUrl}`;
-        router.push(github_authorize_url);
-    }
 
     return (
         <Card className="max-w-lg mx-auto mt-48">
@@ -34,7 +27,7 @@ export default function AuthCard({authTitle} : AuthCardProps) {
                 <Divider orientation="vertical" />
                 <CardBody>
                     <Button
-                        onClick={handleGithubLogin}
+                        onClick={() => signIn("github")}
                         color="default"
                         startContent={<GithubIcon />}
                     >

@@ -4,7 +4,7 @@
 Follow the steps below to set up the entire project using **Docker Compose**.
 
 1. Turn on [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-2. Copy the `.env.sample` file into a `.env` and fill in the environment variables with the required secrets
+2. Copy the `.env.sample` file into a `.env` and fill in the environment variables with the required secrets (Only the `.env` at root directory is needed, .env in subdirectories are deprecated)
 3. Change directory to the `scripts` folder and run `chmod +rwx <script>` for both scripts
 4. Ensure that all the directories have their environment variables setup as well by following the respective `README.md`'s in the directories
 5. For TA reviewing this assignment or **production** environment, simply run `docker compose -f docker-compose.prod.yaml up --build`. For **development**, run `docker compose up --build`

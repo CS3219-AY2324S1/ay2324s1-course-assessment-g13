@@ -15,8 +15,16 @@ services:
         condition: service_started
       question-service:
         condition: service_started
-    env_file:
-      - ./frontend/.env
+    environment:
+      - NEXT_PUBLIC_BACKEND_URL=http://localhost:1234
+      - NEXT_PUBLIC_GITHUB_OAUTH_CLIENT_ID=${GITHUB_CLIENT_ID}
+      - NEXT_PUBLIC_GITHUB_OAUTH_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
+      - NEXT_PUBLIC_FRONTEND_URL=http://localhost:3000
+      - NEXT_PUBLIC_COLLAB_SERVICE_URL=ws://localhost:5005
+      - NEXTAUTH_SECRET=nextauth_secret
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=dgxltgjxl
+      - NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=usohal3c
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
@@ -33,8 +41,22 @@ services:
     build:
       context: ./backend/api-gateway
       dockerfile: Dockerfile.dev
-    env_file:
-      - ./backend/api-gateway/.env
+    environment:
+      - PGUSER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=apigateway
+      - POSTGRES_HOST=db-agw
+      - ACCESS_TOKEN_SECRET_KEY=super_secret_key
+      - REFRESH_TOKEN_SECRET_KEY=super_secret_key
+      - USER_SERVICE_URL=http://user-service:8080
+      - QUESTION_SERVICE_URL=http://question-service:8080
+      - COLLAB_SERVICE_URL=http://collab-service:8080
+      - MATCHING_SERVICE_URL=http://matching-producer:8080
+      - AGW_URL=http://localhost:1234
+      - FRONTEND_URL=http://localhost:3000
+      - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
+      - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
+      - SUPER_ADMIN_KEY=i_want_to_be_superadmin
     ports:
       - "1234:1234"  # Maps container port 1234 to local 1234
     volumes:
@@ -52,6 +74,8 @@ services:
       dockerfile: Dockerfile.dev
     ports:
       - "5005:8080" # Maps container port 8080 to local 5005
+    environment:
+      QUESTION_SERVICE_URL: http://question-service:8080
     volumes:
       -  ./backend/collaboration-service:/usr/src/app
     networks:
@@ -62,8 +86,12 @@ services:
     build:
       context: ./backend/user-service
       dockerfile: Dockerfile.dev
-    env_file:
-      - ./backend/user-service/.env
+    environment:
+      - PGUSER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=users
+      - AGW_URL=http://localhost:1234
+      - POSTGRES_HOST=db-us
     ports:
       - "5006:8080" # Maps container port 8080 to local 5006
     volumes:
@@ -82,7 +110,8 @@ services:
     ports:
       - "5007:8080"
     environment:
-      AMQP_SERVER_URL: amqp://guest:guest@rabbitmq:5672/
+      - AMQP_SERVER_URL=amqp://guest:guest@rabbitmq:5672/
+      - AGW_URL=http://localhost:1234
     networks:
       - peerpreps-backend
       - rabbitmq-network
@@ -101,7 +130,9 @@ services:
     ports:
       - "5008:8080"
     environment:
-      AMQP_SERVER_URL: amqp://guest:guest@rabbitmq:5672/
+      - AMQP_SERVER_URL=amqp://guest:guest@rabbitmq:5672/
+      - COLLAB_URL=http://collaboration-service:8080
+      - RMQ_QUEUE_URL=http://rabbitmq:15672/api/queues/%2f/
     networks:
       - peerpreps-backend
       - rabbitmq-network
@@ -134,8 +165,9 @@ services:
       build:
         context: ./backend/question-service
         dockerfile: Dockerfile.dev
-      env_file:
-        - ./backend/question-service/.env
+      environment:
+        - MONGO_URI=mongodb://mongodb:27017
+        - AGW_URL=http://localhost:1234
       ports:
         - "5009:8080" # Maps container port 8080 to local 5009
       volumes:
@@ -149,8 +181,6 @@ services:
   mongodb:
     image: mongo:7.0.1
     container_name: mongodb-question-service
-    env_file:
-      - ./backend/question-service/.env
     restart: always
     ports:
       - "27017:27017"
@@ -163,15 +193,17 @@ services:
     image: postgres:16rc1-alpine3.18
     container_name: postgres-user-service
     restart: always
-    env_file:
-      - ./backend/user-service/.env
+    environment:
+      - PGUSER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=users
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready", "-d", "users", "-p", "5432" ]
       interval: 5s
       timeout: 60s
       retries: 5
     ports:
-      - "5432:5432"
+      - 5432:5432
     volumes:
       - ./scripts/init_user_db.sh:/docker-entrypoint-initdb.d/init_user_db.sh
       - data:/var/lib/postgresql/data
@@ -182,15 +214,17 @@ services:
     image: postgres:16rc1-alpine3.18
     container_name: postgres-api-gateway
     restart: always
-    env_file:
-      - ./backend/api-gateway/.env
+    environment:
+      - PGUSER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=apigateway
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready", "-d", "apigateway", "-p", "5433" ]
       interval: 5s
       timeout: 60s
       retries: 5
     ports:
-      - "5433:5432"
+      - 5433:5432
     volumes:
       - ./scripts/init_apigw_db.sh:/docker-entrypoint-initdb.d/init_apigw_db.sh
       - agw-data:/var/lib/postgresql/data

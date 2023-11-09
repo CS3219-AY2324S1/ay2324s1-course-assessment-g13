@@ -4,10 +4,12 @@ import {useSelector} from "react-redux";
 import {selectPreferenceState} from "../libs/redux/slices/matchPreferenceSlice";
 import {POST} from "../libs/axios/axios";
 import {selectUsername} from "../libs/redux/slices/userSlice";
+import { useRouter } from 'next/navigation';
 
 export default function MatchButton({inQueue, setInQueue, setSeconds, matchNotfound, setIsCancelled, setShouldNotifyCancelled}) {
   const preferenceState = useSelector(selectPreferenceState)
   const userState = useSelector(selectUsername);
+  const router = useRouter();
 
   const startQueue = () => {
     setInQueue(true);
@@ -18,10 +20,12 @@ export default function MatchButton({inQueue, setInQueue, setSeconds, matchNotfo
         const payload = r.data;
         // If there is a match, notify success and redirect
         if (payload["match_user"] != "") {
-          notifySuccess(`Matched with ${payload["match_user"]}`);
+          notifySuccess(`Matched with ${payload["match_user"]}, redirecting to collaboration room...`);
           setInQueue(false);
           setSeconds(0);
           // TODO perform redirection here based on payload redirect url
+          // console.log(payload["room_id"])
+          redirectToCollab(payload["room_id"]);
         } else {
           matchNotfound()
         }
@@ -33,16 +37,27 @@ export default function MatchButton({inQueue, setInQueue, setSeconds, matchNotfo
     });
   }
 
+  const redirectToCollab = (room_id : string) => {  
+    // Just to match with toast timer, preference whether to instant redirect or not
+    const redirectTimer = setTimeout(() => {
+      router.push(`/collab/?room_id=${room_id}`);
+    }, 1000);
+    return () => {
+      clearTimeout(redirectTimer);
+    }
+  }
+
   const getMatch = async () => {
     return await POST("/match/find", {
       "username":`${userState}`,
-      "match_criteria":`${preferenceState.toLowerCase()}`
+      "match_criteria":`${preferenceState}`
     });
   };
 
   const cancelMatch = async () => {
     return await POST("/match/cancel", {
-      "username": `${userState}`
+      "username": `${userState}`,
+      "match_criteria": `${preferenceState}`
     });
   }
 

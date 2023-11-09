@@ -2,13 +2,12 @@
 import { useEffect, useState } from "react";
 import MatchButton from "./matchButton";
 import SetPreferencesModal from "./preferenceModal";
-import {notifyError, notifySuccess} from "../components/toast/notifications";
+import {notifyError} from "../components/toast/notifications";
 import {useSelector} from "react-redux";
 import {selectPreferenceState} from "../libs/redux/slices/matchPreferenceSlice";
 
 export default function Interviews() {
   const [inQueue, setInQueue] = useState(false);
-  const [isMatch, setIsMatch] = useState(false);
   const [isCancelled, setIsCancelled] = useState(false);
   const [shouldNotifyCancelled, setShouldNotifyCancelled] = useState(false);
   const [seconds, setSeconds] = useState(0);
@@ -41,16 +40,6 @@ export default function Interviews() {
       clearInterval(timer);
     };
   }, [inQueue, seconds]);
-
-
-  // TODO: When match found set this to true
-  useEffect(() => {
-    if (isMatch) {
-      setInQueue(false);
-      setIsMatch(false);
-      notifySuccess("Match Found, Redirecting to Collaboration Room...");
-    }
-  }, [isMatch]);
 
   return (
     <>

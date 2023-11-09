@@ -31,3 +31,11 @@ func HandleMatchingService(c echo.Context) error {
 	proxy.ServeHTTP(c.Response(), c.Request())
 	return nil
 }
+
+func HandleCollabService(c echo.Context) error {
+	targetURL := os.Getenv("COLLAB_SERVICE_URL")
+	target, _ := url.Parse(targetURL)
+	proxy := httputil.NewSingleHostReverseProxy(target)
+	proxy.ServeHTTP(c.Response(), c.Request())
+	return nil
+}

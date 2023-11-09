@@ -30,7 +30,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ setImage }) => {
         return (
           <div
             onClick={() => open?.()}
-            className="relative cursor-pointer hover:opacity-70 transition border-dashed border-2 p-20 border-neutral-300 flex flex-col  justify-center items-center gap-4 text-neutral-600"
+            className="h-20 relative cursor-pointer hover:opacity-70 transition border-dashed border-2 p-20 border-neutral-300 flex flex-col  justify-center items-center gap-4 text-neutral-600"
           >
             <Image src="/imageUpload.svg" alt="upload image" width={100} height={100} />
             <div className="font-semibold text-lg">Click to upload</div>

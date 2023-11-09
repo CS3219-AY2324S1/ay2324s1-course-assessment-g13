@@ -10,16 +10,22 @@
 PGUSER="postgres"
 POSTGRES_PASSWORD="postgres"
 POSTGRES_DB="apigateway"
+POSTGRES_HOST="db-agw"
 
 ACCESS_TOKEN_SECRET_KEY=super_secret_key
 REFRESH_TOKEN_SECRET_KEY=super_secret_key
 
 USER_SERVICE_URL=http://user-service:8080
 QUESTION_SERVICE_URL=http://question-service:8080
+COLLAB_SERVICE_URL=http://collaboration-service:8080
 MATCHING_SERVICE_URL=http://matching-producer:8080
+AGW_URL=http://localhost:1234
+FRONTEND_URL=http://localhost:3000
 
 GITHUB_CLIENT_ID=<details omitted>
 GITHUB_CLIENT_SECRET=<details omitted>
+
+SUPER_ADMIN_KEY=i_want_to_be_superadmin
 ```
 
 For `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`, please refer to the assignment submission folder.
