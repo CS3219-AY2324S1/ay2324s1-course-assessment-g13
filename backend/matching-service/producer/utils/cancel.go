@@ -1,7 +1,5 @@
 package utils
 
-import "fmt"
-
 var cancelledUsers []string
 
 func IsUserCancelled(user string) bool {
@@ -23,16 +21,10 @@ func ResetUser(userToCancel string) {
 	if deletionIndex != -1 {
 		cancelledUsers[deletionIndex] = cancelledUsers[len(cancelledUsers)-1]
 		cancelledUsers = cancelledUsers[:len(cancelledUsers)-1]
-		return
 	}
-	return
 }
 
 func CancelUser(user string) {
-	ResetUser(user)                               // Resets user first
+	ResetUser(user)                               // Resets user first by removing user if they exist
 	cancelledUsers = append(cancelledUsers, user) // Then cancel to prevent duplicates
-}
-
-func PrintCancelledUsers() {
-	fmt.Println(cancelledUsers)
 }

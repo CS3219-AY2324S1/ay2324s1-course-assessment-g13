@@ -1,5 +1,13 @@
 import axios, { AxiosError } from 'axios';
 import { refreshToken } from './helper';
+import { store } from '../redux/store';
+import { logout as AuthLogout } from '../redux/slices/authSlice';
+import { logout as UserLogout } from '../redux/slices/userSlice';
+import { redirect } from 'next/navigation';
+
+type TMessage = {
+  message: string;
+}
 
 const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
@@ -18,6 +26,15 @@ axiosInstance.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       await refreshToken();
       return axiosInstance(error.config);
+    }
+    if (error.response && error.response.status === 404) {
+      console.log(error.response.data);
+      const { message } = error.response.data as TMessage;
+      if (message === "User Not Found!") {
+        store.dispatch(AuthLogout());
+        store.dispatch(UserLogout());
+        window.location.href = "/";
+      }
     }
     return Promise.reject(error);
   }

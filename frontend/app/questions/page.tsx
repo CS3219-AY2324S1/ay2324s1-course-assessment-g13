@@ -8,8 +8,8 @@ import useAuth from '../hooks/useAuth';
 
 export default function Questions() {
   const [questions, setQuestions] = useState([]);
-  const { userRole } = useAuth();
-  const isAdmin = userRole === "admin";
+  const { role } = useAuth();
+  const isAdmin = role === "admin";
   
   const fetchQuestions = async () => {
     try {
@@ -27,7 +27,7 @@ export default function Questions() {
         {isAdmin && <QuestionAddModal fetchQuestions={fetchQuestions} />}
       </div>
       <div className="table w-full">
-        <QuestionsTable isAdmin={isAdmin} fetchQuestions={fetchQuestions} questions={questions} />
+        <QuestionsTable fetchQuestions={fetchQuestions} questions={questions} />
       </div>
     </div>
   );

@@ -26,10 +26,10 @@ export const unprotectedPath = [
 
 export const protectedPath = [
     "/questions",
-    "/profile/info",
-    "/profile/account"
+    "/profile",
+    "/manage-users"
 ]
 
 export const config = {
-    matcher: ["/", "/questions", "/profile/info", "/profile/account", "/login", "/signup"]
+    matcher: ["/", "/questions", "/profile", "/login", "/signup", "/manage-users"]
 };

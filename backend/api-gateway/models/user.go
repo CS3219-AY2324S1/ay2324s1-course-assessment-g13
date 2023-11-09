@@ -4,10 +4,27 @@ import "gorm.io/gorm"
 
 type User struct {
 	gorm.Model
-	UserId   int    `json:"id"`
-	Provider string `json:"provider"`
-	Username string `json:"username"`
-	Email    string `json:"email,omitempty"`
-	Picture  string `json:"picture"`
-	Role     string `json:"role" gorm:"default:'user'"`
+	OauthID       int    `json:"oauth_id"`
+	OauthProvider string `json:"oauth_provider"`
+	Role          string `json:"role" gorm:"default:'user'"`
+}
+
+type LoginRequest struct {
+	OauthID       int    `json:"oauth_id" validate:"required"`
+	OauthProvider string `json:"oauth_provider" validate:"required"`
+}
+
+type CreateUser struct {
+	OauthID           int    `json:"oauth_id" validate:"required"`
+	OauthProvider     string `json:"oauth_provider" validate:"required"`
+	Username          string `json:"username" validate:"required"`
+	PhotoUrl          string `json:"photo_url"`
+	PreferredLanguage string `json:"preferred_language"`
+}
+
+type UserServiceCreateUserRequestBody struct {
+	AuthUserID        uint   `json:"auth_user_id"`
+	Username          string `json:"username"`
+	PhotoUrl          string `json:"photo_url"`
+	PreferredLanguage string `json:"preferred_language"`
 }

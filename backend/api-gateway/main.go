@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"net/http"
+	"os"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -29,18 +30,18 @@ func main() {
 
 	API_GATEWAY.Use(corsMiddleware, handlers.RequireAuthenticationMiddleWare)
 
-	API_GATEWAY.GET(path.GITHUB_LOGIN, handlers.GithubLogin)
+	API_GATEWAY.POST(path.SIGNUP, handlers.CreateUser)
+	API_GATEWAY.POST(path.LOGIN, handlers.Login)
 	API_GATEWAY.GET(path.LOGOUT, handlers.Logout)
 	API_GATEWAY.GET(path.REFRESH, handlers.Refresh)
 
+	API_GATEWAY.GET(path.AUTH_USERS, handlers.GetUsers)
 	API_GATEWAY.GET(path.AUTH_USER, handlers.GetUser)
 	API_GATEWAY.DELETE(path.AUTH_USER, handlers.DeleteUser)
 
-	API_GATEWAY.GET("/", handlers.RootHandler)
-	API_GATEWAY.GET("/github", handlers.GithubLoginHandler)
-
-	API_GATEWAY.GET(path.AUTH_USER_UPGRADE, handlers.UpgradeUser)
-	API_GATEWAY.GET(path.AUTH_USER_DOWNGRADE, handlers.DowngradeUser)
+	API_GATEWAY.POST(path.AUTH_USER_UPGRADE, handlers.UpgradeUser)
+	API_GATEWAY.POST(path.AUTH_USER_DOWNGRADE, handlers.DowngradeUser)
+	API_GATEWAY.GET(path.AUTH_USER_UPGRADE_SUPER_ADMIN, handlers.UpgradeSuperAdmin)
 
 	API_GATEWAY.Any(path.ALL_USER_SERVICE, handlers.HandleUserService)
 	API_GATEWAY.Any(path.ALL_QUESTION_SERVICE, handlers.HandleQuestionService)

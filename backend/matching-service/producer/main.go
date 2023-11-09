@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"net/http"
+	"os"
 	"producer/handlers"
 	"producer/rmq"
 )
@@ -14,6 +15,8 @@ import (
 func main() {
 	rmq.Init()
 	defer rmq.Reset()
+
+	handlers.Init()
 
 	e := echo.New()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{

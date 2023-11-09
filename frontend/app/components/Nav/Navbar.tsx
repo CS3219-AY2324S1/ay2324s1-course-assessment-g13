@@ -1,7 +1,7 @@
 'use client';
 import { Link } from '@nextui-org/link';
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem } from '@nextui-org/navbar';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import useAuth from '../../hooks/useAuth';
 import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@nextui-org/dropdown'
 import { Avatar } from '@nextui-org/avatar';
@@ -9,32 +9,55 @@ import { Button } from '@nextui-org/button';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppState } from '../../libs/redux/store';
 import { useRouter } from 'next/navigation';
-import { logout } from '../../libs/redux/slices/userSlice';
+import { logout as UserLogout } from '../../libs/redux/slices/userSlice';
+import { logout as AuthLogout, update } from '../../libs/redux/slices/authSlice';
 import { GET } from '../../libs/axios/axios';
 import { usePathname } from 'next/navigation';
-import { setIsLeaving } from '../../libs/redux/slices/collabSlice';
+import { setIsLeaving, setIsChatOpen, selectCollabState } from '../../libs/redux/slices/collabSlice';
+import { ChatIcon } from '../../../public/ChatIcon';
+import { notifyError } from '../toast/notifications';
+import { AxiosResponse } from 'axios';
+import { LoginResponse } from '../../(auth)/login/page';
 
 const Nav = () => {
+  const collabState = useSelector(selectCollabState);
   const dispatch = useDispatch();
   const router = useRouter();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const { isAuthenticated } = useAuth();
+  const { status, isLoggedIn, role } = useAuth();
   const photoUrl = useSelector((state: AppState) => state.user.photoUrl);
   const pathname = usePathname();
 
   const handleLogout = async () => {
+    if (!isLoggedIn) return;
     try {
-        dispatch(logout());
+        dispatch(UserLogout());
+        dispatch(AuthLogout());
         await GET('/auth/logout');
         router.push('/');
+        signOut();
     } catch (error) {
-        console.error(error)
+      const message =  error.message.data.message;
+      notifyError(message);
     }
   }
 
+  const handleGetUser = async () => {
+    try {
+      const authResponse: AxiosResponse<LoginResponse> = await GET("/auth/user");
+      const { user } = authResponse.data
+      if (role != user.role) {
+        dispatch(update(user));
+      }
+    } catch (error) {
+      const message = error.message.data.message;
+      notifyError(message);
+    } 
+  }
+
   useEffect(() => {
-    setIsLoggedIn(isAuthenticated);
-  }, [isAuthenticated])
+    status === "unauthenticated" && handleLogout();
+    status === "authenticated" && handleGetUser();
+  }, [status])
 
   const checkPath = (url : string) => {
     return pathname === url;
@@ -67,32 +90,56 @@ const Nav = () => {
       </>
       }
       {checkPath("/collab") && (
-        <Button
-          color="danger" 
-          variant="solid" 
-          className="text-lg" 
-          onPress={() => dispatch(setIsLeaving(true))}
-        >
-          End Collaboration
-        </Button>
+        <NavbarContent justify="center">
+          <NavbarItem>
+            <Button
+              color="danger" 
+              variant="solid" 
+              className="text-lg" 
+              onPress={() => dispatch(setIsLeaving(true))}
+            >
+              End Collaboration
+            </Button>
+          </NavbarItem>
+        </NavbarContent>
+        
       )}
+
       {isLoggedIn ? 
         <NavbarContent justify="end">
+          {checkPath("/collab") && (
+            <NavbarItem>
+              <Button onPress={() => dispatch(setIsChatOpen(!collabState.isChatOpen))} className="h-fit min-w-0 px-0 bg-transparent flex item-center">
+                <span className="cursor-pointer active:opacity-50">
+                  <ChatIcon />
+                </span>
+              </Button>
+            </NavbarItem>
+          )}
           <NavbarItem>
             <Dropdown placement="bottom-end">
               <DropdownTrigger>
                 <Avatar src={photoUrl} showFallback isBordered as="button" color="primary" />
               </DropdownTrigger>
-              <DropdownMenu aria-label="Profile Actions" variant="flat">
-                <DropdownItem key="profile" color="primary">
-                  <Link href={!checkPath("/collab") ? "/profile/info" : "#"}className="text-white text-sm w-full">
-                    Profile
-                  </Link>
-                </DropdownItem>
-                <DropdownItem key="logout" color="danger" onClick={handleLogout}>
-                  Log Out
-                </DropdownItem>
-              </DropdownMenu>
+              {!checkPath("/collab") && (
+                <DropdownMenu aria-label="Profile Actions" variant="flat">
+                  <DropdownItem key="profile" color="primary">
+                    <Link href="/profile" className="text-white text-sm w-full">
+                      Profile
+                    </Link>
+                  </DropdownItem>
+                  { role === 'super admin' && 
+                  <DropdownItem key="manage-users" color="primary">
+                    <Link href="/manage-users" className="text-white text-sm w-full">
+                      Manage Users
+                    </Link>
+                  </DropdownItem>
+                  }
+                  <DropdownItem key="logout" color="danger" onClick={handleLogout}>
+                    Log Out
+                  </DropdownItem>
+                </DropdownMenu>
+              )}
             </Dropdown>
           </NavbarItem>
         </NavbarContent>

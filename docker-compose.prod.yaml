@@ -46,6 +46,8 @@ services:
       dockerfile: Dockerfile.prod
     ports:
       - "5005:8080" # Maps container port 8080 to local 5005
+    environment:
+      QUESTION_SERVICE_URL: http://question-service:8080
     networks:
       - peerpreps-backend
 
@@ -71,6 +73,8 @@ services:
       dockerfile: Dockerfile.prod
     ports:
       - "5007:8080"
+    env_file:
+      - ./backend/matching-service/producer/.env
     environment:
       AMQP_SERVER_URL: amqp://guest:guest@rabbitmq:5672/
     networks:
@@ -88,6 +92,8 @@ services:
       dockerfile: Dockerfile.prod
     ports:
       - "5008:8080"
+    env_file:
+      - ./backend/matching-service/consumer/.env
     environment:
       AMQP_SERVER_URL: amqp://guest:guest@rabbitmq:5672/
     networks:
