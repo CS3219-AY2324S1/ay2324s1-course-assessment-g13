@@ -10,6 +10,7 @@
 PGUSER="postgres"
 POSTGRES_PASSWORD="postgres"
 POSTGRES_DB="apigateway"
+POSTGRES_HOST="db-agw"
 
 ACCESS_TOKEN_SECRET_KEY=super_secret_key
 REFRESH_TOKEN_SECRET_KEY=super_secret_key

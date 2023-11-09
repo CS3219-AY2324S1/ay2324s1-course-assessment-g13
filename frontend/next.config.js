@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 // eslint-disable-next-line no-undef
 module.exports = {
-  output: 'standalone',
+  output: undefined,
   webpack: config => {
     config.watchOptions = {
       poll: 1000,

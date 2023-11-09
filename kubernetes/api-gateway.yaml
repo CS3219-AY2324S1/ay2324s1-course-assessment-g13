@@ -1,0 +1,115 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: api-gateway
+  name: api-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-gateway
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: api-gateway
+    spec:
+      containers:
+      - image: gcr.io/smooth-research-397708/api-gateway:v1
+        name: api-gateway
+        imagePullPolicy: Always
+        resources: {}
+        ports:
+          - containerPort: 1234
+        env:
+          - name: PGUSER
+            valueFrom:
+              secretKeyRef:
+                key: API_GATEWAY_PGUSER
+                name: secrets
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: API_GATEWAY_PGPASSWORD
+                name: secrets
+          - name: POSTGRES_DB
+            valueFrom:
+              configMapKeyRef:
+                key: API_GATEWAY_POSTGRES_NAME
+                name: configmap
+          - name: POSTGRES_HOST
+            valueFrom:
+              configMapKeyRef:
+                key: API_GATEWAY_POSTGRES_HOST
+                name: configmap
+          - name: ACCESS_TOKEN_SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                key: ACCESS_TOKEN_SECRET_KEY
+                name: secrets
+          - name: REFRESH_TOKEN_SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                key: REFRESH_TOKEN_SECRET_KEY
+                name: secrets
+          - name: USER_SERVICE_URL
+            valueFrom:
+              configMapKeyRef:
+                key: USER_SERVICE_URL
+                name: configmap
+          - name: QUESTION_SERVICE_URL
+            valueFrom:
+              configMapKeyRef:
+                key: QUESTION_SERVICE_URL
+                name: configmap
+          - name: COLLAB_SERVICE_URL
+            valueFrom:
+              configMapKeyRef:
+                key: COLLABORATION_SERVICE_URL
+                name: configmap
+          - name: MATCHING_SERVICE_URL
+            valueFrom:
+              configMapKeyRef:
+                key: MATCHING_PRODUCER_URL
+                name: configmap
+          - name: AGW_URL
+            valueFrom:
+              configMapKeyRef:
+                key: API_GATEWAY_URL
+                name: configmap
+          - name: FRONTEND_URL
+            valueFrom:
+              configMapKeyRef:
+                key: FRONTEND_URL
+                name: configmap
+          - name: GITHUB_CLIENT_ID
+            valueFrom:
+              secretKeyRef:
+                key: GITHUB_CLIENT_ID
+                name: secrets
+          - name: GITHUB_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                key: GITHUB_CLIENT_SECRET
+                name: secrets
+status: {}
+---
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  name: "api-gateway-service"
+  namespace: "default"
+  labels:
+    app: "api-gateway"
+spec:
+  ports:
+  - protocol: "TCP"
+    port: 80
+    targetPort: 1234
+  selector:
+    app: "api-gateway"
+  # type: "LoadBalancer"
+  # loadBalancerIP: "34.87.127.0"

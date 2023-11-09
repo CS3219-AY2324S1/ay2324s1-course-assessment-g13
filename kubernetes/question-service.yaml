@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: question-service
+  name: question-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: question-service
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: question-service
+    spec:
+      containers:
+      - image: gcr.io/smooth-research-397708/question-service:v1
+        name: question-service
+        imagePullPolicy: Always
+        resources: {}
+        ports:
+          - containerPort: 8080
+        env:
+          - name: MONGO_URI
+            valueFrom:
+              secretKeyRef:
+                name: secrets
+                key: MONGO_URI
+          - name: AGW_URL
+            valueFrom:
+              configMapKeyRef:
+                key: API_GATEWAY_URL
+                name: configmap
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: question-service
+  labels:
+    run: question-service
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: question-service
