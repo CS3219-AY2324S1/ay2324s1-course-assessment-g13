@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { GET } from '../libs/axios/axios';
 import { notifyError } from '../components/toast/notifications';
 import useAuth from '../hooks/useAuth';
+import LeetCodeQuestionsTable from './leetcodeQuestionsTable';
 
 export default function Questions() {
   const [questions, setQuestions] = useState([]);
@@ -27,7 +28,10 @@ export default function Questions() {
         {isAdmin && <QuestionAddModal fetchQuestions={fetchQuestions} />}
       </div>
       <div className="table w-full">
+        <div className="text-2xl my-7">User Defined Questions</div>
         <QuestionsTable fetchQuestions={fetchQuestions} questions={questions} />
+        <div className="text-2xl my-7">Leetcode Questions</div>
+        <LeetCodeQuestionsTable />
       </div>
     </div>
   );

@@ -8,10 +8,11 @@ import useAuth from '../hooks/useAuth';
 interface StyleCellProps {
   item: Question & { listId: number };
   columnKey: Key;
-  fetchQuestions: () => void;
+  fetchQuestions?: () => void;
+  isLeetCode?: boolean;
 }
 
-const StyleCell: React.FC<StyleCellProps> = ({ item, columnKey, fetchQuestions }) => {
+const StyleCell: React.FC<StyleCellProps> = ({ item, columnKey, fetchQuestions, isLeetCode }) => {
   const { role } = useAuth();
   const isAdmin = role === "admin";
   
@@ -35,7 +36,7 @@ const StyleCell: React.FC<StyleCellProps> = ({ item, columnKey, fetchQuestions }
     case 'actions':
       return (
         <div className="relative flex items-center gap-5">
-          <QuestionDescriptionModal title={item.title} description={item.description} />
+          <QuestionDescriptionModal title={item.title} description={item.description} isLeetCode={isLeetCode} />
           {isAdmin && 
             <DeleteConfirmationModal 
               title={item.title} 
