@@ -2,13 +2,13 @@
 
 # Build all microservice images with the v2 tag based on prod Dockerfiles
 build_images:
-	docker build -f ./frontend/Dockerfile.prod -t gcr.io/smooth-research-397708/frontend:v2 ./frontend
-	docker build -f ./backend/api-gateway/Dockerfile.prod -t gcr.io/smooth-research-397708/api-gateway:v2 ./backend/api-gateway
-	docker build -f ./backend/collaboration-service/Dockerfile.prod -t gcr.io/smooth-research-397708/collaboration-service:v2 ./backend/collaboration-service
-	docker build -f ./backend/matching-service/consumer/Dockerfile.prod -t gcr.io/smooth-research-397708/matching-consumer:v2 ./backend/matching-service/consumer
-	docker build -f ./backend/matching-service/producer/Dockerfile.prod -t gcr.io/smooth-research-397708/matching-producer:v2 ./backend/matching-service/producer
-	docker build -f ./backend/question-service/Dockerfile.prod -t gcr.io/smooth-research-397708/question-service:v2 ./backend/question-service
-	docker build -f ./backend/user-service/Dockerfile.prod -t gcr.io/smooth-research-397708/user-service:v2	 ./backend/user-service
+	docker build --platform linux/x86-64 -f ./frontend/Dockerfile.prod -t gcr.io/smooth-research-397708/frontend:v2 ./frontend
+	docker build --platform linux/x86-64 -f ./backend/api-gateway/Dockerfile.prod -t gcr.io/smooth-research-397708/api-gateway:v2 ./backend/api-gateway
+	docker build --platform linux/x86-64 -f ./backend/collaboration-service/Dockerfile.prod -t gcr.io/smooth-research-397708/collaboration-service:v2 ./backend/collaboration-service
+	docker build --platform linux/x86-64 -f ./backend/matching-service/consumer/Dockerfile.prod -t gcr.io/smooth-research-397708/matching-consumer:v2 ./backend/matching-service/consumer
+	docker build --platform linux/x86-64 -f ./backend/matching-service/producer/Dockerfile.prod -t gcr.io/smooth-research-397708/matching-producer:v2 ./backend/matching-service/producer
+	docker build --platform linux/x86-64 -f ./backend/question-service/Dockerfile.prod -t gcr.io/smooth-research-397708/question-service:v2 ./backend/question-service
+	docker build --platform linux/x86-64 -f ./backend/user-service/Dockerfile.prod -t gcr.io/smooth-research-397708/user-service:v2	 ./backend/user-service
 
 # Pushes all newly built microservice images onto GCR with the v2 tag
 push_images:
