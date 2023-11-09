@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	// "io"
+	"strings"
 	"bytes"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"log"
@@ -156,7 +157,7 @@ func SpinMQConsumer(criteria utils.MatchCriteria) {
 						reqBody, err := json.Marshal(map[string]string{
 							"user1":      matchMakingBuffer[0].RequestBody.Username,
 							"user2":      matchMakingBuffer[1].RequestBody.Username,
-							"complexity": string(criteria),
+							"complexity": strings.Title(string(criteria)),
 						})
 						if err != nil {
 							log.Fatal(err)

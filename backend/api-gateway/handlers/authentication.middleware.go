@@ -40,8 +40,8 @@ func RequireAuthenticationMiddleWare(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 
 		var user models.User
-		oauthId := user.OauthID
-		oauthProvider := user.OauthProvider
+		oauthId := tokenClaims.User.OauthID
+		oauthProvider := tokenClaims.User.OauthProvider
 		err := config.DB.Where("oauth_id = ? AND oauth_provider = ?", oauthId, oauthProvider).First(&user).Error
 		if err != nil {
 			if err == gorm.ErrRecordNotFound {
