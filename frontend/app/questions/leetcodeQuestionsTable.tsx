@@ -2,7 +2,7 @@
 
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@nextui-org/table';
 import { Pagination } from '@nextui-org/pagination';
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Question } from '../types/question';
 import StyleCell from './style-cell';
 import axios from 'axios';
@@ -25,7 +25,7 @@ const LeetCodeQuestionsTable = () => {
     try {
         const queryParams = {
         'offset': offset * pageSize,
-        'page-size': pageSize,
+        'page-size': 5 * pageSize,
         }
         console.log(queryParams);
         const response = await axios.get<ApiResponse>(leetcodeQuestionsURL, {
@@ -38,13 +38,13 @@ const LeetCodeQuestionsTable = () => {
         console.error("Unable to get leetcode questions")
     }
   }
-  const isAdmin = false;
 
   useEffect(() => {
     fetchLeetcodeQuestions(offset, rowsPerPage);
   }, [offset]);
 
   const handlePageChange = (newPage: number) => {
+    
     if (page < newPage) {
         setOffset(prev => prev + 1)
     }
@@ -63,8 +63,6 @@ const LeetCodeQuestionsTable = () => {
       };
     });
   }, [page, questions]);
-
-  const renderCell = useCallback(StyleCell, []);
 
   const columns = useMemo(() => {
     return [
@@ -103,7 +101,11 @@ const LeetCodeQuestionsTable = () => {
       <TableBody items={items} emptyContent={'No rows to display.'}>
         {item => (
           <TableRow key={item.id}>
-            {columnKey => <TableCell>{renderCell({isAdmin, item, columnKey })}</TableCell>}
+            {columnKey => 
+              <TableCell>
+                <StyleCell item={item} columnKey={columnKey} isLeetCode={true} />
+              </TableCell>
+            }
           </TableRow>
         )}
       </TableBody>
