@@ -1,7 +1,7 @@
 "use client";
 
 import AuthCard from "../../components/card/AuthCard";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { GET, POST } from "../../libs/axios/axios";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -69,6 +69,7 @@ export default function LoginPage() {
         } catch (error) {
             const message = error.message.data.message;
             notifyError(message);
+            signOut();
         }
     }
 
