@@ -33,7 +33,8 @@ export default function Collab() {
   const [newMessage, setNewMessage] = useState('');
   const ws = useRef(null);
   const languages = LANGUAGES.slice(1)
-  const [currentLanguage, setCurrentLanguage] = useState(languages[11])
+  const [currentLanguage, setCurrentLanguage] = useState(LANGUAGES[10]);
+  const [isPartnerPresent, setIsPartnerPresent] = useState(true);
 
   useEffect(() => {
     window.addEventListener('popstate', exitRoom);
@@ -63,8 +64,10 @@ export default function Collab() {
         setCurrentLanguage(message.Content as Language);
         notifyWarning(`Editor's language has been changed to ${message.Content}`);
       } else if (message.Type === "exit") {
+        setIsPartnerPresent(false);
         notifyError(message.Content);
       } else {
+        setIsPartnerPresent(true);
         notifySuccess(message.Content);
       }
     }
@@ -83,6 +86,13 @@ export default function Collab() {
     dispatch(setIsLeaving(false));
     dispatch(setIsChatOpen(false));
   }, []);
+
+  useEffect(() => {
+    if (isPartnerPresent && ws.current.readyState) {
+      sendMessage(code, "code");
+      sendMessage(currentLanguage, "language");
+    } 
+  }, [isPartnerPresent])
 
   const sendMessage = (value : string, type : string) => {
     const message = {
@@ -113,6 +123,7 @@ export default function Collab() {
   };
 
   const handleEditorChange = (value: string, event) => {
+    setCode(value);
     sendMessage(value, "code");
   }
 
