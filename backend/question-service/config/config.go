@@ -60,7 +60,7 @@ func PopulateDb() {
 					Constraints:
 					• 1 <= s.length <= 105
 					• s[i] is a printable ascii character.`,
-			Categories: []models.Category{models.Strings, models.Algorithms},
+			Categories: []string{"Strings", "Algorithms"},
 			Complexity: "Easy",
 		},
 		{
@@ -91,7 +91,7 @@ func PopulateDb() {
 			• prerequisites[i].length == 2
 			• 0 <= ai, bi < numCourses
 			• All the pairs prerequisites[i] are unique.`,
-			Categories: []models.Category{models.DataStructures, models.Algorithms},
+			Categories: []string{"DataStructures", "Algorithms"},
 			Complexity: "Medium",
 		},
 		{
@@ -108,7 +108,7 @@ func PopulateDb() {
 			•  1 <= a.length, b.length <= 104
 			•  a and b consist only of '0' or '1' characters.
 			•  Each string does not contain leading zeros except for the zero itself.`,
-			Categories: []models.Category{models.BitManipulation, models.Algorithms},
+			Categories: []string{"BitManipulation", "Algorithms"},
 			Complexity: "Easy",
 		},
 		{
@@ -137,7 +137,7 @@ func PopulateDb() {
 			Constraints:
 			• 1 <= text1.length, text2.length <= 1000
 			• text1 and text2 consist of only lowercase English characters.`,
-			Categories: []models.Category{models.Strings, models.Algorithms},
+			Categories: []string{"Strings", "Algorithms"},
 			Complexity: "Medium",
 		},
 		{
@@ -173,7 +173,7 @@ func PopulateDb() {
 			Constraints:
 			• 1 <= nums.length <= 1000
 			• 0 <= nums[i] < 2^16`,
-			Categories: []models.Category{models.BrainTeaser},
+			Categories: []string{"BrainTeaser"},
 			Complexity: "Hard",
 		},
 	}
