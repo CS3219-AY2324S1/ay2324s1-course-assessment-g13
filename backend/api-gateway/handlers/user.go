@@ -6,7 +6,11 @@ import (
 	"api-gateway/utils/client"
 	"api-gateway/utils/cookie"
 	"api-gateway/utils/message"
+	"bytes"
+	"encoding/json"
 	"net/http"
+	"os"
+	"strconv"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
@@ -139,4 +143,35 @@ func CreateUser(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusCreated, message.CreateSuccessUserMessage(SUCCESS_USER_CREATED, newUser))
+}
+
+func UpdateUser(c echo.Context) error {
+	tokenClaims := c.Get(TOKEN_CLAIMS_CONTEXT_KEY).(*models.Claims)
+
+	currentUser := tokenClaims.User
+	authId := currentUser.ID
+
+	requestBody := new(models.UpdateUser)
+	if err := c.Bind(requestBody); err != nil {
+		return c.JSON(http.StatusBadRequest, message.CreateErrorMessage(INVALID_JSON_REQUEST))
+	}
+
+	requestBodyJSON, err := json.Marshal(requestBody)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage("Error marshalling request body"))
+	}
+
+	resp, err := http.Post(os.Getenv("USER_SERVICE_URL") + "/users/" + strconv.FormatUint(uint64(authId), 10), "application/json", bytes.NewBuffer(requestBodyJSON))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage("Error creating request"))
+	}
+	defer resp.Body.Close()
+
+	var updateUserResponse models.UpdateUserResponse
+	err = json.NewDecoder(resp.Body).Decode(&updateUserResponse)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(INVALID_DB_ERROR))
+	}
+	
+	return c.JSON(http.StatusOK, message.CreateSuccessUupdateUserMessage(SUCCESS_USER_UPDATED, updateUserResponse.User))
 }

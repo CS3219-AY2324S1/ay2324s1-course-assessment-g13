@@ -33,3 +33,10 @@ func CreateSuccessUsersMessage(message string, users []models.User) models.Succe
 		Users:   users,
 	}
 }
+
+func CreateSuccessUupdateUserMessage(message string, user models.UserServiceUser) models.SuccessUpdateUserMessage {
+	return models.SuccessUpdateUserMessage{
+		Message: message,
+		User:    user,
+	}
+}

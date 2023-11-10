@@ -21,6 +21,7 @@ const (
 	SUCCESS_USER_FOUND                 = "User Found!"
 	SUCCESS_USER_CREATED               = "User Created Successfully!"
 	SUCCESS_USER_DELETED               = "User Deleted Successfully!"
+	SUCCESS_USER_UPDATED			   = "User Updated Successfully!"
 	SUCCESS_LOGIN                      = "Login Successfully!"
 	SUCCESS_LOGOUT                     = "Logout Successfully!"
 	SUCCESS_ROLE_UPGRADED              = "User Role Upgraded Successfully!"

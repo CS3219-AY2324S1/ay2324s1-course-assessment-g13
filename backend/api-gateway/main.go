@@ -38,6 +38,7 @@ func main() {
 	API_GATEWAY.GET(path.AUTH_USER, handlers.GetUser)
 	API_GATEWAY.DELETE(path.AUTH_USER, handlers.DeleteUser)
 
+	API_GATEWAY.PUT(path.AUTH_USER_UPDATE, handlers.UpdateUser)
 	API_GATEWAY.POST(path.AUTH_USER_UPGRADE, handlers.UpgradeUser)
 	API_GATEWAY.POST(path.AUTH_USER_DOWNGRADE, handlers.DowngradeUser)
 	API_GATEWAY.GET(path.AUTH_USER_UPGRADE_SUPER_ADMIN, handlers.UpgradeSuperAdmin)

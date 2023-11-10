@@ -28,3 +28,22 @@ type UserServiceCreateUserRequestBody struct {
 	PhotoUrl          string `json:"photo_url"`
 	PreferredLanguage string `json:"preferred_language"`
 }
+
+type UpdateUser struct {
+	Username          string `json:"username"`
+	PhotoUrl          string `json:"photo_url"`
+	PreferredLanguage string `json:"preferred_language"`
+}
+
+type UserServiceUser struct {
+	gorm.Model
+	AuthUserID        uint   `json:"auth_user_id"`
+	Username          string `json:"username"`
+	PhotoUrl          string `json:"photo_url"`
+	PreferredLanguage string `json:"preferred_language"`
+}
+
+type UpdateUserResponse struct {
+	Message string `json:"message"`
+	User	UserServiceUser   `json:"user"`
+}
