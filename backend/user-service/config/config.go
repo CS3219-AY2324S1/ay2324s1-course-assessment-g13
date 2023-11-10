@@ -33,6 +33,6 @@ func ConnectDb() {
 	}
 
 	log.Println("running migrations")
-	DB.AutoMigrate(&model.User{})
+	DB.AutoMigrate(&model.User{}, &model.History{})
 
 }

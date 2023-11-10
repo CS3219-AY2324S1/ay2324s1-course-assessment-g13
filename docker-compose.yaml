@@ -58,7 +58,7 @@ services:
       - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
       - SUPER_ADMIN_KEY=i_want_to_be_superadmin
     ports:
-      - "1234:1234"  # Maps container port 1234 to local 1234
+      - "1234:1234" # Maps container port 1234 to local 1234
     volumes:
       - ./backend/api-gateway:/usr/src/app
     networks:
@@ -76,8 +76,9 @@ services:
       - "5005:8080" # Maps container port 8080 to local 5005
     environment:
       QUESTION_SERVICE_URL: http://question-service:8080
+      USER_SERVICE_URL: http://user-service:8080
     volumes:
-      -  ./backend/collaboration-service:/usr/src/app
+      - ./backend/collaboration-service:/usr/src/app
     networks:
       - peerpreps-backend
 
@@ -155,28 +156,28 @@ services:
       - "5672:5672"
       - "15672:15672"
     healthcheck:
-      test: [ "CMD", "nc", "-z", "rabbitmq", "5672" ]
+      test: ["CMD", "nc", "-z", "rabbitmq", "5672"]
       interval: 5s
       timeout: 10s
       retries: 5
 
   question-service:
-      container_name: question-service
-      build:
-        context: ./backend/question-service
-        dockerfile: Dockerfile.dev
-      environment:
-        - MONGO_URI=mongodb://mongodb:27017
-        - AGW_URL=http://localhost:1234
-      ports:
-        - "5009:8080" # Maps container port 8080 to local 5009
-      volumes:
-        - ./backend/question-service:/usr/src/app
-      depends_on:
-        mongodb:
-          condition: service_started
-      networks:
-        - peerpreps-backend
+    container_name: question-service
+    build:
+      context: ./backend/question-service
+      dockerfile: Dockerfile.dev
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017
+      - AGW_URL=http://localhost:1234
+    ports:
+      - "5009:8080" # Maps container port 8080 to local 5009
+    volumes:
+      - ./backend/question-service:/usr/src/app
+    depends_on:
+      mongodb:
+        condition: service_started
+    networks:
+      - peerpreps-backend
 
   mongodb:
     image: mongo:7.0.1
@@ -198,7 +199,7 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=users
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready", "-d", "users", "-p", "5432" ]
+      test: ["CMD-SHELL", "pg_isready", "-d", "users", "-p", "5432"]
       interval: 5s
       timeout: 60s
       retries: 5
@@ -219,7 +220,7 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=apigateway
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready", "-d", "apigateway", "-p", "5433" ]
+      test: ["CMD-SHELL", "pg_isready", "-d", "apigateway", "-p", "5433"]
       interval: 5s
       timeout: 60s
       retries: 5
