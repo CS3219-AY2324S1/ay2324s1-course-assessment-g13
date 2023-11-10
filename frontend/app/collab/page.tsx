@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect, ChangeEvent } from 'react';
-import { Category, Complexity, ComplexityToColor, Question } from '../types/question';
+import { Complexity, ComplexityToColor, Question } from '../types/question';
 import { GET } from "../libs/axios/axios";
 import { notifyError, notifySuccess, notifyWarning } from '../components/toast/notifications';
 import Editor from '@monaco-editor/react';
@@ -19,6 +19,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useRef } from 'react';
 import { selectUsername } from '../libs/redux/slices/userSlice';
 import { LANGUAGES, Language } from '../constants/languages';
+import Markdown from 'react-markdown';
 
 export default function Collab() {
   const collabState = useSelector(selectCollabState);
@@ -32,9 +33,16 @@ export default function Collab() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const ws = useRef(null);
-  const languages = LANGUAGES.slice(1)
+  const languages = LANGUAGES.slice(1);
   const [currentLanguage, setCurrentLanguage] = useState(LANGUAGES[10]);
   const [isPartnerPresent, setIsPartnerPresent] = useState(true);
+  const [question, setQuestion] = useState<Question>({
+    id: "",
+    title: "",
+    categories: [],
+    complexity: Complexity.EASY,
+    description: ""
+  });
 
   useEffect(() => {
     window.addEventListener('popstate', exitRoom);
@@ -72,10 +80,6 @@ export default function Collab() {
       }
     }
 
-    ws.current.onopen = function (event) {
-      sendMessage(`${username} has joined the room!`, "enter");
-    }
-
     ws.current.onerror = function (event) {
       router.push('/');
     }
@@ -103,14 +107,6 @@ export default function Collab() {
     };
     ws.current.send(JSON.stringify(message));
   }
-
-  const [question, setQuestion] = useState<Question>({
-    id: "",
-    title: "",
-    categories: [],
-    complexity: Complexity.EASY,
-    description: ""
-  });
 
   const fetchQuestion = async () => {
     try {
@@ -173,16 +169,19 @@ export default function Collab() {
               <Chip color={ComplexityToColor[question.complexity]} className="mx-2">
                 {question.complexity}
               </Chip>
-              {question.categories && (question.categories as Category[]).map(category => (
-              <Chip variant="bordered" key={category} className="mx-2">
-                {category}
-              </Chip>
-              ))}
+              <div className="flex flex-wrap">
+                {question.categories && question.categories.map(category => (
+                <Chip variant="bordered" key={category} className="mx-2 mb-2">
+                  {category}
+                </Chip>))}
+              </div>
             </div>
             <div className="mb-4 border-b border-gray-400"></div>
-            {question.description && question.description.split('\n').map((line : string, index : number) => (
-              <p className="my-2 test-md" key={index}>{line}</p>
-            ))}
+            {question.description &&
+              <Markdown className="whitespace-pre-line">
+                {question.description}
+              </Markdown>
+            }
           </div>
         </div>
         <div className="w-1/2 m-6 flex flex-col">
@@ -245,7 +244,10 @@ export default function Collab() {
       >
         <ModalContent>
           <>
-            <ModalHeader className="flex flex-col gap-1">Chat Room</ModalHeader>
+            <ModalHeader className="flex flex-col gap-1">
+              Chat Room
+              <p className="text-sm"> <span className="text-red-600">Warning:</span> The chat resets upon refresh or leaving the room!</p>
+            </ModalHeader>
             <ModalBody>
               {messages.map((message, index) => (
                 <p

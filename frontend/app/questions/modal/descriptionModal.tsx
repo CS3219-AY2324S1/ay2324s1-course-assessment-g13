@@ -9,15 +9,10 @@ import {
   Tooltip,
 } from '@nextui-org/react';
 import { EyeIcon } from '../../../public/EyeIcon';
-import TurndownService  from 'turndown';
 import Markdown from 'react-markdown';
 
-const QuestionDescriptionModal = ({ title, description, isLeetCode=false }) => {
+const QuestionDescriptionModal = ({ title, description }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-
-
-  const turndownService = new TurndownService();
-  const markdownDescription = turndownService.turndown(description);
 
   return (
     <>
@@ -34,13 +29,9 @@ const QuestionDescriptionModal = ({ title, description, isLeetCode=false }) => {
             <>
               <ModalHeader className="flex flex-col gap-1">{title}</ModalHeader>
               <ModalBody className="whitespace-pre-line">
-                {
-                  isLeetCode ? 
-                    <Markdown>
-                      {markdownDescription}
-                    </Markdown> :
-                    <div>{description}</div>
-                }
+                <Markdown>
+                  {description}
+                </Markdown>
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="light" onPress={onClose}>

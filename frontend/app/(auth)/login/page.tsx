@@ -10,6 +10,7 @@ import { useDispatch } from "react-redux";
 import { AxiosResponse } from "axios";
 import { login as UserLogin } from "../../libs/redux/slices/userSlice";
 import { login as AuthLogin } from "../../libs/redux/slices/authSlice";
+import useAuth from "../../hooks/useAuth";
 
 interface LoginRequest {
     oauth_id: number,
@@ -49,6 +50,7 @@ export default function LoginPage() {
     const {data: session, status} = useSession();
     const router = useRouter();
     const dispatch = useDispatch();
+    const { isLoggedIn, authId } = useAuth();
 
     const handleLogin = async () => {
         const id = Number(session.user.id)
@@ -60,10 +62,6 @@ export default function LoginPage() {
             const authResponse: AxiosResponse<LoginResponse> = await POST(`auth/login`, loginRequest);
             const { message: authMessage, user: auth } = authResponse.data
             dispatch(AuthLogin(auth));
-            const authId = auth.ID
-            const userResponse: AxiosResponse<UserResponse> = await GET(`/users/${authId}`)
-            const { user } = userResponse.data
-            dispatch(UserLogin(user));
             notifySuccess(authMessage);
             router.push('/questions');
         } catch (error) {
@@ -73,11 +71,24 @@ export default function LoginPage() {
         }
     }
 
-    useEffect(()=>{
-        if (status === "authenticated") {
-            handleLogin()
+    const handleGetUser = async () => {
+        try {
+            const userResponse: AxiosResponse<UserResponse> = await GET(`/users/${authId}`)
+            const { user } = userResponse.data
+            dispatch(UserLogin(user));
+        } catch (error) {
+            const message = error.message.data.message;
+            notifyError(message);
         }
+    }
+
+    useEffect(()=>{
+        status === "authenticated" && handleLogin()
     }, [status, session])
+
+    useEffect(() => {
+        isLoggedIn && handleGetUser();
+    }, [isLoggedIn])
 
     return (
         <AuthCard authTitle={"Login"} />

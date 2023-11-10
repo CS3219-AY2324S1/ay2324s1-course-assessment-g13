@@ -23,12 +23,15 @@ const QuestionsTable = ({ questions, fetchQuestions }: QuestionProps) => {
     ? Math.ceil(questions.length / rowsPerPage)
     : 1;
 
+  useEffect(() => {
+    setPage(1);
+  }, [noOfPages]);
+
   const items = useMemo(() => {
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
     const paginatedQuestions = questions.slice(start, end);
-    const paginatedQuestionsArr = [...paginatedQuestions];
-    return paginatedQuestionsArr.map((question: Question, i: number) => {
+    return paginatedQuestions.map((question: Question, i: number) => {
       return {
         ...(question as Question),
         listId: i + 1 + start,

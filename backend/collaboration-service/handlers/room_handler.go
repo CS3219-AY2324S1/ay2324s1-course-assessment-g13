@@ -105,19 +105,6 @@ func (h *Handler) JoinRoom(c echo.Context) error {
         return c.JSON(http.StatusBadRequest, "Error joining room")
     }
 
-    // Websockets open at different times, so second user would not be able to know the first user has joined
-    var message *Message
-    if len(room.Users) == 1 {
-        for _, otherUser := range room.Users {
-            message = &Message {
-                Content: fmt.Sprintf("%s has joined the room!", otherUser.Username),
-                RoomId: roomId,
-                Username: otherUser.Username,
-                Type: "enter",
-            }
-        }
-    }
-
     connection, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
     if err != nil {
         log.Printf("error upgrade: %s\n", err.Error())
@@ -146,9 +133,18 @@ func (h *Handler) JoinRoom(c echo.Context) error {
 
     go user.writeMessage()
     
-    if message != nil {
-        h.hub.BroadcastChannel <- message 
-    } 
+    if len(room.Users) == 2 {
+        for _, currUser := range room.Users {
+            message := &Message {
+                Content: fmt.Sprintf("%s has joined the room!", currUser.Username),
+                RoomId: roomId,
+                Username: currUser.Username,
+                Type: "enter",
+            }
+
+            h.hub.BroadcastChannel <- message
+        }
+    }
 
     user.readMessage(h.hub)
     return c.JSON(http.StatusOK, "Successfully joined room!")

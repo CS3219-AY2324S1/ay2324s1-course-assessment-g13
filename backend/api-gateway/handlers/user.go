@@ -19,9 +19,18 @@ import (
 func GetUsers(c echo.Context) error {
 	tokenClaims := c.Get(TOKEN_CLAIMS_CONTEXT_KEY).(*models.Claims)
 
-	superAdmin := tokenClaims.User
+	oauthId := tokenClaims.User.OauthID
+	oauthProvider := tokenClaims.User.OauthProvider
+	var superAdminUser models.User
+	err := config.DB.Where("oauth_id = ? AND oauth_provider = ?", oauthId, oauthProvider).First(&superAdminUser).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return c.JSON(http.StatusBadRequest, message.CreateErrorMessage(INVALID_USER_NOT_FOUND))
+		}
+		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(INVALID_DB_ERROR))
+	}
 
-	if superAdmin.Role != SUPER_ADMIN {
+	if superAdminUser.Role != SUPER_ADMIN {
 		return c.JSON(http.StatusForbidden, message.CreateErrorMessage(FAILURE_NOT_SUPERADMIN_GET_USERS))
 	}
 

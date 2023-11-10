@@ -1,6 +1,6 @@
 import { Chip } from '@nextui-org/chip';
 import QuestionDescriptionModal from './modal/descriptionModal';
-import { Category, ComplexityToColor, Question } from '../types/question';
+import { ComplexityToColor, Question } from '../types/question';
 import { Key } from 'react';
 import DeleteConfirmationModal from './modal/deleteConfirmationModal';
 import useAuth from '../hooks/useAuth';
@@ -9,10 +9,9 @@ interface StyleCellProps {
   item: Question & { listId: number };
   columnKey: Key;
   fetchQuestions?: () => void;
-  isLeetCode?: boolean;
 }
 
-const StyleCell: React.FC<StyleCellProps> = ({ item, columnKey, fetchQuestions, isLeetCode }) => {
+const StyleCell: React.FC<StyleCellProps> = ({ item, columnKey, fetchQuestions }) => {
   const { role } = useAuth();
   const isAdmin = role === "admin";
   
@@ -23,8 +22,8 @@ const StyleCell: React.FC<StyleCellProps> = ({ item, columnKey, fetchQuestions, 
       return <span>{item.title}</span>;
     case 'category':
       return (
-        <div className="relative flex items-center">
-          {(item.categories as Category[]).map(category => (
+        <div className="relative flex items-center flex-wrap">
+          {item.categories.map(category => (
             <Chip variant="bordered" key={category}>
               {category}
             </Chip>
@@ -36,7 +35,7 @@ const StyleCell: React.FC<StyleCellProps> = ({ item, columnKey, fetchQuestions, 
     case 'actions':
       return (
         <div className="relative flex items-center gap-5">
-          <QuestionDescriptionModal title={item.title} description={item.description} isLeetCode={isLeetCode} />
+          <QuestionDescriptionModal title={item.title} description={item.description} />
           {isAdmin && 
             <DeleteConfirmationModal 
               title={item.title} 
