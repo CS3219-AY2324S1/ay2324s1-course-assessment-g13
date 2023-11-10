@@ -12,7 +12,7 @@ import {
 import { Button } from '@nextui-org/button';
 import { Select, SelectItem } from '@nextui-org/select';
 import { Chip } from '@nextui-org/chip';
-import { Category, Complexity } from '../types/question';
+import { Complexity } from '../types/question';
 import { useForm } from 'react-hook-form';
 import { notifySuccess} from '../components/toast/notifications';
 import { Preference } from '../types/preference';

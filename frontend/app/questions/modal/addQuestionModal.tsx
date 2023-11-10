@@ -12,7 +12,7 @@ import { Button } from '@nextui-org/button';
 import { Input } from '@nextui-org/input';
 import { Select, SelectItem } from '@nextui-org/select';
 import { Chip, Textarea } from '@nextui-org/react';
-import { Complexity, Question } from '../../types/question';
+import { Complexity } from '../../types/question';
 import { useForm } from 'react-hook-form';
 import { notifySuccess, notifyError } from '../../components/toast/notifications';
 import { GET, POST } from '../../libs/axios/axios';
