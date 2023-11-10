@@ -28,18 +28,3 @@ type UserServiceCreateUserRequestBody struct {
 	PhotoUrl          string `json:"photo_url"`
 	PreferredLanguage string `json:"preferred_language"`
 }
-
-type History struct {
-	gorm.Model
-	RoomId string `json:"room_id"`
-	QuestionId string `json:"question_id"`
-	Title string `json:"title"`
-	Solution string `json:"solution"`
-	Language string `json:"language"`
-	UserID uint `json:"user_id"`
-}
-
-type HistoryResponse  struct {
-	Message string `json:"message"`
-	Histories []History `json:"histories"`
-}
