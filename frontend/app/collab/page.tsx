@@ -19,6 +19,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useRef } from 'react';
 import { selectUsername } from '../libs/redux/slices/userSlice';
 import { LANGUAGES, Language } from '../constants/languages';
+import Markdown from 'react-markdown';
 
 export default function Collab() {
   const collabState = useSelector(selectCollabState);
@@ -169,9 +170,11 @@ export default function Collab() {
               ))}
             </div>
             <div className="mb-4 border-b border-gray-400"></div>
-            {question.description && question.description.split('\n').map((line : string, index : number) => (
-              <p className="my-2 test-md" key={index}>{line}</p>
-            ))}
+            {question.description &&
+              <Markdown className="whitespace-pre-line">
+                {question.description}
+              </Markdown>
+            }
           </div>
         </div>
         <div className="w-1/2 m-6 flex flex-col">
