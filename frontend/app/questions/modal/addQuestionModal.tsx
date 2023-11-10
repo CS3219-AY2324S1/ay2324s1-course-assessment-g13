@@ -11,17 +11,23 @@ import {
 import { Button } from '@nextui-org/button';
 import { Input } from '@nextui-org/input';
 import { Select, SelectItem } from '@nextui-org/select';
-import { Chip } from '@nextui-org/chip';
-import { Textarea } from '@nextui-org/react';
-import { Category, Complexity, Question } from '../../types/question';
+import { Chip, Textarea } from '@nextui-org/react';
+import { Complexity, Question } from '../../types/question';
 import { useForm } from 'react-hook-form';
 import { notifySuccess, notifyError } from '../../components/toast/notifications';
-import { POST } from '../../libs/axios/axios';
+import { GET, POST } from '../../libs/axios/axios';
+import { useEffect, useState } from 'react';
+
+interface QuestionProps  {
+  title: string;
+  categories: string;
+  complexity: Complexity;
+  description: string;
+}
 
 export default function QuestionAddModal({fetchQuestions}) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const categories = Object.values(Category);
-
+  const [categories, setCategories] = useState([]);
 
   const {
     register,
@@ -30,12 +36,26 @@ export default function QuestionAddModal({fetchQuestions}) {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = handleSubmit(async (data: Question) => {
-    const modifiedData = {
-      ...data,
-      categories: (data.categories as string).split(',') as Category[],
-    };
+  const fetchCategories = async () => {
     try {
+      const response = await GET('questions/categories');
+      const categoryValues = response.data.map(item => item.category);
+      setCategories(categoryValues);
+    } catch (error) {
+      notifyError(error.message.data);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories()
+  }, []);
+
+  const onSubmit = handleSubmit(async (data : QuestionProps) => {
+    try {
+      const modifiedData = {
+        ...data, 
+        categories: data.categories.split(",")
+      };
       const response = await POST('questions', modifiedData);
       fetchQuestions();
       notifySuccess(response.data);
@@ -140,7 +160,7 @@ export default function QuestionAddModal({fetchQuestions}) {
                     label="Description"
                     isRequired
                     labelPlacement="outside"
-                    placeholder="Enter Question Description"
+                    placeholder="Enter Question Description (Markdown Syntax)"
                     errorMessage={errors.description?.message as string}
                   />
                 </ModalBody>

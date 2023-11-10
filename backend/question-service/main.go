@@ -22,6 +22,7 @@ func main() {
 
 	questionGroup := e.Group("/questions")
 	questionGroup.GET("", controllers.GetQuestions)
+	questionGroup.GET("/categories", controllers.GetCategories)
 	questionGroup.GET("/complexity/:complexity", controllers.GetRandomQuestionId)
 	questionGroup.GET("/:id", controllers.GetQuestion)
 	questionGroup.POST("", controllers.CreateQuestion, controllers.AuthorizeAdminMiddleWare)
