@@ -11,7 +11,8 @@ type Question struct {
 }
 
 type Category struct {
-	Category string `json:"category" bson:"category"`
+	Id       primitive.ObjectID `json:"id" bson:"_id,omitempty"`
+	Category string             `json:"category" bson:"category"`
 }
 
 type LeetCodeProblem struct {

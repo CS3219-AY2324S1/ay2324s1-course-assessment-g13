@@ -80,10 +80,6 @@ export default function Collab() {
       }
     }
 
-    ws.current.onopen = function (event) {
-      sendMessage(`${username} has joined the room!`, "enter");
-    }
-
     ws.current.onerror = function (event) {
       router.push('/');
     }
