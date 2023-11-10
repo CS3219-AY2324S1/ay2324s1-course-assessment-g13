@@ -3,7 +3,7 @@ import { Link } from '@nextui-org/link';
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem } from '@nextui-org/navbar';
 import React, { useEffect } from 'react';
 import useAuth from '../../hooks/useAuth';
-import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@nextui-org/dropdown'
+import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@nextui-org/dropdown';
 import { Avatar } from '@nextui-org/avatar';
 import { Button } from '@nextui-org/button';
 import { useDispatch, useSelector } from 'react-redux';
@@ -13,7 +13,11 @@ import { logout as UserLogout } from '../../libs/redux/slices/userSlice';
 import { logout as AuthLogout, update } from '../../libs/redux/slices/authSlice';
 import { GET } from '../../libs/axios/axios';
 import { usePathname } from 'next/navigation';
-import { setIsLeaving, setIsChatOpen, selectCollabState } from '../../libs/redux/slices/collabSlice';
+import {
+  setIsLeaving,
+  setIsChatOpen,
+  selectCollabState,
+} from '../../libs/redux/slices/collabSlice';
 import { ChatIcon } from '../../../public/ChatIcon';
 import { notifyError } from '../toast/notifications';
 import { AxiosResponse } from 'axios';
@@ -31,86 +35,92 @@ const Nav = () => {
   const handleLogout = async () => {
     if (!isLoggedIn) return;
     try {
-        dispatch(UserLogout());
-        dispatch(AuthLogout());
-        await GET('/auth/logout');
-        router.push('/');
-        signOut();
+      dispatch(UserLogout());
+      dispatch(AuthLogout());
+      await GET('/auth/logout');
+      router.push('/');
+      signOut();
     } catch (error) {
-      const message =  error.message.data.message;
+      const message = error.message.data.message;
       notifyError(message);
     }
-  }
+  };
 
   const handleGetUser = async () => {
     try {
-      const authResponse: AxiosResponse<LoginResponse> = await GET("/auth/user");
-      const { user } = authResponse.data
+      const authResponse: AxiosResponse<LoginResponse> = await GET('/auth/user');
+      const { user } = authResponse.data;
       if (role != user.role) {
         dispatch(update(user));
       }
     } catch (error) {
       const message = error.message.data.message;
       notifyError(message);
-    } 
-  }
+    }
+  };
 
   useEffect(() => {
-    status === "unauthenticated" && handleLogout();
-    status === "authenticated" && handleGetUser();
-  }, [status])
+    status === 'unauthenticated' && handleLogout();
+    status === 'authenticated' && handleGetUser();
+  }, [status]);
 
-  const checkPath = (url : string) => {
+  const checkPath = (url: string) => {
     return pathname === url;
-  }
+  };
 
   return (
-    <Navbar
-      isBordered
-      maxWidth="xl"
-    >
+    <Navbar isBordered maxWidth="xl">
       <NavbarBrand>
-        <Link href={isLoggedIn && !checkPath("/collab") ? "/questions" : "#"} className="font-bold text-inherit">
+        <Link
+          href={isLoggedIn && !checkPath('/collab') ? '/questions' : '#'}
+          className="font-bold text-inherit"
+        >
           PeerPrep
         </Link>
       </NavbarBrand>
-      {(isLoggedIn && !checkPath("/collab")) &&
-      <>
-        <NavbarContent justify="center">
-          <NavbarItem isActive>
-            <Link color={checkPath("/questions") ? 'primary' : 'foreground'} href="/questions" aria-current="page">
-              Questions
-            </Link>
-          </NavbarItem>
-          <NavbarItem>
-            <Link color={checkPath("/interviews") ? 'primary' : 'foreground'} href="/interviews">
-              Interviews
-            </Link>
-          </NavbarItem>
-        </NavbarContent>
-      </>
-      }
-      {checkPath("/collab") && (
+      {isLoggedIn && !checkPath('/collab') && (
+        <>
+          <NavbarContent justify="center">
+            <NavbarItem isActive>
+              <Link
+                color={checkPath('/questions') ? 'primary' : 'foreground'}
+                href="/questions"
+                aria-current="page"
+              >
+                Questions
+              </Link>
+            </NavbarItem>
+            <NavbarItem>
+              <Link color={checkPath('/interviews') ? 'primary' : 'foreground'} href="/interviews">
+                Interviews
+              </Link>
+            </NavbarItem>
+          </NavbarContent>
+        </>
+      )}
+      {checkPath('/collab') && (
         <NavbarContent justify="center">
           <NavbarItem>
             <Button
-              color="danger" 
-              variant="solid" 
-              className="text-lg" 
+              color="danger"
+              variant="solid"
+              className="text-lg"
               onPress={() => dispatch(setIsLeaving(true))}
             >
               End Collaboration
             </Button>
           </NavbarItem>
         </NavbarContent>
-        
       )}
 
-      {isLoggedIn ? 
+      {isLoggedIn ? (
         <NavbarContent justify="end">
-          {checkPath("/collab") && (
+          {checkPath('/collab') && (
             <NavbarItem>
-              <Button onPress={() => dispatch(setIsChatOpen(!collabState.isChatOpen))} className="h-fit min-w-0 px-0 bg-transparent flex item-center">
+              <Button
+                onPress={() => dispatch(setIsChatOpen(!collabState.isChatOpen))}
+                className="h-fit min-w-0 px-0 bg-transparent flex item-center"
+              >
                 <span className="cursor-pointer active:opacity-50">
                   <ChatIcon />
                 </span>
@@ -122,20 +132,25 @@ const Nav = () => {
               <DropdownTrigger>
                 <Avatar src={photoUrl} showFallback isBordered as="button" color="primary" />
               </DropdownTrigger>
-              {!checkPath("/collab") && (
+              {!checkPath('/collab') && (
                 <DropdownMenu aria-label="Profile Actions" variant="flat">
                   <DropdownItem key="profile" color="primary">
                     <Link href="/profile" className="text-white text-sm w-full">
                       Profile
                     </Link>
                   </DropdownItem>
-                  { role === 'super admin' && 
-                  <DropdownItem key="manage-users" color="primary">
-                    <Link href="/manage-users" className="text-white text-sm w-full">
-                      Manage Users
+                  <DropdownItem key="history" variant="flat">
+                    <Link href="/history" className="text-white text-sm w-full">
+                      History
                     </Link>
                   </DropdownItem>
-                  }
+                  {role === 'super admin' && (
+                    <DropdownItem key="manage-users" color="primary">
+                      <Link href="/manage-users" className="text-white text-sm w-full">
+                        Manage Users
+                      </Link>
+                    </DropdownItem>
+                  )}
                   <DropdownItem key="logout" color="danger" onClick={handleLogout}>
                     Log Out
                   </DropdownItem>
@@ -144,27 +159,18 @@ const Nav = () => {
             </Dropdown>
           </NavbarItem>
         </NavbarContent>
-        :
+      ) : (
         <NavbarContent justify="end">
           <NavbarItem className="hidden lg:flex gap-3">
-            <Button  
-                variant="bordered" 
-                color="default"
-                as={Link}
-                href="/login"
-            >
-                Login
+            <Button variant="bordered" color="default" as={Link} href="/login">
+              Login
             </Button>
-            <Button  
-                color="primary"
-                as={Link}
-                href="/signup"
-            >
-                Sign Up
+            <Button color="primary" as={Link} href="/signup">
+              Sign Up
             </Button>
           </NavbarItem>
         </NavbarContent>
-      }
+      )}
     </Navbar>
   );
 };

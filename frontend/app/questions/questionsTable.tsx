@@ -2,7 +2,7 @@
 
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@nextui-org/table';
 import { Pagination } from '@nextui-org/pagination';
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Question } from '../types/question';
 import StyleCell from './style-cell';
 
@@ -11,7 +11,7 @@ interface QuestionProps {
   fetchQuestions: () => void;
 }
 
-const QuestionsTable = ({ questions, fetchQuestions} : QuestionProps) => {
+const QuestionsTable = ({ questions, fetchQuestions }: QuestionProps) => {
   const [page, setPage] = useState(1);
   const rowsPerPage = 10;
 
@@ -27,7 +27,7 @@ const QuestionsTable = ({ questions, fetchQuestions} : QuestionProps) => {
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
     const paginatedQuestions = questions.slice(start, end);
-    const paginatedQuestionsArr = [...paginatedQuestions]
+    const paginatedQuestionsArr = [...paginatedQuestions];
     return paginatedQuestionsArr.map((question: Question, i: number) => {
       return {
         ...(question as Question),
@@ -73,11 +73,11 @@ const QuestionsTable = ({ questions, fetchQuestions} : QuestionProps) => {
       <TableBody items={items} emptyContent={'No rows to display.'}>
         {item => (
           <TableRow key={item.id}>
-            {columnKey => 
+            {columnKey => (
               <TableCell>
-                <StyleCell item={item} columnKey={columnKey} fetchQuestions={fetchQuestions}/>
+                <StyleCell item={item} columnKey={columnKey} fetchQuestions={fetchQuestions} />
               </TableCell>
-            }
+            )}
           </TableRow>
         )}
       </TableBody>

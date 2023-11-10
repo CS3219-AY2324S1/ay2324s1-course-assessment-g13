@@ -31,6 +31,7 @@ type User struct {
     RoomId string
     Username string
     Solution string
+    Language string
 }
 
 type Message struct {
@@ -124,12 +125,21 @@ func (h *Handler) JoinRoom(c echo.Context) error {
     }
 
     log.Println("Attempting to join room")
+
+    updatedSolution := ""
+    if len(room.Users) == 1 {
+        for _, otherUser := range room.Users {
+            updatedSolution = otherUser.Solution
+        }
+    }
     
     user := &User{
         Connection: connection,
         MessageChannel: make(chan *Message, 10),
         RoomId: roomId,
         Username: username,
+        Solution: updatedSolution,
+        Language: "",
     }
 
     room.Users[username] = user
@@ -173,6 +183,10 @@ func (user *User) writeMessage() {
             return
         }
 
+        if message.Type == "code" {
+            user.Solution = message.Content
+        }
+
         user.Connection.WriteJSON(message)
     }
 }
@@ -200,6 +214,10 @@ func (user *User) readMessage(hub *Hub) {
 
         if msg.Type == "code" {
             user.Solution = msg.Content
+        }
+
+        if msg.Type == "language" {
+            user.Language = msg.Content
         }
 
         hub.BroadcastChannel <- &msg
@@ -252,6 +270,7 @@ func handleAddHistory(user *User, questionId string) error {
         "title": question.Title,
         "solution": user.Solution,
         "username": user.Username,
+        "language": user.Language,
     })
 
     if err != nil {

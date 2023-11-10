@@ -31,6 +31,7 @@ func main() {
 	e.DELETE("/users/:id", handlers.DeleteUser)
 
 	e.POST("/history", handlers.CreateHistory)
+	e.GET("/histories/:authId", handlers.GetHistories)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }

@@ -42,6 +42,8 @@ func main() {
 	API_GATEWAY.POST(path.AUTH_USER_DOWNGRADE, handlers.DowngradeUser)
 	API_GATEWAY.GET(path.AUTH_USER_UPGRADE_SUPER_ADMIN, handlers.UpgradeSuperAdmin)
 
+	API_GATEWAY.GET(path.AUTH_HISTORY, handlers.GetHistories)
+
 	API_GATEWAY.Any(path.ALL_USER_SERVICE, handlers.HandleUserService)
 	API_GATEWAY.Any(path.ALL_QUESTION_SERVICE, handlers.HandleQuestionService)
 	API_GATEWAY.Any(path.ALL_MATCHING_SERVICE, handlers.HandleMatchingService)

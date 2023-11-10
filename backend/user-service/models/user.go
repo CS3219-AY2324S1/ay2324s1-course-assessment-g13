@@ -36,11 +36,3 @@ type History struct {
 	Language string `json:"language"`
 	UserID uint `json:"user_id" gorm:"index;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
-
-type CreateHistory struct {
-	RoomId string `json:"room_id" validate:"required"`
-	QuestionId string `json:"question_id" validate:"required"`
-	Title string `json:"title" validate:"required"`
-	Solution string `json:"solution" validate:"required"`
-	Username string `json:"username" validate:"required"`
-}
