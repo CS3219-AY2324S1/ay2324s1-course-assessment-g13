@@ -162,7 +162,7 @@ export default function Collab() {
   return (
     <>
       <div className="flex">
-        <div className="w-1/2 m-8" style={{backgroundColor: '#1e1e1e'}}>
+        <div className="w-1/2 m-8 overflow-x-auto" style={{backgroundColor: '#1e1e1e'}}>
           <div className="p-3 flex flex-col justify-center">
             <div className="my-12 flex align-center">
               <p className="mr-12 text-lg">{question.title}</p>

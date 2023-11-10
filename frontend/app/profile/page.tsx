@@ -38,7 +38,7 @@ export default function Profile() {
                 preferredLanguage: user.preferred_language
             }
         } catch (error) {
-            const message = error.message.data.message;
+            const message = error.message.data ? error.message.data.message : 'Server Error';
             notifyError(message);
         }
     }
@@ -67,7 +67,7 @@ export default function Profile() {
             notifySuccess(message);
             reset({}, {keepValues: true})
         } catch (error) {
-            const message = error.message.data.message;
+            const message = error.message.data ? error.message.data.message : 'Server Error';
             notifyError(message);
         }
     })

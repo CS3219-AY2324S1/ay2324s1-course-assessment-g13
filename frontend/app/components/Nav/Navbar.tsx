@@ -41,7 +41,7 @@ const Nav = () => {
       router.push('/');
       signOut();
     } catch (error) {
-      const message = error.message.data.message;
+      const message = error.message.data ? error.message.data.message : 'Server Error';
       notifyError(message);
     }
   };
@@ -54,7 +54,7 @@ const Nav = () => {
         dispatch(update(user));
       }
     } catch (error) {
-      const message = error.message.data.message;
+      const message = error.message.data ? error.message.data.message : 'Server Error';
       notifyError(message);
     }
   };
