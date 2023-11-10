@@ -160,7 +160,7 @@ export default function QuestionAddModal({fetchQuestions}) {
                     label="Description"
                     isRequired
                     labelPlacement="outside"
-                    placeholder="Enter Question Description"
+                    placeholder="Enter Question Description (Markdown Syntax)"
                     errorMessage={errors.description?.message as string}
                   />
                 </ModalBody>
