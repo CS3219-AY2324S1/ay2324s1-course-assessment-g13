@@ -67,6 +67,21 @@ func GetQuestions(c echo.Context) error {
 	return c.JSON(http.StatusOK, questions)
 }
 
+func GetCategories(c echo.Context) error {
+	cursor, err := config.CategoriesCollection.Find(context.TODO(), bson.M{})
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, "Failed to retrieve categories")
+	}
+	defer cursor.Close(context.TODO())
+
+	var categories []models.Category
+	if err := cursor.All(context.TODO(), &categories); err != nil {
+		return c.JSON(http.StatusInternalServerError, "Failed to decode categories")
+	}
+
+	return c.JSON(http.StatusOK, categories)
+}
+
 func CreateQuestion(c echo.Context) error {
 	var question models.Question
 	if err := c.Bind(&question); err != nil {

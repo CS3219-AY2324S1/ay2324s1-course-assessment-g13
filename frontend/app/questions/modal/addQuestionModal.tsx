@@ -11,11 +11,12 @@ import {
 import { Button } from '@nextui-org/button';
 import { Input } from '@nextui-org/input';
 import { Select, SelectItem } from '@nextui-org/select';
-import { Textarea } from '@nextui-org/react';
+import { Chip, Textarea } from '@nextui-org/react';
 import { Complexity, Question } from '../../types/question';
 import { useForm } from 'react-hook-form';
 import { notifySuccess, notifyError } from '../../components/toast/notifications';
-import { POST } from '../../libs/axios/axios';
+import { GET, POST } from '../../libs/axios/axios';
+import { useEffect, useState } from 'react';
 
 interface QuestionProps  {
   title: string;
@@ -26,6 +27,7 @@ interface QuestionProps  {
 
 export default function QuestionAddModal({fetchQuestions}) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [categories, setCategories] = useState([]);
 
   const {
     register,
@@ -34,11 +36,25 @@ export default function QuestionAddModal({fetchQuestions}) {
     formState: { errors },
   } = useForm();
 
+  const fetchCategories = async () => {
+    try {
+      const response = await GET('questions/categories');
+      const categoryValues = response.data.map(item => item.category);
+      setCategories(categoryValues);
+    } catch (error) {
+      notifyError(error.message.data);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories()
+  }, []);
+
   const onSubmit = handleSubmit(async (data : QuestionProps) => {
     try {
       const modifiedData = {
         ...data, 
-        categories: data.categories.split(',').map((category) => category.trim()),
+        categories: data.categories.split(",")
       };
       const response = await POST('questions', modifiedData);
       fetchQuestions();
@@ -102,25 +118,35 @@ export default function QuestionAddModal({fetchQuestions}) {
                       </SelectItem>
                     ))}
                   </Select>
-                  <Input
-                    {...register('categories',
-                      { required: 'Categories are required',
-                        validate: { 
-                          noNumbers : (value) => value.split(',').every((category : string) => !/\d/.test(category)) 
-                          || 'Categories should not contain numbers',
-                          notEmpty: (value) => value.split(',').every((category : string) => category.trim() !== '') 
-                          || 'Categories cannot be empty or contain only whitespace',
-                        }, 
-                      }
-                    )}
-                    autoFocus
-                    label="Categories"
-                    placeholder="Enter Categories (comma-separated)"
+                  <Select
+                    {...register('categories', { required: 'Category is required' })}
+                    items={categories}
+                    label="Category"
                     isRequired
                     variant="bordered"
                     labelPlacement="outside"
+                    isMultiline
+                    selectionMode="multiple"
+                    placeholder="Select Categories"
                     errorMessage={errors.categories?.message as string}
-                  />
+                    renderValue={items => {
+                      return (
+                        <div className="flex flex-wrap gap-2">
+                          {items.map(item => (
+                            <Chip key={item.key} variant="bordered">
+                              {item.key}
+                            </Chip>
+                          ))}
+                        </div>
+                      );
+                    }}
+                  >
+                    {categories.map(category => (
+                      <SelectItem key={category} value={category}>
+                        {category.toUpperCase()}
+                      </SelectItem>
+                    ))}
+                  </Select>
                   <Textarea
                     {...register('description',
                       { 
