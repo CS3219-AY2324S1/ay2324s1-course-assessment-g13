@@ -79,7 +79,7 @@ func CreateUser(c echo.Context) error {
 }
 
 func UpdateUser(c echo.Context) error {
-	authUserID := c.Param("id")
+	authUserID := c.Param("authId")
 
 	intAuthUserId, err := strconv.Atoi(authUserID)
 	if err != nil {

@@ -6,6 +6,7 @@ import (
 	"api-gateway/utils/client"
 	"api-gateway/utils/cookie"
 	"api-gateway/utils/message"
+	"bytes"
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
@@ -139,4 +140,46 @@ func CreateUser(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusCreated, message.CreateSuccessUserMessage(SUCCESS_USER_CREATED, newUser))
+}
+
+func UpdateUser(c echo.Context) error {
+	tokenClaims := c.Get(TOKEN_CLAIMS_CONTEXT_KEY).(*models.Claims)
+
+	currentUser := tokenClaims.User
+	authId := currentUser.ID
+
+	var user models.User
+	err := config.DB.Where("oauth_id = ? AND oauth_provider = ?", oauthId, oauthProvider).First(&user).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return c.JSON(http.StatusBadRequest, message.CreateErrorMessage(INVALID_USER_NOT_FOUND))
+		}
+		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(INVALID_DB_ERROR))
+	}
+
+	requestBody := new(models.UpdateUser)
+	if err := c.Bind(requestBody); err != nil {
+		return c.JSON(http.StatusBadRequest, message.CreateErrorMessage(INVALID_JSON_REQUEST))
+	}
+
+	req, err := http.NewRequest(http.MethodPut, "http://localhost:8081/users/"+authId, bytes.NewBuffer([]byte(requestBody)))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage("Error creating request"))
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage("Error sending request"))
+	}
+	defer resp.Body.Close()
+
+	var updateUserResponse models.UpdateUserResponse
+	err = json.NewDecoder(resp.Body).Decode(&updateUserResponse)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(INVALID_DB_ERROR))
+	}
+	
+	return c.JSON(http.StatusOK, message.CreateSuccessUserMessage(SUCCESS_USER_UPDATED, updateUserResponse.User))
 }
