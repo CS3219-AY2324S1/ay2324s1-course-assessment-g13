@@ -248,7 +248,10 @@ export default function Collab() {
       >
         <ModalContent>
           <>
-            <ModalHeader className="flex flex-col gap-1">Chat Room</ModalHeader>
+            <ModalHeader className="flex flex-col gap-1">
+              Chat Room
+              <p className="text-sm"> <span className="text-red-600">Warning:</span> The chat resets upon refresh or leaving the room!</p>
+            </ModalHeader>
             <ModalBody>
               {messages.map((message, index) => (
                 <p
