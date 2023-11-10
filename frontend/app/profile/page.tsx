@@ -61,7 +61,7 @@ export default function Profile() {
       preferred_language: data.preferredLanguage,
     };
     try {
-      const response: AxiosResponse<UserResponse> = await PUT(`/auth/user`, requestBody);
+      const response: AxiosResponse<UserResponse> = await PUT(`/auth/user/update`, requestBody);
       const { message, user } = response.data;
       dispatch(updateUser(user));
       notifySuccess(message);

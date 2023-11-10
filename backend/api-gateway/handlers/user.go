@@ -7,7 +7,10 @@ import (
 	"api-gateway/utils/cookie"
 	"api-gateway/utils/message"
 	"bytes"
+	"encoding/json"
 	"net/http"
+	"os"
+	"strconv"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
@@ -148,30 +151,19 @@ func UpdateUser(c echo.Context) error {
 	currentUser := tokenClaims.User
 	authId := currentUser.ID
 
-	var user models.User
-	err := config.DB.Where("oauth_id = ? AND oauth_provider = ?", oauthId, oauthProvider).First(&user).Error
-	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return c.JSON(http.StatusBadRequest, message.CreateErrorMessage(INVALID_USER_NOT_FOUND))
-		}
-		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(INVALID_DB_ERROR))
-	}
-
 	requestBody := new(models.UpdateUser)
 	if err := c.Bind(requestBody); err != nil {
 		return c.JSON(http.StatusBadRequest, message.CreateErrorMessage(INVALID_JSON_REQUEST))
 	}
 
-	req, err := http.NewRequest(http.MethodPut, "http://localhost:8081/users/"+authId, bytes.NewBuffer([]byte(requestBody)))
+	requestBodyJSON, err := json.Marshal(requestBody)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage("Error creating request"))
+		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage("Error marshalling request body"))
 	}
 
-	req.Header.Set("Content-Type", "application/json")
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	resp, err := http.Post(os.Getenv("USER_SERVICE_URL") + "/users/" + strconv.FormatUint(uint64(authId), 10), "application/json", bytes.NewBuffer(requestBodyJSON))
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage("Error sending request"))
+		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage("Error creating request"))
 	}
 	defer resp.Body.Close()
 
@@ -181,5 +173,5 @@ func UpdateUser(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(INVALID_DB_ERROR))
 	}
 	
-	return c.JSON(http.StatusOK, message.CreateSuccessUserMessage(SUCCESS_USER_UPDATED, updateUserResponse.User))
+	return c.JSON(http.StatusOK, message.CreateSuccessUupdateUserMessage(SUCCESS_USER_UPDATED, updateUserResponse.User))
 }

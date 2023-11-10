@@ -87,7 +87,6 @@ func UpdateUser(c echo.Context) error {
 	}
 
 	uintAuthUserId := uint(intAuthUserId)
-
 	var user model.User
 	if err := config.DB.Where("auth_user_id = ?", authUserID).First(&user).Error; err != nil {
 		return c.JSON(http.StatusNotFound, message.CreateErrorMessage(INVALID_USER_NOT_FOUND))
