@@ -7,7 +7,7 @@ import { redirect } from 'next/navigation';
 
 type TMessage = {
   message: string;
-}
+};
 
 const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
@@ -15,11 +15,11 @@ const axiosInstance = axios.create({
     'Content-Type': 'application/json',
     Accept: 'application/json',
   },
-  withCredentials: true
+  withCredentials: true,
 });
 
 axiosInstance.interceptors.response.use(
-  (response) => {
+  response => {
     return response;
   },
   async (error: AxiosError) => {
@@ -28,16 +28,15 @@ axiosInstance.interceptors.response.use(
       return axiosInstance(error.config);
     }
     if (error.response && error.response.status === 404) {
-      console.log(error.response.data);
       const { message } = error.response.data as TMessage;
-      if (message === "User Not Found!") {
+      if (message === 'User Not Found!') {
         store.dispatch(AuthLogout());
         store.dispatch(UserLogout());
-        window.location.href = "/";
+        window.location.href = '/';
       }
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export const GET = async (url: string) => {

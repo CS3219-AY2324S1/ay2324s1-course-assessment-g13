@@ -43,12 +43,10 @@ export default function History() {
   const fetchHistory = async () => {
     try {
       const response = await GET(`histories/${authId}`);
-      console.log(response);
       if (response.data != null) {
         setHistory(response.data.histories);
       }
     } catch (error) {
-      console.log(error);
       notifyError(error.message.data.message);
     }
   };
@@ -60,7 +58,6 @@ export default function History() {
   const items = useMemo(() => {
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
-    console.log(history);
     const paginatedHistory = history.slice(start, end);
     const paginatedHistoryArr = [...paginatedHistory];
     return paginatedHistoryArr.map((history, i) => {
