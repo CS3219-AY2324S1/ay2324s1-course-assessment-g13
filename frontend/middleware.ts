@@ -19,7 +19,7 @@ export function middleware(request: NextRequest) {
 
 export const unprotectedPath = ['/login', '/signup', '/'];
 
-export const protectedPath = ['/questions', '/profile', '/manage-users', '/history', '/interview'];
+export const protectedPath = ['/questions', '/profile', '/manage-users', '/history', '/interviews'];
 
 export const config = {
   matcher: [
@@ -30,6 +30,6 @@ export const config = {
     '/signup',
     '/manage-users',
     '/history',
-    '/interview',
+    '/interviews',
   ],
 };
