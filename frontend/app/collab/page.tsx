@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect, ChangeEvent } from 'react';
-import { Category, Complexity, ComplexityToColor, Question } from '../types/question';
+import { Complexity, ComplexityToColor, Question } from '../types/question';
 import { GET } from "../libs/axios/axios";
 import { notifyError, notifySuccess, notifyWarning } from '../components/toast/notifications';
 import Editor from '@monaco-editor/react';
@@ -33,8 +33,8 @@ export default function Collab() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const ws = useRef(null);
-  const languages = LANGUAGES.slice(1)
-  const [currentLanguage, setCurrentLanguage] = useState(languages[11])
+  const languages = LANGUAGES.slice(1);
+  const [currentLanguage, setCurrentLanguage] = useState(languages[11]);
 
   useEffect(() => {
     window.addEventListener('popstate', exitRoom);
@@ -163,11 +163,12 @@ export default function Collab() {
               <Chip color={ComplexityToColor[question.complexity]} className="mx-2">
                 {question.complexity}
               </Chip>
-              {question.categories && (question.categories as Category[]).map(category => (
-              <Chip variant="bordered" key={category} className="mx-2">
-                {category}
-              </Chip>
-              ))}
+              <div className="flex flex-wrap">
+                {question.categories && question.categories.map(category => (
+                <Chip variant="bordered" key={category} className="mx-2 mb-2">
+                  {category}
+                </Chip>))}
+              </div>
             </div>
             <div className="mb-4 border-b border-gray-400"></div>
             {question.description &&
