@@ -15,4 +15,5 @@ const (
 	SUCCESS_USER_CREATED   = "User Created Successfully!"
 	SUCCESS_USER_DELETED   = "User Deleted Successfully!"
 	SUCCESS_USER_UPDATED   = "User Updated Successfully!"
+	SUCCESS_HISTORY_FOUND  = "History Found!"
 )

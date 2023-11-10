@@ -1,14 +1,16 @@
 package handlers
 
 import (
-	"github.com/labstack/echo/v4"
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"log"
 	"net/http"
-    "log"
-    "os"
-    "fmt"
-    "encoding/json"
+	"os"
+
 	"github.com/google/uuid"
-    "github.com/gorilla/websocket"
+	"github.com/gorilla/websocket"
+	"github.com/labstack/echo/v4"
 )
 
 type Room struct {
@@ -28,6 +30,8 @@ type User struct {
     MessageChannel chan *Message
     RoomId string
     Username string
+    Solution string
+    Language string
 }
 
 type Message struct {
@@ -108,12 +112,21 @@ func (h *Handler) JoinRoom(c echo.Context) error {
     }
 
     log.Println("Attempting to join room")
+
+    updatedSolution := ""
+    if len(room.Users) == 1 {
+        for _, otherUser := range room.Users {
+            updatedSolution = otherUser.Solution
+        }
+    }
     
     user := &User{
         Connection: connection,
         MessageChannel: make(chan *Message, 10),
         RoomId: roomId,
         Username: username,
+        Solution: updatedSolution,
+        Language: "",
     }
 
     room.Users[username] = user
@@ -166,6 +179,14 @@ func (user *User) writeMessage() {
             return
         }
 
+        if message.Type == "code" {
+            user.Solution = message.Content
+        }
+
+        if message.Type == "language" {
+            user.Language = message.Content
+        }
+        
         user.Connection.WriteJSON(message)
     }
 }
@@ -191,6 +212,14 @@ func (user *User) readMessage(hub *Hub) {
             break
         }
 
+        if msg.Type == "code" {
+            user.Solution = msg.Content
+        }
+
+        if msg.Type == "language" {
+            user.Language = msg.Content
+        }
+
         hub.BroadcastChannel <- &msg
     }
 }
@@ -207,6 +236,10 @@ func (hub *Hub) Run() {
                 }
             }
         case user := <- hub.DisconnectChannel:
+            err := handleAddHistory(user, hub.Rooms[user.RoomId].QuestionId)
+            if err != nil {
+                log.Fatal(err)
+            }
             delete(hub.Rooms[user.RoomId].Users, user.Username)
             if len(hub.Rooms[user.RoomId].Users) == 0 {
                 delete(hub.Rooms, user.RoomId)
@@ -214,4 +247,45 @@ func (hub *Hub) Run() {
             close(user.MessageChannel)
         }
     }
+}
+
+func handleAddHistory(user *User, questionId string) error {
+    resp, err := http.Get(os.Getenv("QUESTION_SERVICE_URL") + "/questions/" + questionId) 
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer resp.Body.Close()
+
+    var question struct {
+        Title string `json:"title"`
+    }
+    err = json.NewDecoder(resp.Body).Decode(&question)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    reqBody, err := json.Marshal(map[string]string{
+        "room_id": user.RoomId,
+        "question_id": questionId,
+        "title": question.Title,
+        "solution": user.Solution,
+        "username": user.Username,
+        "language": user.Language,
+    })
+
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    resp, err = http.Post(os.Getenv("USER_SERVICE_URL") + "/history", "application/json", bytes.NewBuffer(reqBody))
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer resp.Body.Close()
+
+    if resp.StatusCode != http.StatusCreated {
+        log.Fatal("Error adding history")
+    }
+
+    return nil
 }

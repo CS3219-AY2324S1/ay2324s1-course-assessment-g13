@@ -17,3 +17,8 @@ type SuccessUsersMessage struct {
 type SuccessMessage struct {
 	Message string `json:"message"`
 }
+
+type SuccessHistoriesMessage struct {
+	Message   string    `json:"message"`
+	Histories []History `json:"histories,omitempty"`
+}

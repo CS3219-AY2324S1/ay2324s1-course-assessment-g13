@@ -139,6 +139,11 @@ const Nav = () => {
                       Profile
                     </Link>
                   </DropdownItem>
+                  <DropdownItem key="history" variant="flat">
+                    <Link href="/history" className="text-white text-sm w-full">
+                      History
+                    </Link>
+                  </DropdownItem>
                   {role === 'super admin' && (
                     <DropdownItem key="manage-users" color="primary">
                       <Link href="/manage-users" className="text-white text-sm w-full">

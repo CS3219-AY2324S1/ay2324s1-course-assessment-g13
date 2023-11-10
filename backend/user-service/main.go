@@ -26,8 +26,12 @@ func main() {
 	e.POST("/users", handlers.CreateUser)
 	e.GET("/users", handlers.GetUsers)
 	e.GET("/users/:id", handlers.GetUser)
+
 	e.PUT("/users/:id", handlers.UpdateUser)
 	e.DELETE("/users/:id", handlers.DeleteUser)
+
+	e.POST("/history", handlers.CreateHistory)
+	e.GET("/histories/:authId", handlers.GetHistories)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }

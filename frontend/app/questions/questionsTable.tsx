@@ -11,7 +11,7 @@ interface QuestionProps {
   fetchQuestions: () => void;
 }
 
-const QuestionsTable = ({ questions, fetchQuestions} : QuestionProps) => {
+const QuestionsTable = ({ questions, fetchQuestions }: QuestionProps) => {
   const [page, setPage] = useState(1);
   const rowsPerPage = 10;
 
@@ -26,7 +26,6 @@ const QuestionsTable = ({ questions, fetchQuestions} : QuestionProps) => {
   useEffect(() => {
     setPage(1);
   }, [noOfPages]);
-  
 
   const items = useMemo(() => {
     const start = (page - 1) * rowsPerPage;
@@ -77,11 +76,11 @@ const QuestionsTable = ({ questions, fetchQuestions} : QuestionProps) => {
       <TableBody items={items} emptyContent={'No rows to display.'}>
         {item => (
           <TableRow key={item.id}>
-            {columnKey => 
+            {columnKey => (
               <TableCell>
-                <StyleCell item={item} columnKey={columnKey} fetchQuestions={fetchQuestions}/>
+                <StyleCell item={item} columnKey={columnKey} fetchQuestions={fetchQuestions} />
               </TableCell>
-            }
+            )}
           </TableRow>
         )}
       </TableBody>
