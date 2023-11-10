@@ -57,7 +57,7 @@ const Nav = () => {
 
   useEffect(() => {
     status === "unauthenticated" && handleLogout();
-    status === "authenticated" && handleGetUser();
+    isLoggedIn && handleGetUser();
   }, [status])
 
   const checkPath = (url : string) => {
