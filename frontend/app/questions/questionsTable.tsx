@@ -24,9 +24,7 @@ const QuestionsTable = ({ questions, fetchQuestions} : QuestionProps) => {
     : 1;
 
   useEffect(() => {
-    if (page > noOfPages || page == noOfPages - 1)  {
-      setPage(noOfPages);
-    } 
+    setPage(1);
   }, [noOfPages]);
   
 

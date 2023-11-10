@@ -22,7 +22,7 @@ const StyleCell: React.FC<StyleCellProps> = ({ item, columnKey, fetchQuestions }
       return <span>{item.title}</span>;
     case 'category':
       return (
-        <div className="relative flex items-center">
+        <div className="relative flex items-center flex-wrap">
           {item.categories.map(category => (
             <Chip variant="bordered" key={category}>
               {category}
