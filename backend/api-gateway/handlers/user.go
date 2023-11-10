@@ -6,10 +6,7 @@ import (
 	"api-gateway/utils/client"
 	"api-gateway/utils/cookie"
 	"api-gateway/utils/message"
-	"encoding/json"
 	"net/http"
-	"os"
-	"strconv"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
@@ -40,30 +37,6 @@ func GetUsers(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, message.CreateSuccessUsersMessage(SUCCESS_USER_FOUND, users))
 }
-
-func GetHistories(c echo.Context) error {
-	tokenClaims := c.Get(TOKEN_CLAIMS_CONTEXT_KEY).(*models.Claims)
-
-	currentUser := tokenClaims.User
-	authId := strconv.Itoa(int(currentUser.ID))
-
-	resp, err := http.Get(os.Getenv("USER_SERVICE_URL")+"/histories/" + authId)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage("Failed to retrieve histories"))
-	}
-
-	defer resp.Body.Close()
-
-	var historyResponse models.HistoryResponse
-	err = json.NewDecoder(resp.Body).Decode(&historyResponse)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(INVALID_DB_ERROR))
-	}
-
-	return c.JSON(http.StatusOK, historyResponse.Histories)
-}
-
-
 
 func GetUser(c echo.Context) error {
 	tokenClaims := c.Get(TOKEN_CLAIMS_CONTEXT_KEY).(*models.Claims)

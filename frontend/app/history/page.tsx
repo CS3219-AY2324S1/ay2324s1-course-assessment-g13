@@ -6,6 +6,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { notifyError } from '../components/toast/notifications';
 import { GET } from '../libs/axios/axios';
 import HistoryStyleCell from './style-cell';
+import useAuth from '../hooks/useAuth';
 
 const rowsPerPage = 10;
 
@@ -31,6 +32,7 @@ const columns = [
 interface History {}
 
 export default function History() {
+  const { authId } = useAuth();
   const [page, setPage] = useState(1);
   const [history, setHistory] = useState([]);
 
@@ -40,10 +42,10 @@ export default function History() {
 
   const fetchHistory = async () => {
     try {
-      const response = await GET(`auth/history`);
+      const response = await GET(`histories/${authId}`);
       console.log(response);
       if (response.data != null) {
-        setHistory(response.data);
+        setHistory(response.data.histories);
       }
     } catch (error) {
       console.log(error);
@@ -58,6 +60,7 @@ export default function History() {
   const items = useMemo(() => {
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
+    console.log(history);
     const paginatedHistory = history.slice(start, end);
     const paginatedHistoryArr = [...paginatedHistory];
     return paginatedHistoryArr.map((history, i) => {
