@@ -34,7 +34,15 @@ export default function Collab() {
   const [newMessage, setNewMessage] = useState('');
   const ws = useRef(null);
   const languages = LANGUAGES.slice(1);
-  const [currentLanguage, setCurrentLanguage] = useState(languages[11]);
+  const [currentLanguage, setCurrentLanguage] = useState(LANGUAGES[10]);
+  const [isPartnerPresent, setIsPartnerPresent] = useState(true);
+  const [question, setQuestion] = useState<Question>({
+    id: "",
+    title: "",
+    categories: [],
+    complexity: Complexity.EASY,
+    description: ""
+  });
 
   useEffect(() => {
     window.addEventListener('popstate', exitRoom);
@@ -64,8 +72,10 @@ export default function Collab() {
         setCurrentLanguage(message.Content as Language);
         notifyWarning(`Editor's language has been changed to ${message.Content}`);
       } else if (message.Type === "exit") {
+        setIsPartnerPresent(false);
         notifyError(message.Content);
       } else {
+        setIsPartnerPresent(true);
         notifySuccess(message.Content);
       }
     }
@@ -85,6 +95,13 @@ export default function Collab() {
     dispatch(setIsChatOpen(false));
   }, []);
 
+  useEffect(() => {
+    if (isPartnerPresent && ws.current.readyState) {
+      sendMessage(code, "code");
+      sendMessage(currentLanguage, "language");
+    } 
+  }, [isPartnerPresent])
+
   const sendMessage = (value : string, type : string) => {
     const message = {
       content: value,
@@ -94,14 +111,6 @@ export default function Collab() {
     };
     ws.current.send(JSON.stringify(message));
   }
-
-  const [question, setQuestion] = useState<Question>({
-    id: "",
-    title: "",
-    categories: [],
-    complexity: Complexity.EASY,
-    description: ""
-  });
 
   const fetchQuestion = async () => {
     try {
@@ -114,6 +123,7 @@ export default function Collab() {
   };
 
   const handleEditorChange = (value: string, event) => {
+    setCode(value);
     sendMessage(value, "code");
   }
 
