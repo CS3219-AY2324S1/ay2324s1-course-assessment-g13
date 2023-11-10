@@ -87,4 +87,3 @@ func GetHistories(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, message.CreateSuccessHistoriesMessage(SUCCESS_HISTORY_FOUND, histories))
 }
-
