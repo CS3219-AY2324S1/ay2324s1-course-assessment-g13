@@ -26,7 +26,7 @@ func CreateHistory(c echo.Context) error {
 
 	var language string
 	if reqBody["language"] == "" {
-		language = user.PreferredLanguage
+		language = "PYTHON"
 	} else {
 		language = reqBody["language"]
 	}
@@ -40,6 +40,9 @@ func CreateHistory(c echo.Context) error {
 	} else {
 		// Update existing history
 		existingHistory.Solution = reqBody["solution"]
+		if reqBody["language"] != "" {
+			existingHistory.Language = reqBody["language"]
+		}
 		existingHistory.Language = language
 		if err := config.DB.Save(&existingHistory).Error; err != nil {
 			return c.JSON(http.StatusInternalServerError, message.CreateErrorMessage(INVALID_DB_ERROR))

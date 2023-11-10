@@ -187,6 +187,10 @@ func (user *User) writeMessage() {
             user.Solution = message.Content
         }
 
+        if message.Type == "language" {
+            user.Language = message.Content
+        }
+        
         user.Connection.WriteJSON(message)
     }
 }
