@@ -13,8 +13,8 @@ interface StyleCellProps {
 
 const StyleCell: React.FC<StyleCellProps> = ({ item, columnKey, fetchQuestions }) => {
   const { role } = useAuth();
-  const isAdmin = role === "admin";
-  
+  const isAdmin = role === 'admin';
+
   switch (columnKey) {
     case 'id':
       return <span>{item.listId}</span>;
@@ -36,12 +36,13 @@ const StyleCell: React.FC<StyleCellProps> = ({ item, columnKey, fetchQuestions }
       return (
         <div className="relative flex items-center gap-5">
           <QuestionDescriptionModal title={item.title} description={item.description} />
-          {isAdmin && 
-            <DeleteConfirmationModal 
-              title={item.title} 
-              id={item.id} 
+          {isAdmin && (
+            <DeleteConfirmationModal
+              title={item.title}
+              id={item.id}
               fetchQuestions={fetchQuestions}
-            />}
+            />
+          )}
         </div>
       );
 

@@ -1,5 +1,7 @@
 import { Key } from 'react';
 import SolutionModal from './solutionModal';
+import { Chip } from '@nextui-org/react';
+import { ComplexityToColor } from '../types/question';
 
 interface StyleCellProps {
   item: any;
@@ -18,6 +20,8 @@ const HistoryStyleCell: React.FC<StyleCellProps> = ({ item, columnKey }) => {
       return <span>{date}</span>;
     case 'title':
       return <span>{item.title}</span>;
+    case 'complexity':
+      return <Chip color={ComplexityToColor[item.complexity]}>{item.complexity}</Chip>;
     case 'language':
       return <span>{item.language}</span>;
     case 'actions':

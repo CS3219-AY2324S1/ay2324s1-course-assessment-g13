@@ -20,6 +20,10 @@ const columns = [
     label: 'QUESTION',
   },
   {
+    key: 'complexity',
+    label: 'COMPLEXITY',
+  },
+  {
     key: 'language',
     label: 'LANGUAGE',
   },
