@@ -61,7 +61,7 @@ func UserCancelHandler(c echo.Context) error {
 	UserToChanMap[requestBody.Username] <- true
 
 	// On the own producer, indicate user has cancelled
-	utils.CancelUser(requestBody.Username)
+	utils.CancelUser(requestBody.Username, requestBody.MatchCriteria)
 
 	cancelResponseBody := models.CancelResponse{CancelStatus: true}
 	return c.JSON(http.StatusOK, cancelResponseBody)
@@ -96,7 +96,7 @@ func Init() {
 				panic(err)
 			}
 			log.Println("Cancelling user after message consumption!!!")
-			utils.CancelUser(recvdPkt.RequestBody.Username)
+			utils.CancelUser(recvdPkt.RequestBody.Username, recvdPkt.RequestBody.MatchCriteria)
 		}
 	}()
 }

@@ -26,7 +26,7 @@ func MatchHandler(c echo.Context) error {
 	}
 
 	// Removes the user from our cancel buffer if they have previously tried to match and got cancelled
-	utils.ResetUser(requestBody.Username)
+	utils.ResetUser(requestBody.Username, requestBody.MatchCriteria)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
@@ -128,7 +128,7 @@ func MatchHandler(c echo.Context) error {
 				}
 				matchedUser := packetResponse.ResponseBody.MatchUser
 				// Check if matched user is already out of queue
-				if utils.IsUserCancelled(matchedUser) {
+				if utils.IsUserCancelled(matchedUser, requestBody.MatchCriteria) {
 					log.Printf("User is already out of queue: %s\n", matchedUser)
 					// Publishes the user request into the selected MQ
 					err = channel.PublishWithContext(
@@ -148,7 +148,7 @@ func MatchHandler(c echo.Context) error {
 						return
 					}
 					continue
-				} else if utils.IsUserCancelled(requestBody.Username) {
+				} else if utils.IsUserCancelled(requestBody.Username, requestBody.MatchCriteria) {
 					// If user is already cancelled, cancel the timer
 					log.Printf("User is already cancelled: %s\n", requestBody.Username)
 					cancel()
@@ -174,7 +174,7 @@ func MatchHandler(c echo.Context) error {
 		case <-userCancelChan:
 			log.Println("User manually cancelled on producer side")
 			// Remove user from queue
-			utils.CancelUser(requestBody.Username)
+			utils.CancelUser(requestBody.Username, requestBody.MatchCriteria)
 			<-syncChan // Reads from sync channel to allow goroutine listening to result to break out of loop
 			shouldBreak = true
 			break
@@ -182,7 +182,7 @@ func MatchHandler(c echo.Context) error {
 		case <-ctxTimer.Done():
 			log.Println("30 seconds timer hit on producer side")
 			// Remove user from queue
-			utils.CancelUser(requestBody.Username)
+			utils.CancelUser(requestBody.Username, requestBody.MatchCriteria)
 			<-syncChan // Reads from sync channel to allow goroutine listening to result to break out of loop
 			shouldBreak = true
 			break
