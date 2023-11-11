@@ -36,15 +36,16 @@ export default function History() {
   const [page, setPage] = useState(1);
   const [history, setHistory] = useState([]);
 
-  const noOfPages = Math.ceil(history.length / rowsPerPage)
-    ? Math.ceil(history.length / rowsPerPage)
-    : 1;
+  const noOfPages =
+    history && Math.ceil(history.length / rowsPerPage)
+      ? Math.ceil(history.length / rowsPerPage)
+      : 1;
 
   const fetchHistory = async () => {
     try {
       const response = await GET(`histories/${authId}`);
       if (response.data != null) {
-        setHistory(response.data.histories);
+        setHistory(response.data.histories || []);
       }
     } catch (error) {
       notifyError(error.message.data.message);
