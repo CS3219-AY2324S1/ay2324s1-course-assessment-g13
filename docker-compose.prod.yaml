@@ -44,6 +44,8 @@ services:
     build:
       context: ./backend/collaboration-service
       dockerfile: Dockerfile.prod
+    env_file:
+      - ./backend/collaboration-service/.env
     ports:
       - "5005:8080" # Maps container port 8080 to local 5005
     environment:

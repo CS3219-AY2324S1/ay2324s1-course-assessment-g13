@@ -5,6 +5,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"log"
+	"producer/utils"
 
 	"net/http"
 	"os"
@@ -17,6 +18,7 @@ func main() {
 	defer rmq.Reset()
 
 	handlers.Init()
+	utils.Init()
 
 	e := echo.New()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{

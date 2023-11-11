@@ -1,9 +1,16 @@
 package utils
 
-var cancelledUsers []string
+var cancelledUsers map[string][]string
 
-func IsUserCancelled(user string) bool {
-	for _, cancelledUser := range cancelledUsers {
+func Init() {
+	cancelledUsers = make(map[string][]string)
+	for _, criteria := range MatchCriterias {
+		cancelledUsers[string(criteria)] = []string{}
+	}
+}
+
+func IsUserCancelled(user string, criteria string) bool {
+	for _, cancelledUser := range cancelledUsers[criteria] {
 		if cancelledUser == user {
 			return true
 		}
@@ -11,20 +18,20 @@ func IsUserCancelled(user string) bool {
 	return false
 }
 
-func ResetUser(userToCancel string) {
+func ResetUser(userToCancel string, criteria string) {
 	deletionIndex := -1
-	for index, user := range cancelledUsers {
+	for index, user := range cancelledUsers[criteria] {
 		if user == userToCancel {
 			deletionIndex = index
 		}
 	}
 	if deletionIndex != -1 {
-		cancelledUsers[deletionIndex] = cancelledUsers[len(cancelledUsers)-1]
-		cancelledUsers = cancelledUsers[:len(cancelledUsers)-1]
+		cancelledUsers[criteria][deletionIndex] = cancelledUsers[criteria][len(cancelledUsers[criteria])-1]
+		cancelledUsers[criteria] = cancelledUsers[criteria][:len(cancelledUsers[criteria])-1]
 	}
 }
 
-func CancelUser(user string) {
-	ResetUser(user)                               // Resets user first by removing user if they exist
-	cancelledUsers = append(cancelledUsers, user) // Then cancel to prevent duplicates
+func CancelUser(user string, criteria string) {
+	ResetUser(user, criteria)                                         // Resets user first by removing user if they exist
+	cancelledUsers[criteria] = append(cancelledUsers[criteria], user) // Then cancel to prevent duplicates
 }
