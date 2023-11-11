@@ -13,7 +13,7 @@ const rowsPerPage = 10;
 const columns = [
   {
     key: 'UpdatedAt',
-    label: 'DATE',
+    label: 'COMPLETED AT',
   },
   {
     key: 'title',
@@ -72,42 +72,44 @@ export default function History() {
   return (
     <div className="mx-auto max-w-7xl px-6 h-4/5 my-10">
       <div className="flex justify-between items-center mb-5">
-        <Table
-          aria-label="History Table"
-          bottomContent={
-            <div className="flex w-full justify-center">
-              <Pagination
-                isCompact
-                showControls
-                showShadow
-                color="secondary"
-                page={page}
-                total={noOfPages}
-                onChange={page => setPage(page)}
-              />
-            </div>
-          }
-        >
-          <TableHeader columns={columns}>
-            {column => (
-              <TableColumn key={column.key} align="center">
-                {column.label}
-              </TableColumn>
-            )}
-          </TableHeader>
-          <TableBody items={items} emptyContent={'No rows to display.'}>
-            {item => (
-              <TableRow key={item.ID}>
-                {columnKey => (
-                  <TableCell>
-                    <HistoryStyleCell item={item} columnKey={columnKey} />
-                  </TableCell>
-                )}
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+        <span className="text-3xl">History</span>
       </div>
+      <Table
+        aria-label="History Table"
+        isStriped
+        bottomContent={
+          <div className="flex w-full justify-center">
+            <Pagination
+              isCompact
+              showControls
+              showShadow
+              color="secondary"
+              page={page}
+              total={noOfPages}
+              onChange={page => setPage(page)}
+            />
+          </div>
+        }
+      >
+        <TableHeader columns={columns}>
+          {column => (
+            <TableColumn key={column.key} align="center">
+              {column.label}
+            </TableColumn>
+          )}
+        </TableHeader>
+        <TableBody items={items} emptyContent={'No rows to display.'}>
+          {item => (
+            <TableRow key={item.ID}>
+              {columnKey => (
+                <TableCell>
+                  <HistoryStyleCell item={item} columnKey={columnKey} />
+                </TableCell>
+              )}
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
     </div>
   );
 }
