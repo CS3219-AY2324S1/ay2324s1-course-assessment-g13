@@ -19,9 +19,10 @@ const QuestionsTable = ({ questions, fetchQuestions }: QuestionProps) => {
     fetchQuestions();
   }, []);
 
-  const noOfPages = Math.ceil(questions.length / rowsPerPage)
-    ? Math.ceil(questions.length / rowsPerPage)
-    : 1;
+  const noOfPages =
+    questions && Math.ceil(questions.length / rowsPerPage)
+      ? Math.ceil(questions.length / rowsPerPage)
+      : 1;
 
   useEffect(() => {
     setPage(1);
