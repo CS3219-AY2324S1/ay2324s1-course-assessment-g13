@@ -31,7 +31,8 @@ const QuestionsTable = ({ questions, fetchQuestions }: QuestionProps) => {
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
     const paginatedQuestions = questions.slice(start, end);
-    return paginatedQuestions.map((question: Question, i: number) => {
+    const paginatedQuestionsArr = [...paginatedQuestions];
+    return paginatedQuestionsArr.map((question: Question, i: number) => {
       return {
         ...(question as Question),
         listId: i + 1 + start,

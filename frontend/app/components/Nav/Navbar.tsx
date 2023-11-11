@@ -72,7 +72,7 @@ const Nav = () => {
     <Navbar isBordered maxWidth="xl">
       <NavbarBrand>
         <Link
-          href={isLoggedIn && !checkPath('/collab') ? '/questions' : '#'}
+          href={isLoggedIn ? '/questions' : '/'}
           className="font-bold text-inherit"
         >
           PeerPrep
@@ -132,30 +132,28 @@ const Nav = () => {
               <DropdownTrigger>
                 <Avatar src={photoUrl} showFallback isBordered as="button" color="primary" />
               </DropdownTrigger>
-              {!checkPath('/collab') && (
-                <DropdownMenu aria-label="Profile Actions" variant="flat">
-                  <DropdownItem key="profile" color="primary">
-                    <Link href="/profile" className="text-white text-sm w-full">
-                      Profile
+              <DropdownMenu aria-label="Profile Actions" variant="flat">
+                <DropdownItem key="profile" color="primary">
+                  <Link href="/profile" className="text-white text-sm w-full">
+                    Profile
+                  </Link>
+                </DropdownItem>
+                <DropdownItem key="history" variant="flat">
+                  <Link href="/history" className="text-white text-sm w-full">
+                    History
+                  </Link>
+                </DropdownItem>
+                {role === 'super admin' && (
+                  <DropdownItem key="manage-users" color="primary">
+                    <Link href="/manage-users" className="text-white text-sm w-full">
+                      Manage Users
                     </Link>
                   </DropdownItem>
-                  <DropdownItem key="history" variant="flat">
-                    <Link href="/history" className="text-white text-sm w-full">
-                      History
-                    </Link>
-                  </DropdownItem>
-                  {role === 'super admin' && (
-                    <DropdownItem key="manage-users" color="primary">
-                      <Link href="/manage-users" className="text-white text-sm w-full">
-                        Manage Users
-                      </Link>
-                    </DropdownItem>
-                  )}
-                  <DropdownItem key="logout" color="danger" onClick={handleLogout}>
-                    Log Out
-                  </DropdownItem>
-                </DropdownMenu>
-              )}
+                )}
+                <DropdownItem key="logout" color="danger" onClick={handleLogout}>
+                  Log Out
+                </DropdownItem>
+              </DropdownMenu>
             </Dropdown>
           </NavbarItem>
         </NavbarContent>
