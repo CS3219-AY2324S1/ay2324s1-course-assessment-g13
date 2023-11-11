@@ -54,6 +54,7 @@ const QuestionsTable = ({ questions, fetchQuestions }: QuestionProps) => {
   return (
     <Table
       aria-label="Questions Table"
+      isStriped
       bottomContent={
         <div className="flex w-full justify-center">
           <Pagination
