@@ -258,6 +258,7 @@ func handleAddHistory(user *User, questionId string) error {
 
     var question struct {
         Title string `json:"title"`
+        Complexity string `json:"complexity"`
     }
     err = json.NewDecoder(resp.Body).Decode(&question)
     if err != nil {
@@ -268,6 +269,7 @@ func handleAddHistory(user *User, questionId string) error {
         "room_id": user.RoomId,
         "question_id": questionId,
         "title": question.Title,
+        "complexity": question.Complexity,
         "solution": user.Solution,
         "username": user.Username,
         "language": user.Language,

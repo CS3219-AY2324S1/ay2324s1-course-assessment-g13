@@ -32,6 +32,7 @@ type History struct {
 	RoomId string `json:"room_id"`
 	QuestionId string `json:"question_id"`
 	Title string `json:"title"`
+	Complexity string `json:"complexity"`
 	Solution string `json:"solution"`
 	Language string `json:"language"`
 	UserID uint `json:"user_id" gorm:"index;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`

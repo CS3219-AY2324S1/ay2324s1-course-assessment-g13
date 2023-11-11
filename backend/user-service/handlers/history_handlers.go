@@ -58,6 +58,7 @@ func CreateHistory(c echo.Context) error {
 	newHistory.QuestionId = reqBody["question_id"]
 	newHistory.Title = reqBody["title"]
 	newHistory.Solution = reqBody["solution"]
+	newHistory.Complexity = reqBody["complexity"]
 	newHistory.Language = language
 
 	if err := config.DB.Create(&newHistory).Error; err != nil {
