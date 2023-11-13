@@ -132,7 +132,7 @@ func Init() {
 		log.Println(msg)
 		panic(err)
 	}
-	declaredCancelQueue, err := CancelChannel.QueueDeclare( // TODO Changed this from ResultChannel
+	declaredCancelQueue, err := CancelChannel.QueueDeclare(
 		"cancelQueue", // name
 		false,         // durable
 		false,         // delete when unused
@@ -146,7 +146,7 @@ func Init() {
 		panic(err)
 	}
 
-	err = CancelChannel.QueueBind( // TODO Changed this from ResultChannel
+	err = CancelChannel.QueueBind(
 		declaredCancelQueue.Name, // queue name
 		"",                       // routing key
 		"cancels",                // exchange
