@@ -18,23 +18,23 @@ spec:
         app: frontend
     spec:
       containers:
-      - image: gcr.io/smooth-research-397708/frontend:v1
+      - image: gcr.io/smooth-research-397708/frontend:v2
         name: frontend
         imagePullPolicy: Always
         resources: {}
         ports:
           - containerPort: 3000 
-        # env:
-        #   - name: NEXT_PUBLIC_BACKEND_URL
-        #     valueFrom:
-        #       configMapKeyRef:
-        #         key: API_GATEWAY_URL
-        #         name: configmap
-        #   - name: NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
-        #     valueFrom:
-        #       configMapKeyRef:
-        #         key: NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
-        #         name: configmap
+        env:
+          - name: NEXTAUTH_SECRET
+            valueFrom:
+              secretKeyRef:
+                key: NEXTAUTH_SECRET
+                name: secrets
+          - name: NEXTAUTH_URL
+            valueFrom:
+              configMapKeyRef:
+                key: FRONTEND_URL
+                name: configmap
         #   - name: NEXT_PUBLIC_FRONTEND_URL
         #     valueFrom:
         #       configMapKeyRef:

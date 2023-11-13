@@ -18,7 +18,7 @@ spec:
         app: matching-producer
     spec:
       containers:
-      - image: gcr.io/smooth-research-397708/matching-producer:v1
+      - image: gcr.io/smooth-research-397708/matching-producer:v2
         name: matching-producer
         imagePullPolicy: Always
         resources: {}
@@ -29,6 +29,11 @@ spec:
             valueFrom:
               configMapKeyRef:
                 key: AMQP_SERVER_URL
+                name: configmap
+          - name: AGW_URL
+            valueFrom:
+              configMapKeyRef:
+                key: API_GATEWAY_URL
                 name: configmap
 status: {}
 ---

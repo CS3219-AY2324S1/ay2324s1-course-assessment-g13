@@ -18,12 +18,23 @@ spec:
         app: collaboration-service
     spec:
       containers:
-      - image: gcr.io/smooth-research-397708/collaboration-service:v1
+      - image: gcr.io/smooth-research-397708/collaboration-service:v2
         name: collaboration-service
         imagePullPolicy: Always
         resources: {}
         ports:
-          - containerPort: 8080 
+          - containerPort: 8080
+        env:
+          - name: QUESTION_SERVICE_URL
+            valueFrom:
+              configMapKeyRef:
+                key: QUESTION_SERVICE_URL
+                name: configmap
+          - name: USER_SERVICE_URL
+            valueFrom:
+              configMapKeyRef:
+                key: USER_SERVICE_URL
+                name: configmap
 status: {}
 ---
 apiVersion: v1

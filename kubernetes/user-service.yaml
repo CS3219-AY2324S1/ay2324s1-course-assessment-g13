@@ -18,7 +18,7 @@ spec:
         app: user-service
     spec:
       containers:
-      - image: gcr.io/smooth-research-397708/user-service:v1
+      - image: gcr.io/smooth-research-397708/user-service:v2
         name: user-service
         imagePullPolicy: Always
         resources: {}

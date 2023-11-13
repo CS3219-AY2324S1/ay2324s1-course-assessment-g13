@@ -6,7 +6,7 @@ metadata:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
-    nginx.ingress.kubernetes.io/rewrite-target: /$2$3
+    nginx.ingress.kubernetes.io/rewrite-target: /$2$3$4
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
 spec:
@@ -14,6 +14,20 @@ spec:
   - host: "34.143.144.123.nip.io"
     http:
       paths:
+      - pathType: ImplementationSpecific
+        path: /api/()(auth/register|auth/signup|auth/login|auth/logout|auth/refresh|auth/user|auth/users)(/|$)(.*)
+        backend:
+          service:
+            name: api-gateway-service
+            port:
+              number: 80
+      - pathType: ImplementationSpecific
+        path: /()(api/auth/)(.*)
+        backend:
+          service:
+            name: frontend
+            port:
+              number: 80
       - pathType: ImplementationSpecific
         path: /api(/|$)(.*) # rewrites /api/hello to /hello
         backend:

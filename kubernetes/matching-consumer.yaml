@@ -18,7 +18,7 @@ spec:
         app: matching-consumer
     spec:
       containers:
-      - image: gcr.io/smooth-research-397708/matching-consumer:v1
+      - image: gcr.io/smooth-research-397708/matching-consumer:v2
         name: matching-consumer
         imagePullPolicy: Always
         resources: {}
@@ -34,6 +34,11 @@ spec:
             valueFrom:
               configMapKeyRef:
                 key: COLLABORATION_SERVICE_URL
+                name: configmap
+          - name: RMQ_QUEUE_URL
+            valueFrom:
+              configMapKeyRef:
+                key: RMQ_QUEUE_URL
                 name: configmap
 status: {}
 ---
