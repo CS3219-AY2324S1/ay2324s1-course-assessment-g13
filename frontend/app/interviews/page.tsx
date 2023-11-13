@@ -11,6 +11,7 @@ export default function Interviews() {
   const [isCancelled, setIsCancelled] = useState(false);
   const [shouldNotifyCancelled, setShouldNotifyCancelled] = useState(false);
   const [seconds, setSeconds] = useState(0);
+  const [active, setActive] = useState(false);
   const userPreference = useSelector(selectPreferenceState);
   const timeLimit = 30;
 
@@ -40,6 +41,14 @@ export default function Interviews() {
       clearInterval(timer);
     };
   }, [inQueue, seconds]);
+
+  useEffect(() => {
+    if (active) {
+      setTimeout(() => {
+        setActive(false)
+      }, 3000);
+    }
+  });
 
   return (
     <>
@@ -80,6 +89,8 @@ export default function Interviews() {
           matchNotfound={matchNotfound}
           setIsCancelled={setIsCancelled}
           setShouldNotifyCancelled={setShouldNotifyCancelled}
+          active={active}
+          setActive={setActive}
         />
       </div>
     </>

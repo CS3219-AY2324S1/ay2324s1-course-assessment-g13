@@ -83,10 +83,8 @@ func SpinMQConsumer(criteria utils.MatchCriteria) {
 
 		// Worker polls queue every 1 second
 		for {
-			hasJustBroke := false
 			// Get current MQ length
 			queueSize := rmq.GetLocalQueueSize(string(criteria))
-			log.Printf("Actual size of %s queue: %d\n", string(criteria), queueSize)
 			// If queue has sufficient people queued up
 			if queueSize >= 2 {
 				// Check if request channel is being consumed via sync channel
@@ -230,22 +228,14 @@ func SpinMQConsumer(criteria utils.MatchCriteria) {
 								log.Fatal(msg)
 								return
 							}
-							log.Printf("Worker (%s) breaking out of syncMsg queue\n", criteria)
 							break
 						}
-						log.Printf("Worker (%s) breaking out of msg:Messages queue\n", criteria)
-						hasJustBroke = true
 						break // Break out of the message consumption loop
 					}
 				}
 			}
-			if hasJustBroke {
-				log.Printf("Worker (%s) broke out using just_test\n", criteria)
-				time.Sleep(time.Second * 1)
-			} else {
-				// 1 second interval polling
-				time.Sleep(time.Second * 1)
-			}
+			// 1 second interval polling
+			time.Sleep(time.Second * 1)
 		}
 	}()
 }
