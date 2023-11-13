@@ -22,6 +22,29 @@ For production, we are using `Dockerfile.prod` for all services. These files emp
 a multistage build process which ensures the final image is lean and only contains
 the minimum amount of files to containerise the service.  
 
+## Google Cloud CLI helpful commands
+**To use kubectl with a specific project**
+```shell
+gcloud container clusters get-credentials ${CLUSTER_NAME} \
+--project=${PROJECT} \
+--region=${REGION}
+```
+For the purpose of this project, an example of the above command would be
+```shell
+gcloud container clusters get-credentials peerpreps --project=smooth-research-397708 --region=asia-southeast1
+```
+
+Now, you can run commands like:
+- `kubectl get nodes`: Gets the nodes available in your cluster
+- `kubectl get deployments`: Track status of deployments
+- `kubectl get pod`: See pods created by deployment
+- `kubectl get services`: Get all services
+
+**Gets the project ID**
+```shell
+gcloud config get-value project
+```
+
 ## FAQ / Troubleshooting
 1. Running `docker compose up --build` returns a "database service unhealthy" error and terminates.
     > Simply rerun the command and this issue should go away. The reason for this is because the script
