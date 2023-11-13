@@ -31,9 +31,18 @@ func MatchHandler(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	// Retrieves the appropriate channel to publish the user into
-	var channel *amqp.Channel
+	var criteriaChannel *amqp.Channel
 	if curr, ok := rmq.OpenChannelsMap[utils.MatchCriteria(strings.ToLower(requestBody.MatchCriteria))]; ok {
-		channel = curr
+		criteriaChannel = curr
+	} else {
+		msg := fmt.Sprintf("[MatchHandler] Criteria to match is unknown | ok: %v", ok)
+		log.Println(msg)
+		return c.JSON(http.StatusBadRequest, "Unknown matching criteria")
+	}
+
+	var lengthChannel *amqp.Channel
+	if curr, ok := rmq.LengthChannelsMap[utils.MatchCriteria(strings.ToLower(requestBody.MatchCriteria))]; ok {
+		lengthChannel = curr
 	} else {
 		msg := fmt.Sprintf("[MatchHandler] Criteria to match is unknown | ok: %v", ok)
 		log.Println(msg)
@@ -53,7 +62,7 @@ func MatchHandler(c echo.Context) error {
 	}
 
 	// Publishes the user request into the selected MQ
-	err = channel.PublishWithContext(
+	err = criteriaChannel.PublishWithContext(
 		ctx,
 		"",                        // exchange
 		requestBody.MatchCriteria, // queue name
@@ -62,6 +71,33 @@ func MatchHandler(c echo.Context) error {
 		amqp.Publishing{
 			ContentType: "text/plain",
 			Body:        serialPkt, // message to publish
+		},
+	)
+
+	lengthExchangeName := "length" + string(requestBody.MatchCriteria)
+
+	lengthMsgPacket := models.MessageQueueLengthRequest{
+		Increment:     1,
+		MatchCriteria: requestBody.MatchCriteria,
+	}
+
+	serialLengthPkt, err := json.Marshal(lengthMsgPacket)
+	if err != nil {
+		msg := fmt.Sprintf("[MatchHandler] Error marshalling length packet | err: %v", err)
+		log.Println(msg)
+		return err
+	}
+
+	// Publishes size of 1 into criteria length channel for consumer to see
+	err = lengthChannel.PublishWithContext(
+		ctx,
+		lengthExchangeName,
+		"",
+		false,
+		false,
+		amqp.Publishing{
+			ContentType: "text/plain",
+			Body:        serialLengthPkt,
 		},
 	)
 	if err != nil {
@@ -131,7 +167,7 @@ func MatchHandler(c echo.Context) error {
 				if utils.IsUserCancelled(matchedUser, requestBody.MatchCriteria) {
 					log.Printf("User is already out of queue: %s\n", matchedUser)
 					// Publishes the user request into the selected MQ
-					err = channel.PublishWithContext(
+					err = criteriaChannel.PublishWithContext(
 						ctx,
 						"",                        // exchange
 						requestBody.MatchCriteria, // queue name
@@ -182,6 +218,33 @@ func MatchHandler(c echo.Context) error {
 		case <-ctxTimer.Done():
 			log.Println("30 seconds timer hit on producer side")
 			// Remove user from queue
+			lengthMsgPacket := models.MessageQueueLengthRequest{
+				Increment:     -1,
+				MatchCriteria: requestBody.MatchCriteria,
+			}
+			serialLengthPkt, err := json.Marshal(lengthMsgPacket)
+			if err != nil {
+				msg := fmt.Sprintf("[Init | Cancel] Error marshalling length packet | err: %v", err)
+				log.Println(msg)
+				panic(err)
+			}
+			// Publishes size of 1 into criteria length channel for consumer to see
+			err = lengthChannel.PublishWithContext(
+				context.Background(),
+				lengthExchangeName,
+				"",
+				false,
+				false,
+				amqp.Publishing{
+					ContentType: "text/plain",
+					Body:        serialLengthPkt,
+				},
+			)
+			if err != nil {
+				msg := fmt.Sprintf("[MatchHandler] Error publishing message | err: %v", err)
+				fmt.Println(msg)
+				panic(err)
+			}
 			utils.CancelUser(requestBody.Username, requestBody.MatchCriteria)
 			<-syncChan // Reads from sync channel to allow goroutine listening to result to break out of loop
 			shouldBreak = true
@@ -193,6 +256,33 @@ func MatchHandler(c echo.Context) error {
 				MatchStatus:  1,
 				RoomId:       res.RoomId,
 				ErrorMessage: "",
+			}
+			lengthMsgPacket := models.MessageQueueLengthRequest{
+				Increment:     -1,
+				MatchCriteria: requestBody.MatchCriteria,
+			}
+			serialLengthPkt, err := json.Marshal(lengthMsgPacket)
+			if err != nil {
+				msg := fmt.Sprintf("[Init | Cancel] Error marshalling length packet | err: %v", err)
+				log.Println(msg)
+				panic(err)
+			}
+			// Publishes size of 1 into criteria length channel for consumer to see
+			err = lengthChannel.PublishWithContext(
+				context.Background(),
+				lengthExchangeName,
+				"",
+				false,
+				false,
+				amqp.Publishing{
+					ContentType: "text/plain",
+					Body:        serialLengthPkt,
+				},
+			)
+			if err != nil {
+				msg := fmt.Sprintf("[MatchHandler] Error publishing message | err: %v", err)
+				fmt.Println(msg)
+				panic(err)
 			}
 			return c.JSON(http.StatusOK, matchResponseBody)
 		}

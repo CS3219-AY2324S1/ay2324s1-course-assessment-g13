@@ -14,6 +14,8 @@ import (
 
 var OpenChannelsMap map[utils.MatchCriteria]*amqp.Channel
 var SyncChannelsMap map[utils.MatchCriteria]*amqp.Channel
+var LengthChannelsMap map[utils.MatchCriteria]*amqp.Channel
+var QueueLengthMap map[utils.MatchCriteria]int
 var ResultChannel *amqp.Channel
 var Conn *amqp.Connection
 
@@ -100,6 +102,39 @@ func Init() {
 		log.Println(msg)
 		panic(err)
 	}
+
+	// Constructs length MQ
+	LengthChannelsMap = make(map[utils.MatchCriteria]*amqp.Channel, 4)
+	QueueLengthMap = make(map[utils.MatchCriteria]int, 4)
+
+	for _, channelType := range utils.MatchCriterias {
+		exchangeName := "length" + string(channelType)
+		lengthChannelMQ, err := connectRabbitMQ.Channel()
+		if err != nil {
+			msg := fmt.Sprintf("[Init] Error creating unique criteria MQ length channel | err: %v", err)
+			log.Println(msg)
+			panic(err)
+		}
+
+		LengthChannelsMap[channelType] = lengthChannelMQ
+
+		// Declare length exchange
+		err = lengthChannelMQ.ExchangeDeclare(
+			exchangeName,
+			amqp.ExchangeFanout, // type
+			true,                // durable
+			false,               // auto-deleted
+			false,               // internal
+			false,               // no-wait
+			nil,                 // arguments
+		)
+		if err != nil {
+			msg := fmt.Sprintf("[Init] Error declaring length exchange for %s | err: %v", err, string(channelType))
+			log.Println(msg)
+			panic(err)
+		}
+	}
+
 }
 
 func Reset() {
@@ -164,4 +199,8 @@ func GetQueueSize(queueName string) int64 {
 		log.Fatal(msg)
 	}
 	return queueSizeResponse.MessageStats.Publish - queueSizeResponse.MessageStats.Ack
+}
+
+func GetLocalQueueSize(queueName string) int64 {
+	return int64(QueueLengthMap[utils.MatchCriteria(queueName)])
 }
