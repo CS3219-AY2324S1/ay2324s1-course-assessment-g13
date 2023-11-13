@@ -7,3 +7,8 @@ type MessageQueueRequestPacket struct {
 type MessageQueueResponsePacket struct {
 	ResponseBody MatchResponse `json:"response_body"`
 }
+
+type MessageQueueLengthRequest struct {
+	Increment     int    `json:"increment"`
+	MatchCriteria string `json:"match_criteria"`
+}

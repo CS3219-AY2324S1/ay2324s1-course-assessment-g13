@@ -9,6 +9,7 @@ import (
 )
 
 var OpenChannelsMap map[utils.MatchCriteria]*amqp.Channel
+var LengthChannelsMap map[utils.MatchCriteria]*amqp.Channel
 var ResultChannel *amqp.Channel
 var CancelChannel *amqp.Channel
 var Conn *amqp.Connection
@@ -77,6 +78,37 @@ func Init() {
 		panic(err)
 	}
 
+	LengthChannelsMap = make(map[utils.MatchCriteria]*amqp.Channel, 4)
+
+	// Constructs length MQ
+	for _, channelType := range utils.MatchCriterias {
+		exchangeName := "length" + string(channelType)
+		lengthChannelMQ, err := connectRabbitMQ.Channel()
+		if err != nil {
+			msg := fmt.Sprintf("[Init] Error creating unique criteria MQ length channel | err: %v", err)
+			log.Println(msg)
+			panic(err)
+		}
+
+		LengthChannelsMap[channelType] = lengthChannelMQ
+
+		// Declare length exchange
+		err = lengthChannelMQ.ExchangeDeclare(
+			exchangeName,
+			amqp.ExchangeFanout, // type
+			true,                // durable
+			false,               // auto-deleted
+			false,               // internal
+			false,               // no-wait
+			nil,                 // arguments
+		)
+		if err != nil {
+			msg := fmt.Sprintf("[Init] Error declaring length exchange for %s | err: %v", err, string(channelType))
+			log.Println(msg)
+			panic(err)
+		}
+	}
+
 	// Constructs cancel MQ
 	cancelMQ, err := connectRabbitMQ.Channel()
 	if err != nil {
@@ -100,7 +132,7 @@ func Init() {
 		log.Println(msg)
 		panic(err)
 	}
-	declaredCancelQueue, err := ResultChannel.QueueDeclare(
+	declaredCancelQueue, err := CancelChannel.QueueDeclare(
 		"cancelQueue", // name
 		false,         // durable
 		false,         // delete when unused
@@ -114,7 +146,7 @@ func Init() {
 		panic(err)
 	}
 
-	err = ResultChannel.QueueBind(
+	err = CancelChannel.QueueBind(
 		declaredCancelQueue.Name, // queue name
 		"",                       // routing key
 		"cancels",                // exchange
@@ -135,6 +167,15 @@ func Reset() {
 		err = openChannel.Close()
 		if err != nil {
 			msg := fmt.Sprintf("[Reset] Error closing criteria channels | err: %v", err)
+			log.Println(msg)
+			panic(err)
+		}
+	}
+
+	for _, lengthChannel := range LengthChannelsMap {
+		err = lengthChannel.Close()
+		if err != nil {
+			msg := fmt.Sprintf("[Reset] Error closing length channels | err: %v", err)
 			log.Println(msg)
 			panic(err)
 		}

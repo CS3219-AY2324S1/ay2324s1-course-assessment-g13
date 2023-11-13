@@ -8,6 +8,7 @@ import (
 
 func main() {
 	rmq.Init()
+	rmq.RunQueueListeners()
 	defer rmq.Reset()
 	forever := make(chan bool)
 

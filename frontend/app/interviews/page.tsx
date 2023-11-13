@@ -11,6 +11,7 @@ export default function Interviews() {
   const [isCancelled, setIsCancelled] = useState(false);
   const [shouldNotifyCancelled, setShouldNotifyCancelled] = useState(false);
   const [seconds, setSeconds] = useState(0);
+  const [active, setActive] = useState(false);
   const userPreference = useSelector(selectPreferenceState);
   const timeLimit = 30;
 
@@ -41,13 +42,23 @@ export default function Interviews() {
     };
   }, [inQueue, seconds]);
 
+  useEffect(() => {
+    if (active) {
+      setTimeout(() => {
+        setActive(false)
+      }, 3000);
+    }
+  });
+
   return (
     <>
       <div className="mx-auto px-6 max-w-7xl flex flex-col justify-center text-center my-12">
         <div className="flex justify-between items-center mb-5">
           <span className="text-3xl">Interviews</span>
           <span className="text-2xl">Current Preference: {userPreference}</span>
-          <SetPreferencesModal />
+          <SetPreferencesModal
+              inQueue={inQueue}
+          />
         </div>
         {!inQueue && (
           <div>
@@ -80,6 +91,8 @@ export default function Interviews() {
           matchNotfound={matchNotfound}
           setIsCancelled={setIsCancelled}
           setShouldNotifyCancelled={setShouldNotifyCancelled}
+          active={active}
+          setActive={setActive}
         />
       </div>
     </>

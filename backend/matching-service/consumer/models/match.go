@@ -4,13 +4,13 @@ type MessageQueueRequestPacket struct {
 	RequestBody MatchRequest `json:"request_body"`
 }
 
+type MessageQueueResponsePacket struct {
+	ResponseBody MatchResponse `json:"response_body"`
+}
+
 type MatchRequest struct {
 	Username      string `json:"username"`
 	MatchCriteria string `json:"match_criteria"`
-}
-
-type MessageQueueResponsePacket struct {
-	ResponseBody MatchResponse `json:"response_body"`
 }
 
 type MatchResponse struct {
@@ -27,4 +27,9 @@ type MessageQueueLengthResponse struct {
 type MessageStatsStruct struct {
 	Ack     int64 `json:"ack"`
 	Publish int64 `json:"publish"`
+}
+
+type MessageQueueLengthRequest struct {
+	Increment     int    `json:"increment"`
+	MatchCriteria string `json:"match_criteria"`
 }

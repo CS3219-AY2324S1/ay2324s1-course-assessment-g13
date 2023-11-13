@@ -11,6 +11,7 @@ import (
 	"producer/models"
 	"producer/rmq"
 	"producer/utils"
+	"strings"
 )
 
 var UserToChanMap map[string]chan bool
@@ -97,6 +98,43 @@ func Init() {
 			}
 			log.Println("Cancelling user after message consumption!!!")
 			utils.CancelUser(recvdPkt.RequestBody.Username, recvdPkt.RequestBody.MatchCriteria)
+
+			var lengthChannel *amqp.Channel
+			if curr, ok := rmq.LengthChannelsMap[utils.MatchCriteria(strings.ToLower(recvdPkt.RequestBody.MatchCriteria))]; ok {
+				lengthChannel = curr
+			} else {
+				msg := fmt.Sprintf("[Init | Cancel] Criteria to match is unknown | ok: %v", ok)
+				log.Println(msg)
+				panic(err)
+			}
+			lengthExchangeName := "length" + string(recvdPkt.RequestBody.MatchCriteria)
+			lengthMsgPacket := models.MessageQueueLengthRequest{
+				Increment:     -1,
+				MatchCriteria: recvdPkt.RequestBody.MatchCriteria,
+			}
+			serialLengthPkt, err := json.Marshal(lengthMsgPacket)
+			if err != nil {
+				msg := fmt.Sprintf("[Init | Cancel] Error marshalling length packet | err: %v", err)
+				log.Println(msg)
+				panic(err)
+			}
+			// Publishes size of 1 into criteria length channel for consumer to see
+			err = lengthChannel.PublishWithContext(
+				context.Background(),
+				lengthExchangeName,
+				"",
+				false,
+				false,
+				amqp.Publishing{
+					ContentType: "text/plain",
+					Body:        serialLengthPkt,
+				},
+			)
+			if err != nil {
+				msg := fmt.Sprintf("[MatchHandler] Error publishing message | err: %v", err)
+				fmt.Println(msg)
+				panic(err)
+			}
 		}
 	}()
 }

@@ -5,8 +5,9 @@ import {selectPreferenceState} from "../libs/redux/slices/matchPreferenceSlice";
 import {POST} from "../libs/axios/axios";
 import {selectUsername} from "../libs/redux/slices/userSlice";
 import { useRouter } from 'next/navigation';
+import {useState} from "react";
 
-export default function MatchButton({inQueue, setInQueue, setSeconds, matchNotfound, setIsCancelled, setShouldNotifyCancelled}) {
+export default function MatchButton({inQueue, setInQueue, setSeconds, matchNotfound, setIsCancelled, setShouldNotifyCancelled, active, setActive}) {
   const preferenceState = useSelector(selectPreferenceState)
   const userState = useSelector(selectUsername);
   const router = useRouter();
@@ -20,6 +21,7 @@ export default function MatchButton({inQueue, setInQueue, setSeconds, matchNotfo
         const payload = r.data;
         // If there is a match, notify success and redirect
         if (payload["match_user"] != "") {
+          setActive(true)
           notifySuccess(`Matched with ${payload["match_user"]}, redirecting to collaboration room...`);
           setInQueue(false);
           setSeconds(0);
@@ -35,11 +37,12 @@ export default function MatchButton({inQueue, setInQueue, setSeconds, matchNotfo
     });
   }
 
-  const redirectToCollab = (room_id : string) => {  
+  const redirectToCollab = (room_id : string) => {
     // Just to match with toast timer, preference whether to instant redirect or not
     const redirectTimer = setTimeout(() => {
       router.push(`/collab/?room_id=${room_id}`);
     }, 1000);
+
     return () => {
       clearTimeout(redirectTimer);
     }
@@ -78,6 +81,7 @@ export default function MatchButton({inQueue, setInQueue, setSeconds, matchNotfo
         fullWidth={true}
         onPress={startQueue}
         isLoading={inQueue}
+        isDisabled={active}
       >
         {inQueue ? 'Matching' : 'Match'}
       </Button>

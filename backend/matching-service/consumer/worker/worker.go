@@ -1,19 +1,19 @@
 package worker
 
 import (
+	"bytes"
 	"consumer/models"
 	"consumer/rmq"
 	"consumer/utils"
 	"context"
 	"encoding/json"
 	"fmt"
+	amqp "github.com/rabbitmq/amqp091-go"
+	"log"
 	"net/http"
 	"os"
 	// "io"
 	"strings"
-	"bytes"
-	amqp "github.com/rabbitmq/amqp091-go"
-	"log"
 	"time"
 )
 
@@ -84,7 +84,8 @@ func SpinMQConsumer(criteria utils.MatchCriteria) {
 		// Worker polls queue every 1 second
 		for {
 			// Get current MQ length
-			queueSize := rmq.GetQueueSize(string(criteria))
+			queueSize := rmq.GetLocalQueueSize(string(criteria))
+			//log.Printf("Size of %s queue is now %d\n", string(criteria), queueSize)
 			// If queue has sufficient people queued up
 			if queueSize >= 2 {
 				// Check if request channel is being consumed via sync channel
