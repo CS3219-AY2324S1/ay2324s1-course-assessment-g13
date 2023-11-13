@@ -85,7 +85,6 @@ func SpinMQConsumer(criteria utils.MatchCriteria) {
 		for {
 			// Get current MQ length
 			queueSize := rmq.GetLocalQueueSize(string(criteria))
-			//log.Printf("Size of %s queue is now %d\n", string(criteria), queueSize)
 			// If queue has sufficient people queued up
 			if queueSize >= 2 {
 				// Check if request channel is being consumed via sync channel
@@ -235,8 +234,8 @@ func SpinMQConsumer(criteria utils.MatchCriteria) {
 					}
 				}
 			}
-			// 1 second interval polling
-			time.Sleep(time.Second * 1)
+			// 2 second interval polling
+			time.Sleep(time.Second * 2)
 		}
 	}()
 }

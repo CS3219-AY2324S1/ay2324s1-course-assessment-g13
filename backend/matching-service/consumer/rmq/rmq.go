@@ -157,6 +157,15 @@ func Reset() {
 		}
 	}
 
+	for _, lengthChannel := range LengthChannelsMap {
+		err = lengthChannel.Close()
+		if err != nil {
+			msg := fmt.Sprintf("[Reset] Error closing length channels | err: %v", err)
+			log.Println(msg)
+			panic(err)
+		}
+	}
+
 	err = Conn.Close()
 	if err != nil {
 		msg := fmt.Sprintf("[Reset] Error closing TCP connection | err: %v", err)

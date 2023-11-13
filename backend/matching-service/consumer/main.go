@@ -4,6 +4,7 @@ import (
 	"consumer/rmq"
 	"consumer/utils"
 	"consumer/worker"
+	"log"
 )
 
 func main() {
@@ -16,6 +17,8 @@ func main() {
 	for _, criteria := range utils.MatchCriterias {
 		worker.SpinMQConsumer(criteria)
 	}
+
+	log.Printf("Matching consumer service has started!\n")
 
 	<-forever
 }
