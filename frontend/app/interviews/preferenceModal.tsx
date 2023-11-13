@@ -19,7 +19,7 @@ import { Preference } from '../types/preference';
 import {useDispatch} from "react-redux";
 import {setPreference} from "../libs/redux/slices/matchPreferenceSlice";
 
-export default function SetPreferencesModal() {
+export default function SetPreferencesModal({inQueue}) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   // const categories = Object.values(Category);
   const complexities = Object.values(Complexity);
@@ -46,7 +46,7 @@ export default function SetPreferencesModal() {
 
   return (
     <>
-      <Button color="primary" variant="ghost" className="text-lg py-5" onPress={onOpen}>
+      <Button isDisabled={inQueue} color="primary" variant="ghost" className="text-lg py-5" onPress={onOpen}>
         Set Preferences
       </Button>
       <Modal

@@ -56,7 +56,9 @@ export default function Interviews() {
         <div className="flex justify-between items-center mb-5">
           <span className="text-3xl">Interviews</span>
           <span className="text-2xl">Current Preference: {userPreference}</span>
-          <SetPreferencesModal />
+          <SetPreferencesModal
+              inQueue={inQueue}
+          />
         </div>
         {!inQueue && (
           <div>
