@@ -166,7 +166,7 @@ func MatchHandler(c echo.Context) error {
 				matchedUser := packetResponse.ResponseBody.MatchUser
 				// Check if matched user is already out of queue
 				if utils.IsUserCancelled(matchedUser, requestBody.MatchCriteria) {
-					log.Printf("User is already out of queue: %s\n", matchedUser)
+					log.Printf("Matched User %s is already out of queue, publishing %s back into %s queue\n", matchedUser, requestBody.Username, requestBody.MatchCriteria)
 					// Publishes the user request into the selected MQ
 					err = criteriaChannel.PublishWithContext(
 						ctx,
@@ -209,7 +209,7 @@ func MatchHandler(c echo.Context) error {
 		select {
 		// User cancelled, so terminate listener
 		case <-userCancelChan:
-			log.Println("User manually cancelled on producer side")
+			log.Printf("User %s manually cancelled on producer side\n", requestBody.Username)
 			// Remove user from queue
 			utils.CancelUser(requestBody.Username, requestBody.MatchCriteria)
 			<-syncChan // Reads from sync channel to allow goroutine listening to result to break out of loop
@@ -217,7 +217,7 @@ func MatchHandler(c echo.Context) error {
 			break
 		// 30 seconds timer hit
 		case <-ctxTimer.Done():
-			log.Println("30 seconds timer hit on producer side")
+			log.Printf("30 seconds timer hit on producer side for %s\n", requestBody.Username)
 			// Remove user from queue
 			lengthMsgPacket := models.MessageQueueLengthRequest{
 				Increment:     -1,
