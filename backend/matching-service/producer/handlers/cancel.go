@@ -43,7 +43,7 @@ func UserCancelHandler(c echo.Context) error {
 
 	err = rmq.CancelChannel.PublishWithContext(
 		ctx,
-		"cancels",
+		rmq.CancelExchange,
 		"",    // routing key
 		false, // mandatory
 		false, // immediate
@@ -72,13 +72,13 @@ func Init() {
 	UserToChanMap = make(map[string]chan bool)
 	go func() {
 		messages, err := rmq.CancelChannel.Consume(
-			"cancelQueue", // queue
-			"",            // consumer
-			true,          // auto-ack
-			false,         // exclusive
-			false,         // no-local
-			false,         // no-wait
-			nil,           // args
+			rmq.CancelQueueName, // queue
+			"",                  // consumer
+			true,                // auto-ack
+			false,               // exclusive
+			false,               // no-local
+			false,               // no-wait
+			nil,                 // args
 		)
 		if err != nil {
 			msg := fmt.Sprintf("[Init] Error consuming from cancel queue | err: %v", err)

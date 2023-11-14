@@ -12,7 +12,14 @@ var OpenChannelsMap map[utils.MatchCriteria]*amqp.Channel
 var LengthChannelsMap map[utils.MatchCriteria]*amqp.Channel
 var ResultChannel *amqp.Channel
 var CancelChannel *amqp.Channel
+var InQueueChannel *amqp.Channel
 var Conn *amqp.Connection
+
+const CancelQueueName = "cancelQueue"
+const InQueueName = "inQueueQueue"
+
+const CancelExchange = "cancels"
+const InQueueExchange = "inqueue"
 
 // Init Initialises all required connection and channels based on the MatchCriteria
 // defined within the utils folder
@@ -119,7 +126,7 @@ func Init() {
 	CancelChannel = cancelMQ
 	// Declare cancel exchange
 	err = CancelChannel.ExchangeDeclare(
-		"cancels",           // name
+		CancelExchange,      // name
 		amqp.ExchangeFanout, // type
 		true,                // durable
 		false,               // auto-deleted
@@ -133,12 +140,12 @@ func Init() {
 		panic(err)
 	}
 	declaredCancelQueue, err := CancelChannel.QueueDeclare(
-		"cancelQueue", // name
-		false,         // durable
-		false,         // delete when unused
-		true,          // exclusive
-		false,         // no-wait
-		nil,           // arguments
+		CancelQueueName, // name
+		false,           // durable
+		false,           // delete when unused
+		true,            // exclusive
+		false,           // no-wait
+		nil,             // arguments
 	)
 	if err != nil {
 		msg := fmt.Sprintf("[Init] Error declaring cancel queue | err: %v", err)
@@ -149,12 +156,62 @@ func Init() {
 	err = CancelChannel.QueueBind(
 		declaredCancelQueue.Name, // queue name
 		"",                       // routing key
-		"cancels",                // exchange
+		CancelExchange,           // exchange
 		false,
 		nil,
 	)
 	if err != nil {
 		msg := fmt.Sprintf("[Init] Error binding cancel queue to exchange | err: %v", err)
+		log.Println(msg)
+		panic(err)
+	}
+
+	// Constructs InQueue MQ
+	inQueueMQ, err := connectRabbitMQ.Channel()
+	if err != nil {
+		msg := fmt.Sprintf("[Init] Error creating unique inQueue channel | err: %v", err)
+		log.Println(msg)
+		panic(err)
+	}
+	InQueueChannel = inQueueMQ
+	// Declare cancel exchange
+	err = InQueueChannel.ExchangeDeclare(
+		InQueueExchange,     // name
+		amqp.ExchangeFanout, // type
+		true,                // durable
+		false,               // auto-deleted
+		false,               // internal
+		false,               // no-wait
+		nil,                 // arguments
+	)
+	if err != nil {
+		msg := fmt.Sprintf("[Init] Error declaring inQueue exchange | err: %v", err)
+		log.Println(msg)
+		panic(err)
+	}
+	declaredInQueueQueue, err := InQueueChannel.QueueDeclare(
+		InQueueName, // name
+		false,       // durable
+		false,       // delete when unused
+		true,        // exclusive
+		false,       // no-wait
+		nil,         // arguments
+	)
+	if err != nil {
+		msg := fmt.Sprintf("[Init] Error declaring inQueue queue | err: %v", err)
+		log.Println(msg)
+		panic(err)
+	}
+
+	err = InQueueChannel.QueueBind(
+		declaredInQueueQueue.Name, // queue name
+		"",                        // routing key
+		InQueueExchange,           // exchange
+		false,
+		nil,
+	)
+	if err != nil {
+		msg := fmt.Sprintf("[Init] Error binding inQueue queue to exchange | err: %v", err)
 		log.Println(msg)
 		panic(err)
 	}
@@ -198,6 +255,13 @@ func Reset() {
 	err = CancelChannel.Close()
 	if err != nil {
 		msg := fmt.Sprintf("[Reset] Error closing cancel channel | err: %v", err)
+		log.Println(msg)
+		panic(err)
+	}
+
+	err = InQueueChannel.Close()
+	if err != nil {
+		msg := fmt.Sprintf("[Reset] Error closing inQueue channel | err: %v", err)
 		log.Println(msg)
 		panic(err)
 	}

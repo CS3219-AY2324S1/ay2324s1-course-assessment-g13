@@ -18,7 +18,8 @@ func main() {
 	defer rmq.Reset()
 
 	handlers.Init()
-	utils.Init()
+	utils.InitCancelTracker()
+	handlers.InitQueueTracker()
 
 	e := echo.New()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
