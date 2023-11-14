@@ -34,14 +34,14 @@ export default function SetPreferencesModal({inQueue}) {
   } = useForm();
 
   const onSubmit = handleSubmit((data : Preference) => {
-    // const modifiedData = {
-    //   // categories: (data.categories as string).split(',') as Category[],
-    //   complexities: (data.complexities as string).split(',') as Complexity[],
-    // };
-    dispatch(setPreference(data.complexities as Complexity));
-    notifySuccess("Preferences Set!");
-    onOpenChange();
-    reset();
+      if (data.complexities == "") {
+          reset()
+      } else {
+          dispatch(setPreference(data.complexities as Complexity));
+          notifySuccess("Preferences Set!");
+          onOpenChange();
+          reset();
+      }
   });
 
   return (
