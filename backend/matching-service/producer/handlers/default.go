@@ -37,6 +37,7 @@ func MatchHandler(c echo.Context) error {
 
 	// Removes the user from our cancel buffer if they have previously tried to match and got cancelled
 	utils.ResetUser(requestBody.Username, requestBody.MatchCriteria)
+	RemoveUserFromQueueImmediate(requestBody.Username)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
@@ -50,6 +51,36 @@ func MatchHandler(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, "Unknown matching criteria")
 	}
 
+	userQueueUpdate := models.MessageQueueInQueuePacket{
+		Username: requestBody.Username,
+		Config:   "",
+	}
+
+	SetUserInQueue(requestBody.Username)
+	userQueueUpdate.Config = utils.Queue
+	serialQueueUpdatePkt, err := json.Marshal(userQueueUpdate)
+	if err != nil {
+		msg := fmt.Sprintf("[MatchHandler] Error marshalling inQueue packet | err: %v", err)
+		log.Println(msg)
+		return err
+	}
+	err = rmq.InQueueChannel.PublishWithContext(
+		ctx,
+		rmq.InQueueExchange,
+		"",
+		false,
+		false,
+		amqp.Publishing{
+			ContentType: "text/plain",
+			Body:        serialQueueUpdatePkt,
+		},
+	)
+	if err != nil {
+		msg := fmt.Sprintf("[MatchHandler] Error publishing inQueue message | err: %v", err)
+		fmt.Println(msg)
+		return err
+	}
+
 	msgPacket := models.MessageQueueRequestPacket{
 		RequestBody: requestBody,
 	}
@@ -61,6 +92,8 @@ func MatchHandler(c echo.Context) error {
 		log.Println(msg)
 		return err
 	}
+
+	log.Printf("Producer has received a find request from %s for criteria %s\n", requestBody.Username, requestBody.MatchCriteria)
 
 	// Publishes the user request into the selected MQ
 	err = criteriaChannel.PublishWithContext(
@@ -165,8 +198,9 @@ func MatchHandler(c echo.Context) error {
 				}
 				matchedUser := packetResponse.ResponseBody.MatchUser
 				// Check if matched user is already out of queue
-				if utils.IsUserCancelled(matchedUser, requestBody.MatchCriteria) {
-					log.Printf("User is already out of queue: %s\n", matchedUser)
+				if utils.IsUserCancelled(matchedUser, requestBody.MatchCriteria) || !IsUserInQueue(matchedUser) {
+					log.Printf("Matched User %s | Out of queue: %v | inQueue: %v, publishing %s back into %s queue\n", matchedUser,
+						utils.IsUserCancelled(matchedUser, requestBody.MatchCriteria), !IsUserInQueue(matchedUser), requestBody.Username, requestBody.MatchCriteria)
 					// Publishes the user request into the selected MQ
 					err = criteriaChannel.PublishWithContext(
 						ctx,
@@ -209,15 +243,42 @@ func MatchHandler(c echo.Context) error {
 		select {
 		// User cancelled, so terminate listener
 		case <-userCancelChan:
-			log.Println("User manually cancelled on producer side")
+			log.Printf("User %s manually cancelled on producer side\n", requestBody.Username)
+
+			RemoveUserFromQueueImmediate(requestBody.Username)
+			userQueueUpdate.Config = utils.Immediate
+			serialQueueUpdatePkt, err := json.Marshal(userQueueUpdate)
+			if err != nil {
+				msg := fmt.Sprintf("[MatchHandler] Error marshalling inQueue packet | err: %v", err)
+				log.Println(msg)
+				return err
+			}
+			err = rmq.InQueueChannel.PublishWithContext(
+				ctx,
+				rmq.InQueueExchange,
+				"",
+				false,
+				false,
+				amqp.Publishing{
+					ContentType: "text/plain",
+					Body:        serialQueueUpdatePkt,
+				},
+			)
+			if err != nil {
+				msg := fmt.Sprintf("[MatchHandler] Error publishing inQueue message | err: %v", err)
+				fmt.Println(msg)
+				return err
+			}
+
 			// Remove user from queue
 			utils.CancelUser(requestBody.Username, requestBody.MatchCriteria)
+
 			<-syncChan // Reads from sync channel to allow goroutine listening to result to break out of loop
 			shouldBreak = true
 			break
 		// 30 seconds timer hit
 		case <-ctxTimer.Done():
-			log.Println("30 seconds timer hit on producer side")
+			log.Printf("30 seconds timer hit on producer side for %s\n", requestBody.Username)
 			// Remove user from queue
 			lengthMsgPacket := models.MessageQueueLengthRequest{
 				Increment:     -1,
@@ -246,6 +307,32 @@ func MatchHandler(c echo.Context) error {
 				fmt.Println(msg)
 				panic(err)
 			}
+
+			RemoveUserFromQueueImmediate(requestBody.Username)
+			userQueueUpdate.Config = utils.Immediate
+			serialQueueUpdatePkt, err := json.Marshal(userQueueUpdate)
+			if err != nil {
+				msg := fmt.Sprintf("[MatchHandler] Error marshalling inQueue packet | err: %v", err)
+				log.Println(msg)
+				return err
+			}
+			err = rmq.InQueueChannel.PublishWithContext(
+				ctx,
+				rmq.InQueueExchange,
+				"",
+				false,
+				false,
+				amqp.Publishing{
+					ContentType: "text/plain",
+					Body:        serialQueueUpdatePkt,
+				},
+			)
+			if err != nil {
+				msg := fmt.Sprintf("[MatchHandler] Error publishing inQueue message | err: %v", err)
+				fmt.Println(msg)
+				return err
+			}
+
 			utils.CancelUser(requestBody.Username, requestBody.MatchCriteria)
 			<-syncChan // Reads from sync channel to allow goroutine listening to result to break out of loop
 			shouldBreak = true
@@ -284,6 +371,30 @@ func MatchHandler(c echo.Context) error {
 				msg := fmt.Sprintf("[MatchHandler] Error publishing message | err: %v", err)
 				fmt.Println(msg)
 				panic(err)
+			}
+			RemoveUserFromQueueDelay(requestBody.Username)
+			userQueueUpdate.Config = utils.Delayed
+			serialQueueUpdatePkt, err := json.Marshal(userQueueUpdate)
+			if err != nil {
+				msg := fmt.Sprintf("[MatchHandler] Error marshalling inQueue packet | err: %v", err)
+				log.Println(msg)
+				return err
+			}
+			err = rmq.InQueueChannel.PublishWithContext(
+				ctx,
+				rmq.InQueueExchange,
+				"",
+				false,
+				false,
+				amqp.Publishing{
+					ContentType: "text/plain",
+					Body:        serialQueueUpdatePkt,
+				},
+			)
+			if err != nil {
+				msg := fmt.Sprintf("[MatchHandler] Error publishing inQueue message | err: %v", err)
+				fmt.Println(msg)
+				return err
 			}
 			return c.JSON(http.StatusOK, matchResponseBody)
 		}

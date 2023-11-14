@@ -17,3 +17,11 @@ var MatchCriterias = []MatchCriteria{
 func ConstructResultChanIdentifier(str string) string {
 	return "results/" + str
 }
+
+type QueueConfig string
+
+const (
+	Queue     QueueConfig = "queue"
+	Immediate QueueConfig = "immediate"
+	Delayed   QueueConfig = "delayed"
+)

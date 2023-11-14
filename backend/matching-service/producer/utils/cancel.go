@@ -2,7 +2,7 @@ package utils
 
 var cancelledUsers map[string][]string
 
-func Init() {
+func InitCancelTracker() {
 	cancelledUsers = make(map[string][]string)
 	for _, criteria := range MatchCriterias {
 		cancelledUsers[string(criteria)] = []string{}
