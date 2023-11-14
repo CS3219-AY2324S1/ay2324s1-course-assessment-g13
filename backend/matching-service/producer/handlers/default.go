@@ -37,6 +37,7 @@ func MatchHandler(c echo.Context) error {
 
 	// Removes the user from our cancel buffer if they have previously tried to match and got cancelled
 	utils.ResetUser(requestBody.Username, requestBody.MatchCriteria)
+	utils.RemoveUserFromQueueImmediate(requestBody.Username)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
@@ -50,6 +51,8 @@ func MatchHandler(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, "Unknown matching criteria")
 	}
 
+	utils.SetUserInQueue(requestBody.Username)
+
 	msgPacket := models.MessageQueueRequestPacket{
 		RequestBody: requestBody,
 	}
@@ -61,6 +64,8 @@ func MatchHandler(c echo.Context) error {
 		log.Println(msg)
 		return err
 	}
+
+	log.Printf("Producer has received a find request from %s for criteria %s\n", requestBody.Username, requestBody.MatchCriteria)
 
 	// Publishes the user request into the selected MQ
 	err = criteriaChannel.PublishWithContext(
@@ -165,8 +170,9 @@ func MatchHandler(c echo.Context) error {
 				}
 				matchedUser := packetResponse.ResponseBody.MatchUser
 				// Check if matched user is already out of queue
-				if utils.IsUserCancelled(matchedUser, requestBody.MatchCriteria) {
-					log.Printf("Matched User %s is already out of queue, publishing %s back into %s queue\n", matchedUser, requestBody.Username, requestBody.MatchCriteria)
+				if utils.IsUserCancelled(matchedUser, requestBody.MatchCriteria) || !utils.IsUserInQueue(matchedUser) {
+					log.Printf("Matched User %s | Out of queue: %v | inQueue: %v, publishing %s back into %s queue\n", matchedUser,
+						utils.IsUserCancelled(matchedUser, requestBody.MatchCriteria), !utils.IsUserInQueue(matchedUser), requestBody.Username, requestBody.MatchCriteria)
 					// Publishes the user request into the selected MQ
 					err = criteriaChannel.PublishWithContext(
 						ctx,
@@ -212,6 +218,7 @@ func MatchHandler(c echo.Context) error {
 			log.Printf("User %s manually cancelled on producer side\n", requestBody.Username)
 			// Remove user from queue
 			utils.CancelUser(requestBody.Username, requestBody.MatchCriteria)
+			utils.RemoveUserFromQueueImmediate(requestBody.Username)
 			<-syncChan // Reads from sync channel to allow goroutine listening to result to break out of loop
 			shouldBreak = true
 			break
@@ -246,6 +253,7 @@ func MatchHandler(c echo.Context) error {
 				fmt.Println(msg)
 				panic(err)
 			}
+			utils.RemoveUserFromQueueImmediate(requestBody.Username)
 			utils.CancelUser(requestBody.Username, requestBody.MatchCriteria)
 			<-syncChan // Reads from sync channel to allow goroutine listening to result to break out of loop
 			shouldBreak = true
@@ -285,6 +293,7 @@ func MatchHandler(c echo.Context) error {
 				fmt.Println(msg)
 				panic(err)
 			}
+			utils.RemoveUserFromQueueDelay(requestBody.Username)
 			return c.JSON(http.StatusOK, matchResponseBody)
 		}
 		if shouldBreak {

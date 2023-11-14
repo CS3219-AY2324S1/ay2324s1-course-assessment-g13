@@ -32,7 +32,7 @@ func SpinMQConsumer(criteria utils.MatchCriteria) {
 		messages, err := reqChannel.Consume(
 			string(criteria), // queue name
 			"",               // consumer
-			false,            // auto-ack
+			true,             // auto-ack
 			false,            // exclusive
 			false,            // no local
 			false,            // no wait
@@ -87,12 +87,14 @@ func SpinMQConsumer(criteria utils.MatchCriteria) {
 			queueSize := rmq.GetLocalQueueSize(string(criteria))
 			// If queue has sufficient people queued up
 			if queueSize >= 2 {
+				log.Printf("Queue size >= 2 now\n")
 				// Check if request channel is being consumed via sync channel
 				syncQueueSize := rmq.GetQueueSize(syncQueueName)
 				if syncQueueSize == 1 {
 					// If request channel is being consumed, re-loop
 					continue
 				} else {
+					log.Printf("Entering sync block\n")
 					// If not, add into sync channel that this worker is currently consuming from request queue
 					err = syncChannel.PublishWithContext(
 						ctx,
@@ -113,13 +115,6 @@ func SpinMQConsumer(criteria utils.MatchCriteria) {
 				// Sequentially dequeue them and match them
 				matchMakingBuffer := []models.MessageQueueRequestPacket{}
 				for message := range messages {
-					// Ack the message that is consumed
-					err := reqChannel.Ack(message.DeliveryTag, false)
-					if err != nil {
-						msg := fmt.Sprintf("[SpinMQConsumer] Error ACKing request packet | err: %v", err)
-						log.Fatal(msg)
-						return
-					}
 
 					res := models.MessageQueueRequestPacket{}
 					err = json.Unmarshal(message.Body, &res)
@@ -128,6 +123,7 @@ func SpinMQConsumer(criteria utils.MatchCriteria) {
 						log.Fatal(msg)
 						return
 					}
+					log.Printf("Message received by %s consumer for user %s: %+v\n", res.RequestBody.MatchCriteria, res.RequestBody.Username, message)
 
 					isReplaced := false
 
