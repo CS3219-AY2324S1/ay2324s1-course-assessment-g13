@@ -5,7 +5,6 @@ import {selectPreferenceState} from "../libs/redux/slices/matchPreferenceSlice";
 import {POST} from "../libs/axios/axios";
 import {selectUsername} from "../libs/redux/slices/userSlice";
 import { useRouter } from 'next/navigation';
-import {useState} from "react";
 
 export default function MatchButton({inQueue, setInQueue, setSeconds, matchNotfound, setIsCancelled, setShouldNotifyCancelled, active, setActive}) {
   const preferenceState = useSelector(selectPreferenceState)

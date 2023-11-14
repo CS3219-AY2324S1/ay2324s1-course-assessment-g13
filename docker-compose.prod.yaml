@@ -16,7 +16,7 @@ services:
       question-service:
         condition: service_started
     env_file:
-      - ./frontend/.env
+      - frontend/.env
     build:
       context: ./frontend
       dockerfile: Dockerfile.prod

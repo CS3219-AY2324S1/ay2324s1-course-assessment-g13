@@ -25,11 +25,6 @@ func MatchHandler(c echo.Context) error {
 		return err
 	}
 
-	// Removes the user from our cancel buffer if they have previously tried to match and got cancelled
-	utils.ResetUser(requestBody.Username, requestBody.MatchCriteria)
-
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
 	// Retrieves the appropriate channel to publish the user into
 	var criteriaChannel *amqp.Channel
 	if curr, ok := rmq.OpenChannelsMap[utils.MatchCriteria(strings.ToLower(requestBody.MatchCriteria))]; ok {
@@ -39,6 +34,12 @@ func MatchHandler(c echo.Context) error {
 		log.Println(msg)
 		return c.JSON(http.StatusBadRequest, "Unknown matching criteria")
 	}
+
+	// Removes the user from our cancel buffer if they have previously tried to match and got cancelled
+	utils.ResetUser(requestBody.Username, requestBody.MatchCriteria)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
 
 	var lengthChannel *amqp.Channel
 	if curr, ok := rmq.LengthChannelsMap[utils.MatchCriteria(strings.ToLower(requestBody.MatchCriteria))]; ok {
